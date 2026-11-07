@@ -1,0 +1,197 @@
+import React, { useState } from 'react';
+import { useApp } from '../context/AppContext';
+import { translations } from '../locales/translations';
+import { 
+  GraduationCap, UserCheck, Languages, Wifi, WifiOff, 
+  RotateCcw, Sparkles, ShieldCheck, ChevronDown, LogOut, Lock
+} from 'lucide-react';
+
+export const Header: React.FC = () => {
+  const { 
+    role, setRole, lang, setLang, isRtl, isOffline, setIsOffline, 
+    currentStudent, setCurrentStudent, students, resetToDefaults,
+    isTeacherAuthenticated, teacherLogout, studentLogout
+  } = useApp();
+
+  const [showStudentPicker, setShowStudentPicker] = useState(false);
+  const t = translations[lang];
+
+  return (
+    <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs no-print">
+      {/* Top Banner / Privacy Alert */}
+      <div className="bg-linear-to-r from-blue-700 via-indigo-700 to-blue-800 text-white text-xs px-4 py-1.5 flex items-center justify-between">
+        <div className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+          <ShieldCheck className="w-3.5 h-3.5 text-blue-200 shrink-0" />
+          <span className="font-medium">{t.app.anonymousNotice}</span>
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            onClick={() => setIsOffline(!isOffline)}
+            className={`flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium transition-colors ${
+              isOffline ? 'bg-amber-500 text-white' : 'bg-blue-600/60 hover:bg-blue-600 text-blue-100'
+            }`}
+            title="Simuler le mode hors ligne (PWA)"
+          >
+            {isOffline ? (
+              <>
+                <WifiOff className="w-3 h-3" />
+                <span>{t.app.offlineMode}</span>
+              </>
+            ) : (
+              <>
+                <Wifi className="w-3 h-3 text-emerald-300" />
+                <span>{t.app.onlineStatus}</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Main Navigation Bar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo & Platform Info */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+              <GraduationCap className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="font-bold text-xl tracking-tight text-slate-900 flex items-center gap-1.5">
+                  <span>ÉVAL</span>
+                  <span className="text-blue-600">'PROGRESS</span>
+                </h1>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 uppercase tracking-wider">
+                  4AEP
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 hidden sm:block">
+                {t.app.slogan}
+              </p>
+            </div>
+          </div>
+
+          {/* Controls: Role Switcher, Student Selector, Language, Reset */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Student Switcher when in Student Mode */}
+            {role === 'student' && currentStudent && (
+              <div className="flex items-center gap-1.5">
+                <div className="relative">
+                  <button
+                    onClick={() => setShowStudentPicker(!showStudentPicker)}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-medium transition"
+                  >
+                    <span className="text-base">{currentStudent.avatarIcon || '👤'}</span>
+                    <span className="font-semibold text-blue-700">{currentStudent.studentCode}</span>
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                  </button>
+
+                  {showStudentPicker && (
+                    <div className={`absolute top-full mt-1.5 ${isRtl ? 'left-0' : 'right-0'} w-60 bg-white rounded-xl shadow-xl border border-slate-200 p-2 z-50 max-h-64 overflow-y-auto`}>
+                      <div className="text-[11px] font-semibold text-slate-400 px-2 py-1">
+                        {isRtl ? 'اختر رمز مسار (Code Massar) :' : 'Choisir un Code Massar :'}
+                      </div>
+                      {students.map((st) => (
+                        <button
+                          key={st.id}
+                          onClick={() => {
+                            setCurrentStudent(st);
+                            setShowStudentPicker(false);
+                          }}
+                          className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-left transition ${
+                            currentStudent?.id === st.id 
+                              ? 'bg-blue-50 text-blue-700 font-semibold' 
+                              : 'hover:bg-slate-50 text-slate-700'
+                          }`}
+                        >
+                          <span className="text-sm">{st.avatarIcon}</span>
+                          <div className="flex-1 truncate">
+                            <span className="font-bold">{st.studentCode}</span>
+                            <span className="text-[10px] text-slate-400 block">{st.displayPseudonym}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={studentLogout}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 text-xs font-medium transition"
+                  title={isRtl ? 'تسجيل الخروج من هذا الحساب' : 'Changer de compte Massar'}
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">{isRtl ? 'خروج' : 'Quitter'}</span>
+                </button>
+              </div>
+            )}
+
+            {/* Role Switcher Pill */}
+            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+              <button
+                onClick={() => setRole('teacher')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  role === 'teacher'
+                    ? 'bg-white text-blue-700 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <UserCheck className="w-3.5 h-3.5" />
+                <span>{t.app.roleTeacher}</span>
+                {isTeacherAuthenticated && (
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" title="Connecté" />
+                )}
+              </button>
+              <button
+                onClick={() => setRole('student')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  role === 'student'
+                    ? 'bg-white text-indigo-700 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>{t.app.roleStudent}</span>
+              </button>
+            </div>
+
+            {/* Teacher Logout button if authenticated */}
+            {role === 'teacher' && isTeacherAuthenticated && (
+              <button
+                onClick={teacherLogout}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50/50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition"
+                title={isRtl ? 'تسجيل الخروج وقفل فضاء الأستاذ' : 'Verrouiller / Déconnexion'}
+              >
+                <Lock className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{isRtl ? 'قفل' : 'Verrouiller'}</span>
+              </button>
+            )}
+
+            {/* Language Switcher */}
+            <button
+              onClick={() => setLang(lang === 'fr' ? 'ar' : 'fr')}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition"
+              title="Changer de langue / تغيير اللغة"
+            >
+              <Languages className="w-3.5 h-3.5 text-slate-500" />
+              <span className="font-semibold">{lang === 'fr' ? 'العربية' : 'Français'}</span>
+            </button>
+
+            {/* Reset Demo Data Button */}
+            <button
+              onClick={() => {
+                if (window.confirm(isRtl ? 'هل تريد استعادة البيانات التجريبية الأصلية؟' : 'Voulez-vous réinitialiser les données de démonstration ?')) {
+                  resetToDefaults();
+                }
+              }}
+              className="p-2 rounded-lg border border-slate-200 hover:bg-rose-50 hover:text-rose-600 text-slate-400 transition"
+              title={t.common.resetDemo}
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};

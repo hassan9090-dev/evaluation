@@ -1,0 +1,686 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { 
+  Role, Language, SchoolClass, Student, Skill, Question, 
+  Evaluation, EvaluationAttempt, RemediationResource, RemediationAssignment, MasteryLevel 
+} from '../types';
+import { 
+  initialClasses, initialStudents, initialSkills, initialQuestions, 
+  initialEvaluations, generateInitialAttempts, initialRemediationResources, 
+  initialRemediationAssignments 
+} from '../data/mockInitialData';
+
+export type TeacherTab = 
+  | 'dashboard' 
+  | 'classes' 
+  | 'skills' 
+  | 'questionBank' 
+  | 'evaluations' 
+  | 'correction' 
+  | 'remediation' 
+  | 'analytics' 
+  | 'research';
+
+export type StudentTab = 
+  | 'home' 
+  | 'tests' 
+  | 'results' 
+  | 'remediation';
+
+interface AppContextType {
+  role: Role;
+  setRole: (role: Role) => void;
+  lang: Language;
+  setLang: (lang: Language) => void;
+  isRtl: boolean;
+  activeTeacherTab: TeacherTab;
+  setActiveTeacherTab: (tab: TeacherTab) => void;
+  activeStudentTab: StudentTab;
+  setActiveStudentTab: (tab: StudentTab) => void;
+  currentStudent: Student | null;
+  setCurrentStudent: (student: Student | null) => void;
+  isTeacherAuthenticated: boolean;
+  teacherLogin: (password: string) => boolean;
+  teacherLogout: () => void;
+  studentLoginByMassar: (codeMassar: string) => { success: boolean; student?: Student; error?: string };
+  studentLogout: () => void;
+  selectedClassId: string;
+  setSelectedClassId: (id: string) => void;
+  isOffline: boolean;
+  setIsOffline: (val: boolean) => void;
+
+  // Data
+  classes: SchoolClass[];
+  students: Student[];
+  skills: Skill[];
+  questions: Question[];
+  evaluations: Evaluation[];
+  attempts: EvaluationAttempt[];
+  remediationResources: RemediationResource[];
+  remediationAssignments: RemediationAssignment[];
+
+  // Actions
+  addQuestion: (q: Question) => void;
+  updateQuestion: (q: Question) => void;
+  deleteQuestion: (id: string) => void;
+  addEvaluation: (ev: Evaluation) => void;
+  updateEvaluation: (ev: Evaluation) => void;
+  addStudent: (s: Omit<Student, 'id'>) => void;
+  updateStudent: (s: Student) => void;
+  submitAttempt: (attempt: EvaluationAttempt) => void;
+  saveGrading: (attemptId: string, updatedAnswers: Record<string, any>, generalFeedback?: string) => void;
+  assignRemediation: (studentId: string, resourceId: string, skillId: string) => void;
+  completeRemediation: (assignmentId: string, notes?: string) => void;
+  resetToDefaults: () => void;
+
+  // Analytics Helpers
+  getSkillById: (id: string) => Skill | undefined;
+  getQuestionById: (id: string) => Question | undefined;
+  getEvaluationById: (id: string) => Evaluation | undefined;
+  getMasteryLevel: (percentage: number) => { level: MasteryLevel; labelKey: string; color: string; badgeBg: string };
+  calculateSkillMasteryForClass: (skillId: string, classId?: string) => {
+    percentage: number;
+    totalObtained: number;
+    totalMax: number;
+    testedCount: number;
+    level: MasteryLevel;
+  };
+  calculateStudentMastery: (studentId: string, skillId: string) => {
+    percentage: number;
+    level: MasteryLevel;
+    testsCount: number;
+  };
+  calculateClassOverview: (classId: string) => {
+    studentCount: number;
+    evaluationsCount: number;
+    participationRate: number;
+    averageScorePct: number;
+    levelDistribution: Record<MasteryLevel, number>;
+    criticalSkills: { skill: Skill; masteryPct: number; studentsNeedingHelp: number }[];
+  };
+}
+
+const AppContext = createContext<AppContextType | undefined>(undefined);
+
+const STORAGE_KEY_PREFIX = 'eval_progress_v1_';
+
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [role, setRole] = useState<Role>(() => {
+    return (localStorage.getItem(STORAGE_KEY_PREFIX + 'role') as Role) || 'teacher';
+  });
+
+  const [lang, setLang] = useState<Language>(() => {
+    return (localStorage.getItem(STORAGE_KEY_PREFIX + 'lang') as Language) || 'fr';
+  });
+
+  const isRtl = lang === 'ar';
+
+  const [activeTeacherTab, setActiveTeacherTab] = useState<TeacherTab>('dashboard');
+  const [activeStudentTab, setActiveStudentTab] = useState<StudentTab>('home');
+  const [selectedClassId, setSelectedClassId] = useState<string>('class-4aep-a');
+  const [isOffline, setIsOffline] = useState<boolean>(false);
+
+  // Core Data States
+  const [classes, setClasses] = useState<SchoolClass[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'classes');
+    return saved ? JSON.parse(saved) : initialClasses;
+  });
+
+  const [students, setStudents] = useState<Student[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'students');
+    return saved ? JSON.parse(saved) : initialStudents;
+  });
+
+  const [isTeacherAuthenticated, setIsTeacherAuthenticated] = useState<boolean>(() => {
+    return sessionStorage.getItem(STORAGE_KEY_PREFIX + 'teacher_auth') === 'true';
+  });
+
+  const teacherLogin = (password: string): boolean => {
+    if (password === 'pass123') {
+      setIsTeacherAuthenticated(true);
+      sessionStorage.setItem(STORAGE_KEY_PREFIX + 'teacher_auth', 'true');
+      return true;
+    }
+    return false;
+  };
+
+  const teacherLogout = () => {
+    setIsTeacherAuthenticated(false);
+    sessionStorage.removeItem(STORAGE_KEY_PREFIX + 'teacher_auth');
+  };
+
+  const [currentStudent, setCurrentStudent] = useState<Student | null>(() => {
+    const savedCode = localStorage.getItem(STORAGE_KEY_PREFIX + 'current_student_code');
+    if (savedCode) {
+      const found = initialStudents.find(s => s.studentCode.toLowerCase() === savedCode.toLowerCase());
+      if (found) return found;
+    }
+    return null;
+  });
+
+  const studentLoginByMassar = (codeMassar: string): { success: boolean; student?: Student; error?: string } => {
+    const clean = codeMassar.trim().toLowerCase();
+    const found = students.find(s => s.studentCode.toLowerCase() === clean);
+    if (found) {
+      setCurrentStudent(found);
+      localStorage.setItem(STORAGE_KEY_PREFIX + 'current_student_code', found.studentCode);
+      return { success: true, student: found };
+    }
+    return { success: false, error: 'Code Massar introuvable' };
+  };
+
+  const studentLogout = () => {
+    setCurrentStudent(null);
+    localStorage.removeItem(STORAGE_KEY_PREFIX + 'current_student_code');
+  };
+
+  const [skills] = useState<Skill[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'skills');
+    return saved ? JSON.parse(saved) : initialSkills;
+  });
+
+  const [questions, setQuestions] = useState<Question[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'questions');
+    return saved ? JSON.parse(saved) : initialQuestions;
+  });
+
+  const [evaluations, setEvaluations] = useState<Evaluation[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'evaluations');
+    return saved ? JSON.parse(saved) : initialEvaluations;
+  });
+
+  const [attempts, setAttempts] = useState<EvaluationAttempt[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'attempts');
+    return saved ? JSON.parse(saved) : generateInitialAttempts();
+  });
+
+  const [remediationResources, setRemediationResources] = useState<RemediationResource[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'rem_res');
+    return saved ? JSON.parse(saved) : initialRemediationResources;
+  });
+
+  const [remediationAssignments, setRemediationAssignments] = useState<RemediationAssignment[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'rem_asg');
+    return saved ? JSON.parse(saved) : initialRemediationAssignments;
+  });
+
+  // LocalStorage Persistence
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'role', role);
+  }, [role]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'lang', lang);
+    document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+    document.documentElement.lang = lang;
+  }, [lang, isRtl]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'classes', JSON.stringify(classes));
+  }, [classes]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'students', JSON.stringify(students));
+  }, [students]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'questions', JSON.stringify(questions));
+  }, [questions]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'evaluations', JSON.stringify(evaluations));
+  }, [evaluations]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'attempts', JSON.stringify(attempts));
+  }, [attempts]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'rem_res', JSON.stringify(remediationResources));
+  }, [remediationResources]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'rem_asg', JSON.stringify(remediationAssignments));
+  }, [remediationAssignments]);
+
+  // Helpers
+  const getSkillById = (id: string) => skills.find(s => s.id === id);
+  const getQuestionById = (id: string) => questions.find(q => q.id === id);
+  const getEvaluationById = (id: string) => evaluations.find(e => e.id === id);
+
+  const getMasteryLevel = (percentage: number) => {
+    if (percentage >= 90) {
+      return { 
+        level: 4 as MasteryLevel, 
+        labelKey: 'level4', 
+        color: 'text-indigo-700 dark:text-indigo-400', 
+        badgeBg: 'bg-indigo-50 border-indigo-200 text-indigo-700' 
+      };
+    }
+    if (percentage >= 75) {
+      return { 
+        level: 3 as MasteryLevel, 
+        labelKey: 'level3', 
+        color: 'text-emerald-700 dark:text-emerald-400', 
+        badgeBg: 'bg-emerald-50 border-emerald-200 text-emerald-700' 
+      };
+    }
+    if (percentage >= 50) {
+      return { 
+        level: 2 as MasteryLevel, 
+        labelKey: 'level2', 
+        color: 'text-amber-700 dark:text-amber-400', 
+        badgeBg: 'bg-amber-50 border-amber-200 text-amber-700' 
+      };
+    }
+    return { 
+      level: 1 as MasteryLevel, 
+      labelKey: 'level1', 
+      color: 'text-rose-700 dark:text-rose-400', 
+      badgeBg: 'bg-rose-50 border-rose-200 text-rose-700' 
+    };
+  };
+
+  const calculateSkillMasteryForClass = (skillId: string, classId?: string) => {
+    const targetClassId = classId || selectedClassId;
+    const classStudentIds = new Set(
+      students.filter(s => s.classId === targetClassId).map(s => s.id)
+    );
+
+    let totalObtained = 0;
+    let totalMax = 0;
+    let testedCount = 0;
+
+    attempts.forEach(att => {
+      if (!classStudentIds.has(att.studentId)) return;
+      if (att.status !== 'corrected') return;
+
+      Object.values(att.answers).forEach(ans => {
+        const q = getQuestionById(ans.questionId);
+        if (q && q.skillId === skillId) {
+          if (ans.scoreObtained !== undefined) {
+            totalObtained += ans.scoreObtained;
+            totalMax += ans.maxScore;
+            testedCount++;
+          }
+        }
+      });
+    });
+
+    const percentage = totalMax > 0 ? Math.round((totalObtained / totalMax) * 100) : 0;
+    const { level } = getMasteryLevel(percentage);
+
+    return {
+      percentage,
+      totalObtained,
+      totalMax,
+      testedCount,
+      level,
+    };
+  };
+
+  const calculateStudentMastery = (studentId: string, skillId: string) => {
+    let totalObtained = 0;
+    let totalMax = 0;
+    let testsCount = 0;
+
+    attempts.forEach(att => {
+      if (att.studentId !== studentId) return;
+      if (att.status !== 'corrected') return;
+
+      Object.values(att.answers).forEach(ans => {
+        const q = getQuestionById(ans.questionId);
+        if (q && q.skillId === skillId) {
+          if (ans.scoreObtained !== undefined) {
+            totalObtained += ans.scoreObtained;
+            totalMax += ans.maxScore;
+            testsCount++;
+          }
+        }
+      });
+    });
+
+    const percentage = totalMax > 0 ? Math.round((totalObtained / totalMax) * 100) : 0;
+    const { level } = getMasteryLevel(percentage);
+
+    return {
+      percentage,
+      level,
+      testsCount,
+    };
+  };
+
+  const calculateClassOverview = (classId: string) => {
+    const classStudents = students.filter(s => s.classId === classId);
+    const studentCount = classStudents.length;
+    const classEvals = evaluations.filter(e => e.classId === classId);
+    const evaluationsCount = classEvals.length;
+
+    const studentIds = new Set(classStudents.map(s => s.id));
+    const classAttempts = attempts.filter(a => studentIds.has(a.studentId) && a.status === 'corrected');
+
+    const totalPossibleAttempts = Math.max(1, studentCount * classEvals.filter(e => e.status !== 'draft').length);
+    const participationRate = Math.min(100, Math.round((classAttempts.length / totalPossibleAttempts) * 100));
+
+    const avgScorePct = classAttempts.length > 0
+      ? Math.round(classAttempts.reduce((acc, curr) => acc + (curr.percentage || 0), 0) / classAttempts.length)
+      : 0;
+
+    const levelDistribution: Record<MasteryLevel, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };
+    classAttempts.forEach(att => {
+      if (att.percentage !== undefined) {
+        const { level } = getMasteryLevel(att.percentage);
+        levelDistribution[level] = (levelDistribution[level] || 0) + 1;
+      }
+    });
+
+    // Identify critical skills
+    const criticalSkills: { skill: Skill; masteryPct: number; studentsNeedingHelp: number }[] = [];
+    skills.forEach(skill => {
+      const stats = calculateSkillMasteryForClass(skill.id, classId);
+      if (stats.testedCount > 0 && stats.percentage < 70) {
+        let studentsStruggling = 0;
+        classStudents.forEach(st => {
+          const stMastery = calculateStudentMastery(st.id, skill.id);
+          if (stMastery.testsCount > 0 && stMastery.percentage < 60) {
+            studentsStruggling++;
+          }
+        });
+        criticalSkills.push({
+          skill,
+          masteryPct: stats.percentage,
+          studentsNeedingHelp: studentsStruggling,
+        });
+      }
+    });
+
+    criticalSkills.sort((a, b) => a.masteryPct - b.masteryPct);
+
+    return {
+      studentCount,
+      evaluationsCount,
+      participationRate,
+      averageScorePct: avgScorePct,
+      levelDistribution,
+      criticalSkills: criticalSkills.slice(0, 4),
+    };
+  };
+
+  // State Mutators
+  const addQuestion = (q: Question) => {
+    setQuestions(prev => [q, ...prev]);
+  };
+
+  const updateQuestion = (q: Question) => {
+    setQuestions(prev => prev.map(item => item.id === q.id ? q : item));
+  };
+
+  const deleteQuestion = (id: string) => {
+    setQuestions(prev => prev.filter(q => q.id !== id));
+  };
+
+  const addEvaluation = (ev: Evaluation) => {
+    setEvaluations(prev => [ev, ...prev]);
+  };
+
+  const updateEvaluation = (ev: Evaluation) => {
+    setEvaluations(prev => prev.map(item => item.id === ev.id ? ev : item));
+  };
+
+  const addStudent = (s: Omit<Student, 'id'>) => {
+    const newStudent: Student = {
+      ...s,
+      id: `std-${Date.now().toString().slice(-4)}`
+    };
+    setStudents(prev => [...prev, newStudent]);
+  };
+
+  const updateStudent = (s: Student) => {
+    setStudents(prev => prev.map(st => st.id === s.id ? s : st));
+  };
+
+  const submitAttempt = (attempt: EvaluationAttempt) => {
+    // Automatically grade any objective questions
+    const ev = getEvaluationById(attempt.evaluationId);
+    let autoTotal = 0;
+    let hasManualQuestions = false;
+
+    const scoredAnswers: Record<string, any> = { ...attempt.answers };
+
+    Object.keys(scoredAnswers).forEach(qId => {
+      const q = getQuestionById(qId);
+      if (!q) return;
+
+      const ans = scoredAnswers[qId];
+      if (q.type === 'qcm') {
+        const correctOpt = q.options?.find(o => o.isCorrect);
+        const isOk = correctOpt && ans.studentResponse === correctOpt.id;
+        ans.isCorrect = !!isOk;
+        ans.scoreObtained = isOk ? q.maxScore : 0;
+        autoTotal += ans.scoreObtained;
+      } else if (q.type === 'vrai_faux') {
+        const isOk = ans.studentResponse === q.correctBoolean;
+        ans.isCorrect = !!isOk;
+        ans.scoreObtained = isOk ? q.maxScore : 0;
+        autoTotal += ans.scoreObtained;
+      } else if (q.type === 'fill_blanks' || q.type === 'short_answer') {
+        const cleanStudent = (ans.studentResponse || '').toString().trim().toLowerCase();
+        const cleanExpected = (q.correctAnswerText || '').trim().toLowerCase();
+        const isOk = cleanStudent === cleanExpected;
+        ans.isCorrect = isOk;
+        ans.scoreObtained = isOk ? q.maxScore : 0;
+        autoTotal += ans.scoreObtained;
+      } else if (q.type === 'ordering') {
+        const studentArr = Array.isArray(ans.studentResponse) ? ans.studentResponse : [];
+        const expected = q.orderingItems || [];
+        const isExact = studentArr.length === expected.length && studentArr.every((item: string, i: number) => item === expected[i]);
+        ans.isCorrect = isExact;
+        ans.scoreObtained = isExact ? q.maxScore : 0;
+        autoTotal += ans.scoreObtained;
+      } else if (q.type === 'matching') {
+        const studentPairs = ans.studentResponse || {};
+        const pairs = q.matchingPairs || [];
+        let correctCount = 0;
+        pairs.forEach(p => {
+          if (studentPairs[p.left] === p.right) correctCount++;
+        });
+        const isAllCorrect = pairs.length > 0 && correctCount === pairs.length;
+        ans.isCorrect = isAllCorrect;
+        const partialScore = pairs.length > 0 ? Math.round((correctCount / pairs.length) * q.maxScore * 10) / 10 : 0;
+        ans.scoreObtained = partialScore;
+        autoTotal += ans.scoreObtained;
+      } else if (q.type === 'categorization') {
+        const studentBins = ans.studentResponse || {};
+        const cats = q.categories || [];
+        let totalItems = 0;
+        let correctItems = 0;
+        cats.forEach(c => {
+          totalItems += c.items.length;
+          const placed = studentBins[c.id] || [];
+          c.items.forEach(it => {
+            if (placed.includes(it)) correctItems++;
+          });
+        });
+        const isAllCorrect = totalItems > 0 && correctItems === totalItems;
+        ans.isCorrect = isAllCorrect;
+        const partialScore = totalItems > 0 ? Math.round((correctItems / totalItems) * q.maxScore * 10) / 10 : 0;
+        ans.scoreObtained = partialScore;
+        autoTotal += ans.scoreObtained;
+      } else if (q.type === 'drag_drop_text') {
+        const studentSlots = ans.studentResponse || {}; // { [slotIndex]: word }
+        const slots = q.dragDropSlots || [];
+        let correctCount = 0;
+        slots.forEach(s => {
+          const studentWord = (studentSlots[s.slotIndex] || '').toString().trim().toLowerCase();
+          const expected = s.expectedWord.trim().toLowerCase();
+          if (studentWord === expected) {
+            correctCount++;
+          }
+        });
+        const isAllCorrect = slots.length > 0 && correctCount === slots.length;
+        ans.isCorrect = isAllCorrect;
+        const partialScore = slots.length > 0 ? Math.round((correctCount / slots.length) * q.maxScore * 10) / 10 : 0;
+        ans.scoreObtained = partialScore;
+        autoTotal += ans.scoreObtained;
+      } else if (q.type === 'odd_one_out') {
+        const chosenId = ans.studentResponse;
+        const oddItem = q.oddOneOutItems?.find(i => i.isOdd);
+        const isOk = oddItem && chosenId === oddItem.id;
+        ans.isCorrect = !!isOk;
+        ans.scoreObtained = isOk ? q.maxScore : 0;
+        autoTotal += ans.scoreObtained;
+      } else {
+        hasManualQuestions = true;
+      }
+    });
+
+    const isAllAuto = !hasManualQuestions;
+    const finalTotal = isAllAuto ? autoTotal : autoTotal;
+    const maxScore = ev?.totalScore || attempt.maxScore;
+    const percentage = isAllAuto ? Math.round((finalTotal / maxScore) * 100) : undefined;
+
+    const completedAttempt: EvaluationAttempt = {
+      ...attempt,
+      status: isAllAuto ? 'corrected' : 'submitted',
+      totalScore: isAllAuto ? finalTotal : undefined,
+      percentage,
+      answers: scoredAnswers,
+      submittedAt: new Date().toISOString(),
+    };
+
+    setAttempts(prev => {
+      const idx = prev.findIndex(a => a.id === completedAttempt.id);
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy[idx] = completedAttempt;
+        return copy;
+      }
+      return [completedAttempt, ...prev];
+    });
+  };
+
+  const saveGrading = (attemptId: string, updatedAnswers: Record<string, any>, generalFeedback?: string) => {
+    setAttempts(prev => prev.map(att => {
+      if (att.id !== attemptId) return att;
+
+      let grandTotal = 0;
+      Object.values(updatedAnswers).forEach(ans => {
+        if (ans.scoreObtained !== undefined) {
+          grandTotal += Number(ans.scoreObtained);
+        }
+      });
+
+      const percentage = Math.round((grandTotal / att.maxScore) * 100);
+
+      return {
+        ...att,
+        status: 'corrected',
+        answers: updatedAnswers,
+        totalScore: grandTotal,
+        percentage,
+        generalFeedback: generalFeedback ?? att.generalFeedback,
+      };
+    }));
+  };
+
+  const assignRemediation = (studentId: string, resourceId: string, skillId: string) => {
+    const newAsg: RemediationAssignment = {
+      id: `asg-${Date.now()}`,
+      studentId,
+      resourceId,
+      skillId,
+      assignedAt: new Date().toISOString(),
+      status: 'pending',
+    };
+    setRemediationAssignments(prev => [newAsg, ...prev]);
+  };
+
+  const completeRemediation = (assignmentId: string, notes?: string) => {
+    setRemediationAssignments(prev => prev.map(asg => {
+      if (asg.id !== assignmentId) return asg;
+      return {
+        ...asg,
+        status: 'completed',
+        completedAt: new Date().toISOString(),
+        studentNotes: notes || asg.studentNotes,
+      };
+    }));
+  };
+
+  const resetToDefaults = () => {
+    localStorage.clear();
+    setClasses(initialClasses);
+    setStudents(initialStudents);
+    setQuestions(initialQuestions);
+    setEvaluations(initialEvaluations);
+    setAttempts(generateInitialAttempts());
+    setRemediationResources(initialRemediationResources);
+    setRemediationAssignments(initialRemediationAssignments);
+    setCurrentStudent(initialStudents[0]);
+    setActiveTeacherTab('dashboard');
+    setActiveStudentTab('home');
+  };
+
+  return (
+    <AppContext.Provider
+      value={{
+        role,
+        setRole,
+        lang,
+        setLang,
+        isRtl,
+        activeTeacherTab,
+        setActiveTeacherTab,
+        activeStudentTab,
+        setActiveStudentTab,
+        currentStudent,
+        setCurrentStudent,
+        isTeacherAuthenticated,
+        teacherLogin,
+        teacherLogout,
+        studentLoginByMassar,
+        studentLogout,
+        selectedClassId,
+        setSelectedClassId,
+        isOffline,
+        setIsOffline,
+        classes,
+        students,
+        skills,
+        questions,
+        evaluations,
+        attempts,
+        remediationResources,
+        remediationAssignments,
+        addQuestion,
+        updateQuestion,
+        deleteQuestion,
+        addEvaluation,
+        updateEvaluation,
+        addStudent,
+        updateStudent,
+        submitAttempt,
+        saveGrading,
+        assignRemediation,
+        completeRemediation,
+        resetToDefaults,
+        getSkillById,
+        getQuestionById,
+        getEvaluationById,
+        getMasteryLevel,
+        calculateSkillMasteryForClass,
+        calculateStudentMastery,
+        calculateClassOverview,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
+};
+
+export const useApp = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useApp must be used within an AppProvider');
+  }
+  return context;
+};

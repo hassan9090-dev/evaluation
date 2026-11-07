@@ -1,0 +1,1092 @@
+دفتر التحملات التقني والتربوي لمشروع ÉVAL'PROGRESS
+Cahier des charges
+Version 1.0
+ÉVAL'PROGRESS
+Plateforme numérique d'évaluation et de suivi des apprentissages
+منصة رقمية لتقويم وتتبع مكتسبات المتعلمين
+SomaCBT: Offline CBT for exams, report cards, and student portal
+somacbt.org
+المعلومات	التفاصيل
+مجال المشروع	تكنولوجيا التربية (EdTech)
+الفئة المستهدفة	تلاميذ المستوى الرابع ابتدائي
+المواد	اللغة الفرنسية والرياضيات
+المستعملون	الأستاذ والمتعلم
+نوع الحل	Web Application + PWA
+طبيعة المشروع	بحث تطبيقي وتطوير رقمي
+مجال التجريب	مؤسسة تعليمية بالمغرب
+مدة الإنجاز	24 أسبوعاً
+النسخة المستهدفة	MVP ثم نسخة مطورة
+الشعار:
+Évaluer pour comprendre, suivre pour progresser.
+مقدمة عامة
+يهدف مشروع ÉVAL'PROGRESS إلى تصميم وتطوير منصة رقمية تساعد الأستاذ على قياس وتقويم مكتسبات المتعلمين في مادتي اللغة الفرنسية والرياضيات، وتحليل نتائجهم، وتتبع تطورهم خلال فترات التعلم المختلفة.
+تعتمد المنصة على مبدأ الانتقال من التقويم التقليدي الذي يركز غالباً على النقطة العددية إلى تقويم قائم على المهارات والمؤشرات، يسمح بتحديد مستوى التحكم في كل مهارة، ورصد الصعوبات، وتوجيه أنشطة الدعم والمعالجة.
+لا تقتصر وظيفة المنصة على إجراء الاختبارات وتصحيحها، بل تشمل دورة متكاملة:
+1.	قياس المكتسبات.
+2.	تحليل النتائج.
+3.	تشخيص الصعوبات.
+4.	اقتراح أنشطة الدعم.
+5.	تتبع تطور التعلمات.
+6.	إنتاج تقارير تربوية تساعد الأستاذ على اتخاذ القرار.
+يمثل المشروع في الوقت نفسه منتجاً رقمياً قابلاً للاستعمال في المؤسسات التعليمية، وموضوعاً للبحث العلمي والتجريب الميداني في إطار الماستر.
+الجزء الأول: الإطار العام للمشروع
+1.1. سياق المشروع (Contexte du projet)
+يشهد المجال التربوي تطوراً متزايداً في استعمال التكنولوجيا الرقمية، خاصة في مجالات التعليم والتعلم والتقويم.
+ومع ذلك، تواجه الممارسة التقويمية داخل القسم مجموعة من التحديات، من بينها:
+•	صعوبة تتبع تطور جميع المتعلمين بشكل فردي.
+•	الاعتماد الكبير على النقطة العددية دون تحليل تفصيلي للمهارات.
+•	الوقت المستغرق في التصحيح وتسجيل النتائج.
+•	صعوبة الاحتفاظ بسجل منظم للتقويمات المتعاقبة.
+•	صعوبة تحديد المهارات التي تتطلب تدخلاً تربوياً.
+•	محدودية الأدوات التي تربط نتائج التقويم بأنشطة الدعم.
+من هذا المنطلق، يقترح المشروع تطوير أداة رقمية تجمع بين القياس والتقويم والتحليل والتتبع.
+1.2. الإشكالية (Problématique)
+يمكن صياغة الإشكالية الرئيسية كما يلي:
+Dans quelle mesure la conception et l'expérimentation d'une plateforme numérique d'évaluation et de suivi des apprentissages peuvent-elles contribuer à améliorer le repérage des difficultés et le suivi des acquis des élèves de quatrième année du primaire en français et en mathématiques ?
+الإشكالية بالعربية:
+إلى أي حد يمكن لتصميم وتجريب منصة رقمية للتقويم والتتبع أن يساهم في تحسين رصد صعوبات التعلم وتتبع مكتسبات تلاميذ المستوى الرابع ابتدائي في مادتي اللغة الفرنسية والرياضيات؟
+1.3. أهداف المشروع (Objectifs du projet)
+الأهداف العامة:
+•	رقمنة جزء من عمليات التقويم المدرسي.
+•	توفير أدوات منظمة لقياس المهارات.
+•	تسهيل تتبع المكتسبات الفردية والجماعية.
+•	تحسين استثمار نتائج التقويم في الدعم التربوي.
+•	توفير مؤشرات تساعد على اتخاذ القرارات التربوية.
+الأهداف الخاصة:
+الرمز	الهدف
+OBJ-01	إنشاء اختبارات رقمية قابلة للتخصيص
+OBJ-02	بناء بنك أسئلة مصنف حسب المهارات
+OBJ-03	تصحيح الإجابات الموضوعية آلياً
+OBJ-04	تسجيل نتائج التقويمات
+OBJ-05	حساب مؤشرات التحكم في المهارات
+OBJ-06	تتبع تطور المتعلم زمنياً
+OBJ-07	تحديد المهارات التي تحتاج إلى دعم
+OBJ-08	إنتاج تقارير فردية وجماعية
+OBJ-09	تسهيل عمل الأستاذ وتقليل المهام الإدارية المتكررة
+1.4. نطاق المشروع (Périmètre du projet)
+داخل نطاق المشروع
+الفرنسية والرياضيات
+المستوى الرابع ابتدائي
+الأستاذ والمتعلم
+التقويم التشخيصي والتكويني والإجمالي
+تحليل النتائج وتتبع المكتسبات
+أنشطة الدعم والتقارير
+خارج نطاق النسخة الأولى
+•	تدبير جميع المستويات الدراسية.
+•	تدبير الحياة المدرسية والإدارة.
+•	الربط الإلزامي بمنظومات وطنية.
+•	الذكاء الاصطناعي التنبؤي.
+•	التصحيح الآلي الكامل للتعبير الكتابي المفتوح.
+•	نظام التواصل مع أولياء الأمور.
+الجزء الثاني: المستخدمون والصلاحيات
+2.1. الفئات المستهدفة (Utilisateurs cibles)
+تعتمد النسخة الأولى على نوعين أساسيين من المستخدمين.
+Educación evalúa el nivel de Lengua y Matemáticas de unos 39.000 alumnos
+المستخدم الأول: الأستاذ (Enseignant)
+المسؤول عن تدبير القسم والاختبارات والنتائج وتحليل مكتسبات المتعلمين.
+صلاحيات الإدارة التربوية
+Hunton Primary School
+المستخدم الثاني: المتعلم (Élève)
+يستعمل المنصة لإنجاز الاختبارات والأنشطة والاطلاع على تغذية راجعة مبسطة.
+صلاحيات التعلم والتقويم
+2.2. مصفوفة الصلاحيات (Matrice des permissions)
+الوظيفة	الأستاذ	المتعلم
+تسجيل الدخول	نعم	نعم
+إنشاء قسم	نعم	لا
+إضافة متعلم	نعم	لا
+إنشاء اختبار	نعم	لا
+إنجاز اختبار	لا	نعم
+الاطلاع على النتائج الفردية	جميع متعلميه	نتائجه المسموح بها فقط
+الاطلاع على نتائج القسم	نعم	لا
+تعديل بنك الأسئلة	نعم	لا
+الاطلاع على أنشطة الدعم	نعم	نعم
+إنشاء التقارير	نعم	لا
+إدارة حسابات المستخدمين	حسب الدور	لا
+قاعدة أساسية: لا يجوز للمتعلم الاطلاع على بيانات أو نتائج متعلم آخر.
+2.3. تعريف المتعلمين بطريقة تحافظ على الخصوصية
+يجب ألا تكون الأسماء الكاملة أو المعلومات الشخصية الحساسة ضرورية لتشغيل المنصة.
+يقترح استعمال:
+•	معرف رقمي داخلي (Student ID).
+•	رمز تعريفي مستعار (Identifiant pseudonyme).
+•	رمز دخول فردي عند الحاجة.
+مثال:
+المعرف	الرمز	القسم
+ST-0001	ELEVE-A01	4A
+ST-0002	ELEVE-A02	4A
+ST-0003	ELEVE-A03	4A
+تظل أي لائحة تربط الرموز بهويات المتعلمين الحقيقية منفصلة ومحفوظة بشكل آمن لدى الجهة المخولة.
+الجزء الثالث: التصور التربوي والديداكتيكي
+3.1. المبادئ التربوية (Principes pédagogiques)
+تعتمد المنصة على خمسة مبادئ:
+1.	التقويم المبني على المهارات (Évaluation par compétences).
+2.	التقويم المستمر (Évaluation continue).
+3.	مراعاة الفروق الفردية (Différenciation pédagogique).
+4.	التغذية الراجعة (Feedback).
+5.	الدعم والمعالجة (Remédiation pédagogique).
+3.2. أنواع التقويم
+Évaluation diagnostique
+بداية التعلم
+Education Support Course — Free Online, Certificate & Lifetime [2026] | Elevify
+elevify.com
+الغرض:
+•	تحديد المكتسبات السابقة.
+•	رصد التعثرات الأولية.
+•	تحديد نقطة الانطلاق المناسبة للتعلم.
+Évaluation formative
+أثناء التعلم
+Using EdTech for real-time formative assessment | SchoolAI
+schoolai.com
+الغرض:
+•	تتبع تطور التعلمات.
+•	تقديم تغذية راجعة.
+•	تحديد الصعوبات التي تظهر خلال التعلم.
+Évaluation sommative
+نهاية الوحدة
+lorraine. Social et solidaire, Pep Lor’Est en quête de notoriété
+estrepublicain.fr
+الغرض:
+•	قياس المكتسبات في نهاية فترة محددة.
+•	تقدير مستوى التحكم.
+•	مقارنة النتائج بالمؤشرات المحددة مسبقاً.
+3.3. تحديد المهارات المستهدفة
+يجب بناء بنك المهارات وفق المنهاج الدراسي المغربي المعمول به، مع مراجعة الوثائق الرسمية الخاصة بالمستوى الرابع، واستشارة المشرف الأكاديمي وأستاذ المادة.
+لا تعتبر القائمة التالية منهجاً رسمياً نهائياً، بل تصنيفاً أولياً مقترحاً لبناء النظام.
+أولاً: اللغة الفرنسية (Français)
+المجال	المهارة	الرمز
+Lecture	قراءة النصوص	FR-01
+Compréhension	فهم المقروء	FR-02
+Vocabulaire	توظيف المفردات	FR-03
+Grammaire	استعمال القواعد	FR-04
+Conjugaison	تصريف الأفعال	FR-05
+Orthographe	الإملاء	FR-06
+Production écrite	التعبير الكتابي	FR-07
+ثانياً: الرياضيات (Mathématiques)
+المجال	المهارة	الرمز
+Numération	التعامل مع الأعداد	MA-01
+Calcul	العمليات الحسابية	MA-02
+Résolution de problèmes	حل المسائل	MA-03
+Géométrie	الهندسة	MA-04
+Mesure	القياس	MA-05
+Organisation des données	تنظيم المعطيات	MA-06
+يجب اعتماد هذه التصنيفات أو تعديلها بناء على الوثائق المرجعية الرسمية، وعدم افتراض أن جميعها تمثل وحدات مستقلة في المنهاج.
+3.4. مستويات التحكم (Niveaux de maîtrise)
+يقترح اعتماد أربعة مستويات:
+المستوى	التسمية	الوصف
+1	Non maîtrisé	لم يتحقق المؤشر بعد
+2	En cours d'acquisition	تحكم جزئي
+3	Maîtrisé	تحقق مستوى التحكم المحدد
+4	Très bien maîtrisé	تحكم متقدم ومستقر
+يجب تحديد معايير الانتقال بين هذه المستويات لكل مهارة، بناءً على شبكة تقويم مصادق عليها.
+3.5. نموذج شبكة التقويم (Grille d'évaluation)
+مثال تطبيقي افتراضي لمهارة فهم المقروء:
+المعيار	النقطة
+استخراج معلومة صريحة	2
+تحديد الفكرة الأساسية	2
+فهم معنى كلمة من السياق	2
+الإجابة عن أسئلة الفهم	2
+صياغة إجابة واضحة	2
+المجموع	10
+هذا المثال يوضح طريقة بناء شبكة القياس فقط، ويجب التحقق من ملاءمة المعايير والأوزان للمستوى الدراسي المستهدف.
+الجزء الرابع: المتطلبات الوظيفية
+4.1. إدارة الأقسام والمتعلمين (Gestion des classes et élèves)
+أساسي في MVP
+يجب أن تسمح المنصة للأستاذ بالوظائف التالية:
+•	إنشاء قسم دراسي.
+•	تعديل معلومات القسم.
+•	إضافة متعلم جديد.
+•	إنشاء معرف مستعار للمتعلم.
+•	تعديل وضعية المتعلم.
+•	البحث عن متعلم بواسطة الرمز.
+•	عرض لائحة المتعلمين.
+•	استيراد قائمة المتعلمين من ملف CSV.
+•	أرشفة بيانات قسم عند انتهاء السنة الدراسية وفق سياسة الاحتفاظ بالبيانات.
+حقول القسم:
+الحقل	النوع
+id	Integer
+class_name	Varchar
+school_year	Varchar
+teacher_id	Foreign Key
+created_at	DateTime
+حقول المتعلم:
+الحقل	النوع
+id	Integer
+student_code	Varchar
+class_id	Foreign Key
+status	Boolean
+created_at	DateTime
+لا يحتاج النظام إلى تخزين تاريخ الميلاد أو العنوان أو معلومات صحية أو عائلية لتقديم وظائفه الأساسية.
+4.2. إدارة بنك الأسئلة (Banque de questions)
+أساسي في MVP
+يعتبر بنك الأسئلة من أهم مكونات المشروع.
+يجب أن يسمح للأستاذ بـ:
+1.	إضافة سؤال.
+2.	تعديل السؤال.
+3.	حذف السؤال أو أرشفته.
+4.	تحديد المادة.
+5.	تحديد المهارة.
+6.	تحديد مستوى الصعوبة.
+7.	تحديد نوع السؤال.
+8.	إضافة الإجابة الصحيحة أو شبكة التصحيح.
+9.	إضافة صورة أو وثيقة عند الحاجة.
+10.	ربط السؤال بمرجع أو وحدة تعليمية معتمدة.
+أنواع الأسئلة المقترحة:
+النوع	Question Type
+اختيار من متعدد	QCM
+صحيح أو خطأ	True / False
+إكمال الفراغ	Fill in the blanks
+ترتيب الكلمات	Ordering
+ربط العناصر	Matching
+إجابة قصيرة	Short answer
+تعبير كتابي	Written production
+حل مسألة	Problem solving
+بالنسبة للأسئلة المفتوحة، يجب أن يدعم النظام التصحيح اليدوي وفق شبكة تقييم، بدلاً من افتراض صحة التصحيح الآلي.
+4.3. إدارة الاختبارات (Gestion des évaluations)
+أساسي في MVP
+يجب أن يستطيع الأستاذ:
+•	إنشاء اختبار جديد.
+•	اختيار المادة.
+•	اختيار نوع التقويم.
+•	تحديد المهارات المستهدفة.
+•	إضافة الأسئلة من بنك الأسئلة.
+•	تحديد النقطة القصوى.
+•	تحديد مدة الاختبار عند الحاجة.
+•	تحديد تاريخ بداية ونهاية الاختبار.
+•	تفعيل الاختبار أو إيقافه.
+•	معاينة الاختبار قبل نشره.
+•	حفظ نسخة من الاختبار ونتائجه.
+بطاقة الاختبار:
+الحقل	الوصف
+evaluation_id	معرف الاختبار
+title	عنوان الاختبار
+subject	المادة
+evaluation_type	نوع التقويم
+description	الوصف
+total_score	النقطة القصوى
+duration	المدة بالدقائق
+start_date	تاريخ البداية
+end_date	تاريخ النهاية
+status	حالة الاختبار
+4.4. إنجاز الاختبارات (Passation des évaluations)
+أساسي في MVP
+عند دخول المتعلم إلى المنصة، تظهر له الاختبارات المتاحة له.
+مسار العمل:
+1.	تسجيل الدخول بواسطة رمز المتعلم.
+2.	الاطلاع على الاختبارات المتاحة.
+3.	اختيار الاختبار.
+4.	قراءة التعليمات.
+5.	الإجابة عن الأسئلة.
+6.	حفظ الإجابات.
+7.	إرسال الاختبار.
+8.	تأكيد عملية الإرسال.
+يجب مراعاة:
+•	حفظ الإجابات دورياً.
+•	منع الإرسال المكرر.
+•	تسجيل تاريخ البداية والنهاية.
+•	معالجة انقطاع الاتصال.
+•	عدم عرض الإجابات الصحيحة قبل موافقة الأستاذ.
+4.5. التصحيح والتنقيط (Correction et notation)
+أساسي في MVP
+يجب أن يوفر النظام نوعين من التصحيح:
+أ. التصحيح الآلي (Correction automatique)
+يستعمل في الأسئلة الموضوعية التي لها إجابة محددة مسبقاً.
+مثال:
+•	QCM.
+•	Vrai / Faux.
+•	Matching.
+•	بعض أسئلة إكمال الفراغ.
+ب. التصحيح اليدوي (Correction manuelle)
+يستعمل في:
+•	Production écrite.
+•	الإجابات المفتوحة.
+•	حل المسائل التي تتطلب تقدير خطوات الحل.
+•	الأسئلة التي تعتمد على شبكة معايير.
+مثال شبكة تقييم الإنتاج الكتابي:
+المعيار	الدرجة القصوى
+احترام المطلوب	2
+تنظيم الأفكار	2
+سلامة اللغة	3
+استعمال المفردات	2
+وضوح الكتابة	1
+المجموع	10
+يجب أن يتمكن الأستاذ من تعديل التنقيط وإضافة ملاحظات تفسيرية.
+4.6. لوحة القيادة (Tableau de bord)
+أساسي في MVP
+تعتبر لوحة القيادة الواجهة الرئيسية للأستاذ.
+Nebular Landing
+nebular.academy
+المعلومات التي تعرض:
+•	عدد الأقسام.
+•	عدد المتعلمين.
+•	عدد الاختبارات المنجزة.
+•	متوسط نتائج التقويمات.
+•	توزيع مستويات التحكم.
+•	المهارات الأكثر احتياجاً للدعم.
+•	مقارنة نتائج التقويمات السابقة.
+ويجب توفير مرشحات (Filtres) حسب:
+•	القسم.
+•	المادة.
+•	المهارة.
+•	نوع التقويم.
+•	الفترة الزمنية.
+4.7. ملف المتعلم (Profil individuel)
+أساسي في MVP
+لكل متعلم بطاقة رقمية تشمل:
+1.	المعرف المستعار.
+2.	القسم.
+3.	نتائج التقويمات.
+4.	مستوى التحكم في المهارات.
+5.	تطور النتائج.
+6.	المهارات التي تحتاج إلى دعم.
+7.	الأنشطة المنجزة.
+8.	ملاحظات الأستاذ.
+Bewize - Data Driven School
+bewize.ma
+يجب أن تسمح البطاقة بمقارنة نتائج المتعلم بين تقويمين أو أكثر، مع مراعاة أن الاختبارات المقارنة تقيس المهارات نفسها وبدرجة صعوبة مناسبة.
+4.8. فضاء الدعم والمعالجة (Espace de remédiation)
+الوظيفة الأساسية بنسخة مبسطة
+الهدف هو الربط بين نتيجة التقويم والنشاط الداعم.
+مثال:
+المهارة	الصعوبة	النشاط المقترح
+Compréhension	صعوبة استخراج المعلومات	قراءة نص والإجابة عن أسئلة
+Vocabulaire	محدودية المفردات	تمارين الربط والتصنيف
+Calcul	أخطاء في العمليات	تمارين متدرجة
+Résolution de problèmes	صعوبة اختيار العملية	مسائل قصيرة مع خطوات الحل
+آلية العمل:
+•	يحدد النظام المهارات ذات النتائج المنخفضة وفق العتبات المعتمدة.
+•	يعرض موارد مرتبطة بهذه المهارات.
+•	يختار الأستاذ النشاط المناسب.
+•	يسجل إنجاز النشاط.
+•	يعيد الأستاذ تقويم المهارة لاحقاً.
+مهم: الاقتراحات في النسخة الأولى تكون مبنية على قواعد واضحة (Rule-based recommendations)، وليست تشخيصاً آلياً نهائياً أو قراراً تربوياً مستقلاً.
+4.9. التقارير (Reporting)
+أساسي في MVP
+يجب أن يدعم النظام إنتاج التقارير بصيغتين:
+•	PDF.
+•	Excel / XLSX.
+التقرير الفردي:
+•	رمز المتعلم.
+•	المادة.
+•	نتائج الاختبارات.
+•	مستوى التحكم حسب المهارة.
+•	التطور عبر الزمن.
+•	المهارات التي تحتاج إلى دعم.
+•	ملاحظات الأستاذ.
+التقرير الجماعي:
+•	عدد المتعلمين المشاركين.
+•	متوسط النتائج.
+•	نسب التحكم حسب المهارة.
+•	توزيع مستويات التحكم.
+•	قائمة المهارات التي تحتاج إلى تدخل.
+•	مقارنة النتائج بين فترات التقويم.
+ينبغي أن تكون التقارير البحثية مجهولة الهوية (Anonymisées)، وأن تقتصر مشاركة التقارير الفردية على الأشخاص المخولين.
+الجزء الخامس: المتطلبات غير الوظيفية
+5.1. سهولة الاستخدام (Ergonomie)
+يجب تصميم المنصة لتكون بسيطة وواضحة، مع مراعاة أن الأستاذ قد يستعملها يومياً وأن المتعلم المستهدف في سن مبكرة.
+المتطلبات:
+•	واجهات بسيطة.
+•	أزرار واضحة وكبيرة نسبياً.
+•	تعليمات قصيرة ومفهومة.
+•	استعمال ألوان متناسقة.
+•	تقليل عدد الخطوات لإنجاز الاختبار.
+•	دعم العرض باللغة العربية والفرنسية.
+•	دعم اتجاه الكتابة RTL وLTR.
+•	تصميم متجاوب (Responsive Design).
+5.2. التوافق (Compatibilité)
+يجب أن تعمل المنصة على:
+الجهاز	التوافق المطلوب
+Windows PC	نعم
+Android	نعم
+iPhone	حسب توافق المتصفح
+Tablet	نعم
+Chrome	نعم
+Firefox	نعم
+Edge	نعم
+5.3. العمل دون اتصال (Mode hors ligne)
+بما أن الاتصال بالإنترنت قد لا يكون متاحاً دائماً داخل المؤسسة، يقترح دعم العمل دون اتصال بشكل تدريجي.
+في النسخة الأولى:
+•	تثبيت التطبيق كـ PWA.
+•	تخزين الملفات الثابتة مؤقتاً.
+•	توفير نسخة محلية لبعض الأنشطة المسموح بها.
+•	توضيح حالة الاتصال.
+في النسخة المتقدمة:
+•	تخزين الإجابات مؤقتاً.
+•	مزامنة البيانات عند عودة الاتصال.
+•	معالجة تعارض التعديلات (Synchronisation).
+•	منع ضياع الإجابات عند انقطاع الشبكة.
+يجب ألا يسمح التخزين المحلي المشترك على جهاز القسم بكشف نتائج المتعلمين لبعضهم.
+5.4. الأمن والحماية (Sécurité)
+المتطلبات الأساسية:
+•	استعمال HTTPS في الاستضافة.
+•	تخزين كلمات المرور بطريقة آمنة باستخدام Hashing.
+•	تطبيق نظام صلاحيات (Role-Based Access Control).
+•	التحقق من صلاحية الوصول إلى بيانات القسم.
+•	حماية الجلسات.
+•	التحقق من المدخلات.
+•	حماية قاعدة البيانات والنسخ الاحتياطية.
+•	منع عرض البيانات الحساسة في عناوين الصفحات أو السجلات العامة.
+5.5. حماية البيانات الشخصية (Protection des données)
+لأن المنصة تستهدف قاصرين، يجب اعتماد مبدأ تقليل البيانات (Data Minimization).
+التدابير المقترحة:
+1.	استعمال معرفات مستعارة.
+2.	عدم جمع معلومات شخصية غير ضرورية.
+3.	عدم استخدام صور المتعلمين في النسخة الأولى.
+4.	تقييد الوصول حسب الدور.
+5.	تحديد مدة الاحتفاظ بالبيانات.
+6.	تأمين النسخ الاحتياطية.
+7.	عدم نشر نتائج فردية على واجهات عامة.
+8.	الحصول على التراخيص والموافقات المؤسسية اللازمة، وموافقة أولياء الأمور حيثما تقتضي القواعد المعمول بها.
+9.	عدم استعمال البيانات في أغراض أخرى غير الأغراض المحددة.
+10.	مراجعة المتطلبات القانونية المغربية، بما فيها قانون حماية المعطيات الشخصية رقم 09-08 ومتطلبات CNDP، مع المؤسسة والجهة المختصة قبل التجريب والاستضافة.
+الجزء السادس: الهندسة التقنية للنظام
+6.1. المعمارية العامة (Architecture technique)
+يقترح اعتماد معمارية ثلاثية الطبقات (Architecture en trois couches):
+Architecture globale
+Couche Présentation
+React + Bootstrap
+PC / Smartphone / Tablet / PWA
+Couche Application
+Laravel REST API
+Authentication / Evaluation / Scoring / Analytics
+Couche Données
+MySQL
+Classes / Students / Questions / Evaluations / Results
+Communication
+HTTP / HTTPS + JSON
+6.2. التقنيات المقترحة (Technologies)
+المكون	التقنية	الوظيفة
+Frontend	React	بناء الواجهات
+UI Framework	Bootstrap 5	تصميم متجاوب
+Backend	Laravel	منطق التطبيق
+API	REST API	تبادل البيانات
+Database	MySQL	تخزين البيانات
+Charts	Chart.js	الرسوم البيانية
+PWA	Service Worker	التثبيت والعمل المحدود دون اتصال
+PDF	DomPDF أو بديل مناسب	إنتاج التقارير
+Excel	Laravel Excel	تصدير النتائج
+Versioning	Git	تتبع تغييرات المشروع
+هذا الاختيار يستفيد من بنية React وBootstrap المناسبة لتطوير واجهات الويب المتجاوبة، مع Laravel لإدارة البيانات والصلاحيات والعمليات الخلفية.
+6.3. البديل المبسط (Alternative MVP)
+إذا كان تطوير Frontend وBackend منفصلين سيزيد من مدة الإنجاز، يمكن اعتماد:
+•	Laravel.
+•	Blade.
+•	Bootstrap 5.
+•	MySQL.
+•	Chart.js.
+وبذلك يمكن بناء تطبيق متكامل دون الحاجة إلى React في البداية.
+يمكن إضافة React لاحقاً إذا تطورت احتياجات الواجهة أو التطبيق.
+التوصية: اعتماد Laravel + Blade + Bootstrap للنسخة الأولية إذا كانت الأولوية هي سرعة الوصول إلى نموذج قابل للتجريب، أو Laravel API + React إذا كان الهدف منذ البداية بناء تطبيق PWA أكثر استقلالية.
+6.4. تصميم قاعدة البيانات (Conception de la base de données)
+يجب أن تكون قاعدة البيانات منظمة وفق مبدأ التطبيع (Normalisation)، وأن تسمح بتتبع كل عملية تقويم والاحتفاظ بتاريخ النتائج.
+الكيانات الأساسية (Entités)
+الجدول	الوظيفة
+users	حسابات المستخدمين
+classes	الأقسام
+students	المتعلمون
+subjects	المواد
+skills	المهارات
+questions	الأسئلة
+question_options	اختيارات الأسئلة
+evaluations	الاختبارات
+evaluation_questions	الأسئلة المرتبطة بالاختبارات
+attempts	محاولات إنجاز الاختبارات
+answers	إجابات المتعلمين
+skill_results	نتائج المهارات
+resources	موارد الدعم
+remediation_assignments	أنشطة الدعم المسندة
+audit_logs	سجل العمليات المهمة
+مخطط العلاقات (MCD simplifié)
+USERS
+id · email · password · role
+1 : N
+CLASSES
+id · class_name · teacher_id
+1 : N
+STUDENTS
+id · student_code · class_id
+1 : N
+ATTEMPTS
+id · student_id · evaluation_id · score
+ANSWERS
+id · attempt_id · question_id · score
+SUBJECTS → SKILLS → QUESTIONS
+تصنيف الأسئلة وربطها بالمهارات
+SKILL_RESULTS
+نتائج كل متعلم حسب المهارة والتقويم
+تفاصيل أهم العلاقات
+•	الأستاذ الواحد يمكنه تدبير عدة أقسام.
+•	القسم الواحد يحتوي على عدة متعلمين.
+•	المادة الواحدة تحتوي على عدة مهارات.
+•	المهارة الواحدة يمكن ربطها بعدة أسئلة.
+•	الاختبار الواحد يحتوي على عدة أسئلة.
+•	المتعلم الواحد يمكنه إنجاز عدة اختبارات.
+•	كل محاولة يمكن أن تحتوي على عدة إجابات.
+•	كل محاولة تنتج نتائج مرتبطة بالمهارات المقاسة.
+•	المورد الواحد يمكن ربطه بمهارة أو أكثر.
+نموذج حقول الجداول
+Table: subjects
+Field	Type
+id	BIGINT
+name	VARCHAR
+code	VARCHAR
+description	TEXT
+Table: skills
+Field	Type
+id	BIGINT
+subject_id	BIGINT
+skill_code	VARCHAR
+skill_name	VARCHAR
+description	TEXT
+active	BOOLEAN
+Table: questions
+Field	Type
+id	BIGINT
+skill_id	BIGINT
+question_text	TEXT
+question_type	VARCHAR
+difficulty	VARCHAR
+max_score	DECIMAL
+correction_method	VARCHAR
+status	BOOLEAN
+Table: evaluations
+Field	Type
+id	BIGINT
+title	VARCHAR
+subject_id	BIGINT
+evaluation_type	VARCHAR
+total_score	DECIMAL
+duration	INTEGER
+status	VARCHAR
+Table: evaluation_questions
+Field	Type
+id	BIGINT
+evaluation_id	BIGINT
+question_id	BIGINT
+question_order	INTEGER
+points	DECIMAL
+Table: attempts
+Field	Type
+id	BIGINT
+evaluation_id	BIGINT
+student_id	BIGINT
+started_at	DATETIME
+submitted_at	DATETIME
+total_score	DECIMAL
+status	VARCHAR
+Table: answers
+Field	Type
+id	BIGINT
+attempt_id	BIGINT
+question_id	BIGINT
+answer_content	TEXT
+score_obtained	DECIMAL
+teacher_feedback	TEXT
+corrected_at	DATETIME
+ينبغي إضافة قيود فريدة تمنع تسجيل محاولات غير مسموح بها، وقيود تحقق تمنع تجاوز النقطة الممنوحة للنقطة القصوى.
+نموذج برمجي للعلاقات
+User
+ └── hasMany Classes
+
+Class
+ └── hasMany Students
+
+Subject
+ └── hasMany Skills
+
+Skill
+ └── hasMany Questions
+
+Evaluation
+ └── belongsToMany Questions
+
+Student
+ └── hasMany Attempts
+
+Attempt
+ ├── belongsTo Student
+ ├── belongsTo Evaluation
+ └── hasMany Answers
+
+SkillResult
+ ├── belongsTo Student
+ ├── belongsTo Skill
+ └── belongsTo Attempt
+ملاحظة تصميمية: يجب ربط نتيجة المهارة بمحاولة تقويم محددة، وليس تخزين متوسط نهائي واحد فقط؛ لأن ذلك ضروري لتحليل التطور زمنياً.
+الجزء السابع: الواجهات المطلوبة (Interface utilisateur)
+7.1. خريطة التنقل (Sitemap)
+ÉVAL'PROGRESS
+Authentification
+Espace Enseignant
+•	Dashboard
+•	Classes
+•	Élèves
+•	Matières
+•	Compétences
+•	Banque de questions
+•	Évaluations
+•	Résultats
+•	Remédiation
+•	Rapports
+•	Paramètres
+Espace Élève
+•	Accueil
+•	Mes évaluations
+•	Passer un test
+•	Mes résultats
+•	Mes compétences
+•	Activités de soutien
+•	Mon parcours
+7.2. قائمة الشاشات (Écrans)
+الرمز	الشاشة	الوظيفة
+SCR-01	Login	تسجيل الدخول
+SCR-02	Teacher Dashboard	لوحة الأستاذ
+SCR-03	Classes	إدارة الأقسام
+SCR-04	Students	إدارة المتعلمين
+SCR-05	Student Profile	الملف الفردي
+SCR-06	Subjects	إدارة المواد
+SCR-07	Skills	إدارة المهارات
+SCR-08	Question Bank	بنك الأسئلة
+SCR-09	Question Editor	تحرير السؤال
+SCR-10	Evaluation Builder	إنشاء الاختبار
+SCR-11	Student Test	واجهة الاختبار
+SCR-12	Correction	تصحيح الإجابات
+SCR-13	Results	النتائج
+SCR-14	Analytics	التحليل
+SCR-15	Remediation	الدعم
+SCR-16	Reports	التقارير
+SCR-17	Student Dashboard	واجهة المتعلم
+SCR-18	Settings	الإعدادات
+7.3. تصور واجهة الأستاذ
+CBSE AI Assessment Suite for Teacher · Built with Blink
+blink.new
+العناصر:
+•	Sidebar.
+•	Top Navigation.
+•	Statistics Cards.
+•	Performance Chart.
+•	Skills Analysis.
+•	Recent Evaluations.
+•	Student Progress.
+7.4. تصور واجهة المتعلم
+Bewize - Soutien scolaire digital, ludique et autonome
+bewize.ma
+يجب أن تكون الواجهة:
+•	بسيطة.
+•	واضحة.
+•	مناسبة للسن المستهدف.
+•	خالية من الإعلانات.
+•	لا تعرض ترتيب المتعلمين أو مقارنات محبطة بينهم.
+•	تقدم تغذية راجعة بناءة.
+الجزء الثامن: مؤشرات القياس والتحليل
+8.1. المبادئ العامة
+يجب أن تعتمد المنصة على مؤشرات قابلة للحساب والتفسير، مع توضيح كيفية حساب كل مؤشر.
+لا ينبغي أن يؤدي تجميع النتائج إلى إخفاء الصعوبات الخاصة بمهارة معينة.
+8.2. نسبة النجاح (Taux de réussite)
+\[ TR=\frac{N_r}{N_p}\times100 \]
+حيث:
+•	\(N_r\): عدد المتعلمين الذين حققوا معيار النجاح المحدد.
+•	\(N_p\): عدد المتعلمين الذين شاركوا في التقويم.
+يجب تحديد معيار النجاح قبل التقويم وعدم تغييره بعد الاطلاع على النتائج.
+8.3. متوسط النتائج (Moyenne)
+\[ M=\frac{\sum_{i=1}^{n}S_i}{n} \]
+حيث \(S_i\) نقطة المتعلم و\(n\) عدد المحاولات أو المتعلمين وفق مستوى التحليل.
+8.4. نسبة التحكم في مهارة (Taux de maîtrise)
+إذا كانت الأسئلة مرتبطة بمهارة معينة، يمكن حساب:
+\[ TM_s=\frac{\sum S_{obtenus}}{\sum S_{max}}\times100 \]
+حيث:
+•	\(S_{obtenus}\): مجموع النقاط المحصل عليها في الأسئلة المرتبطة بالمهارة.
+•	\(S_{max}\): مجموع النقاط القصوى لهذه الأسئلة.
+مثال افتراضي:
+المهارة	النقاط المحصلة	النقاط القصوى	النسبة
+Lecture	16	20	80%
+Compréhension	10	20	50%
+Grammaire	18	20	90%
+هذا المؤشر يحسب الأداء في الأسئلة المرتبطة بالمهارة، ولا يمثل وحده إثباتاً نهائياً للتحكم فيها. يجب مراعاة جودة الأسئلة وعددها ومدى تمثيلها للمهارة.
+8.5. تطور المكتسبات (Progression des acquis)
+\[ P=S_{post}-S_{pre} \]
+حيث:
+•	\(S_{pre}\): النتيجة القبلية.
+•	\(S_{post}\): النتيجة البعدية.
+مثال:
+التقويم	النتيجة
+Initial	45%
+Final	65%
+Progression	+20 نقطة مئوية
+يجب استعمال اختبارات متكافئة أو أسئلة مشتركة ومبررة منهجياً عند مقارنة النتائج.
+8.6. توزيع مستويات التحكم
+يمكن للمنصة عرض توزيع المتعلمين على المستويات الأربعة.
+مثال افتراضي لتوزيع مستويات التحكم
+توزيع 25 متعلماً وفق شبكة تقييم افتراضية.
+ 
+بيانات توضيحية وليست نتائج تجربة فعلية.
+8.7. مؤشرات استعمال المنصة
+المؤشر	طريقة القياس
+Taux de complétion	الاختبارات المكتملة ÷ الاختبارات المبدوءة
+Temps de correction	الزمن اللازم للتصحيح
+Taux de participation	المشاركون ÷ المستهدفون
+Taux de satisfaction	متوسط إجابات الاستبيان
+Taux de disponibilité	وقت عمل المنصة ÷ وقت التشغيل المخطط
+ينبغي التمييز بين مؤشرات الأداء التربوي ومؤشرات جودة التطبيق؛ فالتحسن في أحدهما لا يثبت تلقائياً التحسن في الآخر.
+الجزء التاسع: سير العمل (Workflows)
+9.1. سيناريو عمل الأستاذ
+#chatgpt-mermaid-_r_tg_{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:16px;fill:rgb(13, 13, 13);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#chatgpt-mermaid-_r_tg_ .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_tg_ .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_tg_ .error-icon{fill:rgb(243, 243, 243);}#chatgpt-mermaid-_r_tg_ .error-text{fill:rgb(13, 13, 13);stroke:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tg_ .edge-thickness-normal{stroke-width:1px;}#chatgpt-mermaid-_r_tg_ .edge-thickness-thick{stroke-width:3.5px;}#chatgpt-mermaid-_r_tg_ .edge-pattern-solid{stroke-dasharray:0;}#chatgpt-mermaid-_r_tg_ .edge-thickness-invisible{stroke-width:0;fill:none;}#chatgpt-mermaid-_r_tg_ .edge-pattern-dashed{stroke-dasharray:3;}#chatgpt-mermaid-_r_tg_ .edge-pattern-dotted{stroke-dasharray:2;}#chatgpt-mermaid-_r_tg_ .marker{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_tg_ .marker.cross{stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_tg_ svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:16px;}#chatgpt-mermaid-_r_tg_ p{margin:0;}#chatgpt-mermaid-_r_tg_ .label{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tg_ .cluster-label text{fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tg_ .cluster-label span{color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tg_ .cluster-label span p{background-color:transparent;}#chatgpt-mermaid-_r_tg_ .label text,#chatgpt-mermaid-_r_tg_ span{fill:rgb(13, 13, 13);color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tg_ .node rect,#chatgpt-mermaid-_r_tg_ .node circle,#chatgpt-mermaid-_r_tg_ .node ellipse,#chatgpt-mermaid-_r_tg_ .node polygon,#chatgpt-mermaid-_r_tg_ .node path{fill:rgb(222, 234, 251);stroke:rgb(83, 154, 248);stroke-width:1px;}#chatgpt-mermaid-_r_tg_ .rough-node .label text,#chatgpt-mermaid-_r_tg_ .node .label text,#chatgpt-mermaid-_r_tg_ .image-shape .label,#chatgpt-mermaid-_r_tg_ .icon-shape .label{text-anchor:middle;}#chatgpt-mermaid-_r_tg_ .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#chatgpt-mermaid-_r_tg_ .rough-node .label,#chatgpt-mermaid-_r_tg_ .node .label,#chatgpt-mermaid-_r_tg_ .image-shape .label,#chatgpt-mermaid-_r_tg_ .icon-shape .label{text-align:center;}#chatgpt-mermaid-_r_tg_ .node.clickable{cursor:pointer;}#chatgpt-mermaid-_r_tg_ .root .anchor path{fill:rgb(143, 143, 143)!important;stroke-width:0;stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_tg_ .arrowheadPath{fill:rgb(143, 143, 143);}#chatgpt-mermaid-_r_tg_ .edgePath .path{stroke:rgb(143, 143, 143);stroke-width:1px;}#chatgpt-mermaid-_r_tg_ .flowchart-link{stroke:rgb(143, 143, 143);fill:none;}#chatgpt-mermaid-_r_tg_ .edgeLabel{background-color:rgb(252, 252, 252);text-align:center;}#chatgpt-mermaid-_r_tg_ .edgeLabel p{background-color:rgb(252, 252, 252);}#chatgpt-mermaid-_r_tg_ .edgeLabel rect{opacity:0.5;background-color:rgb(252, 252, 252);fill:rgb(252, 252, 252);}#chatgpt-mermaid-_r_tg_ .labelBkg{background-color:rgba(252, 252, 252, 0.5);}#chatgpt-mermaid-_r_tg_ .cluster rect{fill:rgb(243, 243, 243);stroke:rgba(0, 0, 0, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_tg_ .cluster text{fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tg_ .cluster span{color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tg_ div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:12px;background:rgb(243, 243, 243);border:1px solid rgba(0, 0, 0, 0.1);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-mermaid-_r_tg_ .flowchartTitleText{text-anchor:middle;font-size:18px;fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tg_ rect.text{fill:none;stroke-width:0;}#chatgpt-mermaid-_r_tg_ .icon-shape,#chatgpt-mermaid-_r_tg_ .image-shape{background-color:rgb(252, 252, 252);text-align:center;}#chatgpt-mermaid-_r_tg_ .icon-shape p,#chatgpt-mermaid-_r_tg_ .image-shape p{background-color:rgb(252, 252, 252);padding:2px;}#chatgpt-mermaid-_r_tg_ .icon-shape .label rect,#chatgpt-mermaid-_r_tg_ .image-shape .label rect{opacity:0.5;background-color:rgb(252, 252, 252);fill:rgb(252, 252, 252);}#chatgpt-mermaid-_r_tg_ .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-mermaid-_r_tg_ .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#chatgpt-mermaid-_r_tg_ .node .neo-node{stroke:rgb(83, 154, 248);}#chatgpt-mermaid-_r_tg_ [data-look="neo"].node rect,#chatgpt-mermaid-_r_tg_ [data-look="neo"].cluster rect,#chatgpt-mermaid-_r_tg_ [data-look="neo"].node polygon{stroke:url(#chatgpt-mermaid-_r_tg_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_tg_ [data-look="neo"].swimlane.cluster rect{filter:none;}#chatgpt-mermaid-_r_tg_ [data-look="neo"].node path{stroke:url(#chatgpt-mermaid-_r_tg_-gradient);stroke-width:1px;}#chatgpt-mermaid-_r_tg_ [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_tg_ [data-look="neo"].node .neo-line path{stroke:rgb(83, 154, 248);filter:none;}#chatgpt-mermaid-_r_tg_ [data-look="neo"].node circle{stroke:url(#chatgpt-mermaid-_r_tg_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_tg_ [data-look="neo"].node circle .state-start{fill:#000000;}#chatgpt-mermaid-_r_tg_ [data-look="neo"].icon-shape .icon{fill:url(#chatgpt-mermaid-_r_tg_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_tg_ [data-look="neo"].icon-shape .icon-neo path{stroke:url(#chatgpt-mermaid-_r_tg_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_tg_ .node text{font-size:14px;font-weight:600;letter-spacing:normal;fill:rgb(0, 79, 153);}#chatgpt-mermaid-_r_tg_ .edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(0, 79, 153);}#chatgpt-mermaid-_r_tg_ .node tspan[font-weight="normal"],#chatgpt-mermaid-_r_tg_ .edgeLabels tspan[font-weight="normal"]{font-weight:600;}#chatgpt-mermaid-_r_tg_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(245, 250, 255);stroke:rgb(206, 219, 229);stroke-width:1px;}#chatgpt-mermaid-_r_tg_ .node rect,#chatgpt-mermaid-_r_tg_ .node circle,#chatgpt-mermaid-_r_tg_ .node ellipse,#chatgpt-mermaid-_r_tg_ .node polygon,#chatgpt-mermaid-_r_tg_ .node path{fill:rgb(229, 243, 255);stroke:rgba(0, 0, 0, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_tg_ .node rect{rx:16px;ry:16px;}#chatgpt-mermaid-_r_tg_ .mermaid-decision .label-container{fill:rgb(245, 250, 255);stroke:rgb(206, 219, 229);stroke-dasharray:2px,2px;}#chatgpt-mermaid-_r_tg_ .edgePaths .flowchart-link{stroke:rgb(143, 143, 143);stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;}#chatgpt-mermaid-_r_tg_ .marker{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_tg_ :root{--mermaid-font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;}تسجيل دخول الأستاذاختيار القسماختيار المادة والمهارةإنشاء التقويماختيار الأسئلةنشر الاختبارإنجاز المتعلمين للاختبارتصحيح الإجاباتتحليل النتائجتحديد الصعوباتاختيار أنشطة الدعمإجراء تقويم جديدتتبع التطور
+9.2. سيناريو عمل المتعلم
+#chatgpt-mermaid-_r_tn_{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:16px;fill:rgb(13, 13, 13);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#chatgpt-mermaid-_r_tn_ .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_tn_ .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_tn_ .error-icon{fill:rgb(243, 243, 243);}#chatgpt-mermaid-_r_tn_ .error-text{fill:rgb(13, 13, 13);stroke:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tn_ .edge-thickness-normal{stroke-width:1px;}#chatgpt-mermaid-_r_tn_ .edge-thickness-thick{stroke-width:3.5px;}#chatgpt-mermaid-_r_tn_ .edge-pattern-solid{stroke-dasharray:0;}#chatgpt-mermaid-_r_tn_ .edge-thickness-invisible{stroke-width:0;fill:none;}#chatgpt-mermaid-_r_tn_ .edge-pattern-dashed{stroke-dasharray:3;}#chatgpt-mermaid-_r_tn_ .edge-pattern-dotted{stroke-dasharray:2;}#chatgpt-mermaid-_r_tn_ .marker{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_tn_ .marker.cross{stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_tn_ svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:16px;}#chatgpt-mermaid-_r_tn_ p{margin:0;}#chatgpt-mermaid-_r_tn_ .label{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tn_ .cluster-label text{fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tn_ .cluster-label span{color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tn_ .cluster-label span p{background-color:transparent;}#chatgpt-mermaid-_r_tn_ .label text,#chatgpt-mermaid-_r_tn_ span{fill:rgb(13, 13, 13);color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tn_ .node rect,#chatgpt-mermaid-_r_tn_ .node circle,#chatgpt-mermaid-_r_tn_ .node ellipse,#chatgpt-mermaid-_r_tn_ .node polygon,#chatgpt-mermaid-_r_tn_ .node path{fill:rgb(222, 234, 251);stroke:rgb(83, 154, 248);stroke-width:1px;}#chatgpt-mermaid-_r_tn_ .rough-node .label text,#chatgpt-mermaid-_r_tn_ .node .label text,#chatgpt-mermaid-_r_tn_ .image-shape .label,#chatgpt-mermaid-_r_tn_ .icon-shape .label{text-anchor:middle;}#chatgpt-mermaid-_r_tn_ .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#chatgpt-mermaid-_r_tn_ .rough-node .label,#chatgpt-mermaid-_r_tn_ .node .label,#chatgpt-mermaid-_r_tn_ .image-shape .label,#chatgpt-mermaid-_r_tn_ .icon-shape .label{text-align:center;}#chatgpt-mermaid-_r_tn_ .node.clickable{cursor:pointer;}#chatgpt-mermaid-_r_tn_ .root .anchor path{fill:rgb(143, 143, 143)!important;stroke-width:0;stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_tn_ .arrowheadPath{fill:rgb(143, 143, 143);}#chatgpt-mermaid-_r_tn_ .edgePath .path{stroke:rgb(143, 143, 143);stroke-width:1px;}#chatgpt-mermaid-_r_tn_ .flowchart-link{stroke:rgb(143, 143, 143);fill:none;}#chatgpt-mermaid-_r_tn_ .edgeLabel{background-color:rgb(252, 252, 252);text-align:center;}#chatgpt-mermaid-_r_tn_ .edgeLabel p{background-color:rgb(252, 252, 252);}#chatgpt-mermaid-_r_tn_ .edgeLabel rect{opacity:0.5;background-color:rgb(252, 252, 252);fill:rgb(252, 252, 252);}#chatgpt-mermaid-_r_tn_ .labelBkg{background-color:rgba(252, 252, 252, 0.5);}#chatgpt-mermaid-_r_tn_ .cluster rect{fill:rgb(243, 243, 243);stroke:rgba(0, 0, 0, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_tn_ .cluster text{fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tn_ .cluster span{color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tn_ div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:12px;background:rgb(243, 243, 243);border:1px solid rgba(0, 0, 0, 0.1);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-mermaid-_r_tn_ .flowchartTitleText{text-anchor:middle;font-size:18px;fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_tn_ rect.text{fill:none;stroke-width:0;}#chatgpt-mermaid-_r_tn_ .icon-shape,#chatgpt-mermaid-_r_tn_ .image-shape{background-color:rgb(252, 252, 252);text-align:center;}#chatgpt-mermaid-_r_tn_ .icon-shape p,#chatgpt-mermaid-_r_tn_ .image-shape p{background-color:rgb(252, 252, 252);padding:2px;}#chatgpt-mermaid-_r_tn_ .icon-shape .label rect,#chatgpt-mermaid-_r_tn_ .image-shape .label rect{opacity:0.5;background-color:rgb(252, 252, 252);fill:rgb(252, 252, 252);}#chatgpt-mermaid-_r_tn_ .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-mermaid-_r_tn_ .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#chatgpt-mermaid-_r_tn_ .node .neo-node{stroke:rgb(83, 154, 248);}#chatgpt-mermaid-_r_tn_ [data-look="neo"].node rect,#chatgpt-mermaid-_r_tn_ [data-look="neo"].cluster rect,#chatgpt-mermaid-_r_tn_ [data-look="neo"].node polygon{stroke:url(#chatgpt-mermaid-_r_tn_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_tn_ [data-look="neo"].swimlane.cluster rect{filter:none;}#chatgpt-mermaid-_r_tn_ [data-look="neo"].node path{stroke:url(#chatgpt-mermaid-_r_tn_-gradient);stroke-width:1px;}#chatgpt-mermaid-_r_tn_ [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_tn_ [data-look="neo"].node .neo-line path{stroke:rgb(83, 154, 248);filter:none;}#chatgpt-mermaid-_r_tn_ [data-look="neo"].node circle{stroke:url(#chatgpt-mermaid-_r_tn_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_tn_ [data-look="neo"].node circle .state-start{fill:#000000;}#chatgpt-mermaid-_r_tn_ [data-look="neo"].icon-shape .icon{fill:url(#chatgpt-mermaid-_r_tn_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_tn_ [data-look="neo"].icon-shape .icon-neo path{stroke:url(#chatgpt-mermaid-_r_tn_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_tn_ .node text{font-size:14px;font-weight:600;letter-spacing:normal;fill:rgb(0, 79, 153);}#chatgpt-mermaid-_r_tn_ .edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(0, 79, 153);}#chatgpt-mermaid-_r_tn_ .node tspan[font-weight="normal"],#chatgpt-mermaid-_r_tn_ .edgeLabels tspan[font-weight="normal"]{font-weight:600;}#chatgpt-mermaid-_r_tn_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(245, 250, 255);stroke:rgb(206, 219, 229);stroke-width:1px;}#chatgpt-mermaid-_r_tn_ .node rect,#chatgpt-mermaid-_r_tn_ .node circle,#chatgpt-mermaid-_r_tn_ .node ellipse,#chatgpt-mermaid-_r_tn_ .node polygon,#chatgpt-mermaid-_r_tn_ .node path{fill:rgb(229, 243, 255);stroke:rgba(0, 0, 0, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_tn_ .node rect{rx:16px;ry:16px;}#chatgpt-mermaid-_r_tn_ .mermaid-decision .label-container{fill:rgb(245, 250, 255);stroke:rgb(206, 219, 229);stroke-dasharray:2px,2px;}#chatgpt-mermaid-_r_tn_ .edgePaths .flowchart-link{stroke:rgb(143, 143, 143);stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;}#chatgpt-mermaid-_r_tn_ .marker{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_tn_ :root{--mermaid-font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;}دخول المتعلملوحة المتعلمعرض الاختبارات المتاحةاختيار الاختبارقراءة التعليماتالإجابة عن الأسئلةإرسال الإجاباتحفظ المحاولةعرض التغذية الراجعة المسموح بهاإنجاز نشاط الدعم
+9.3. مثال متكامل لاستعمال المنصة
+لنفترض أن الأستاذ يريد تقييم مهارة فهم المقروء (Compréhension écrite).
+1.	يختار المادة الفرنسية.
+2.	يختار المهارة المستهدفة.
+3.	ينشئ اختباراً تشخيصياً.
+4.	يختار أسئلة من بنك الأسئلة.
+5.	ينشر الاختبار للقسم.
+6.	ينجز المتعلمون الاختبار.
+7.	يتم تصحيح الأسئلة الموضوعية آلياً.
+8.	يصحح الأستاذ الأسئلة المفتوحة.
+9.	تعرض المنصة النتائج حسب المهارة.
+10.	يحدد الأستاذ المتعلمين الذين يحتاجون إلى دعم.
+11.	يسند أنشطة مناسبة.
+12.	يعيد التقويم بعد فترة التعلم.
+13.	يقارن النتائج السابقة واللاحقة.
+هذا السيناريو هو المثال الأساسي الذي ينبغي أن يعمل بكفاءة قبل إضافة أي وظيفة متقدمة.
+الجزء العاشر: الاختبارات والتحقق من الجودة
+10.1. أنواع الاختبارات (Tests)
+يجب التحقق من المنصة على مستويات متعددة.
+الاختبار	الهدف
+Unit Testing	اختبار الوظائف البرمجية منفردة
+Integration Testing	اختبار التواصل بين المكونات
+Functional Testing	التحقق من الوظائف المطلوبة
+UI Testing	التحقق من الواجهات
+Security Testing	التحقق من الحماية
+Performance Testing	قياس الأداء
+Usability Testing	اختبار سهولة الاستخدام
+Compatibility Testing	اختبار الأجهزة والمتصفحات
+Offline Testing	اختبار العمل دون اتصال
+10.2. معايير القبول (Critères d'acceptation)
+لا تعتبر النسخة الأولية جاهزة للتجريب إلا بعد تحقق المعايير التالية:
+الرمز	معيار القبول	النتيجة المطلوبة
+AC-01	تسجيل دخول الأستاذ	يعمل
+AC-02	إنشاء قسم	يعمل
+AC-03	إضافة متعلم برمز مستعار	يعمل
+AC-04	إنشاء سؤال وربطه بمهارة	يعمل
+AC-05	إنشاء اختبار	يعمل
+AC-06	إنجاز اختبار بواسطة المتعلم	يعمل
+AC-07	حفظ الإجابات	دون ضياع
+AC-08	التصحيح الآلي	مطابق لمفتاح الإجابة
+AC-09	التصحيح اليدوي	قابل للتعديل
+AC-10	حساب النتائج	مطابق للحسابات المرجعية
+AC-11	تحليل المهارات	يعرض النتائج الصحيحة
+AC-12	إنتاج PDF	ملف قابل للفتح
+AC-13	تصدير Excel	بيانات سليمة
+AC-14	حماية الصلاحيات	لا يوجد وصول غير مصرح به
+AC-15	التوافق مع الهاتف	واجهة قابلة للاستعمال
+قاعدة مهمة: يجب اختبار الحسابات بواسطة بيانات اختبار معروفة النتائج، ومقارنة النتائج المحسوبة آلياً بالحسابات المرجعية.
+10.3. التحقق التربوي (Validation pédagogique)
+يجب ألا يقتصر التحقق على نجاح البرمجة.
+من الضروري:
+•	عرض الاختبارات على أساتذة متخصصين.
+•	مراجعة ارتباط كل سؤال بالمهارة المحددة.
+•	التأكد من وضوح التعليمات.
+•	التأكد من ملاءمة مستوى الصعوبة.
+•	مراجعة معايير التصحيح.
+•	التأكد من عدم وجود غموض في الإجابات الصحيحة.
+•	مراجعة ملاءمة الأدوات للمنهاج المغربي المعتمد.
+يمكن الاستعانة بمحكمين تربويين (Experts pédagogiques) قبل اعتماد بنك الأسئلة للتجريب.
+الجزء الحادي عشر: التجريب الميداني والبحث العلمي
+هذا الجزء هو الذي سيحول المشروع من مجرد تطبيق معلوماتي إلى بحث أكاديمي تطبيقي.
+11.1. نوع البحث (Type de recherche)
+يقترح اعتماد:
+Recherche-développement avec une approche mixte (quantitative et qualitative).
+أي البحث والتطوير باستخدام منهجية تجمع البيانات الكمية والنوعية.
+11.2. مجتمع البحث والعينة (Population et échantillon)
+المجتمع المستهدف:
+تلاميذ المستوى الرابع ابتدائي.
+العينة الأولية المقترحة:
+قسم واحد يضم حوالي 25 إلى 30 متعلماً، باعتبار ذلك افتراضاً تخطيطياً فقط.
+يجب تعديل حجم العينة حسب القسم الفعلي، وشروط المؤسسة، وموافقة المشرف الأكاديمي.
+11.3. مراحل التجريب
+Protocole expérimental
+1.	Préparation
+o	الحصول على الموافقات اللازمة.
+o	تحديد المهارات المستهدفة.
+o	تجهيز الاختبارات.
+o	اختبار المنصة تقنياً.
+2.	Pré-test
+o	إجراء تقويم قبلي.
+o	تسجيل النتائج.
+o	تحديد مستوى المكتسبات الأولية.
+3.	Expérimentation
+o	استعمال المنصة في التقويم.
+o	تسجيل النتائج.
+o	تحليل الصعوبات.
+o	تنفيذ أنشطة الدعم.
+4.	Post-test
+o	إجراء تقويم بعدي.
+o	قياس تطور النتائج.
+o	مقارنة أداء المتعلمين.
+5.	Analyse et interprétation
+o	تحليل البيانات الكمية.
+o	دراسة ملاحظات الأستاذ.
+o	تحليل تجربة الاستعمال.
+o	مناقشة النتائج والحدود.
+11.4. أدوات جمع البيانات (Outils de collecte)
+الأداة	البيانات المستهدفة
+Pré-test	المكتسبات الأولية
+Post-test	المكتسبات اللاحقة
+Questionnaire	رضا الأستاذ
+Grille d'observation	سهولة الاستعمال والممارسة
+Entretien	آراء الأستاذ
+Logs de la plateforme	استعمال النظام
+Rapports	نتائج التقويمات
+11.5. فرضيات البحث (Hypothèses)
+يمكن صياغة الفرضيات الأولية كما يلي:
+H1: تساهم المنصة الرقمية في تسهيل تتبع مكتسبات المتعلمين حسب المهارات.
+H2: تسمح مؤشرات التحليل برصد الصعوبات الفردية والجماعية بصورة أكثر تنظيماً.
+H3: يساهم الربط بين نتائج التقويم وأنشطة الدعم في تحسين تنظيم التدخلات التربوية.
+H4: يمكن أن يساهم استعمال المنصة في تقليل الوقت المخصص لبعض المهام الإدارية والتصحيحية.
+هذه فرضيات للاختبار وليست نتائج مثبتة.
+11.6. تحليل النتائج
+يمكن استعمال:
+•	Excel للتحليل الإحصائي الوصفي.
+•	SPSS أو Python للتحليل المتقدم عند الحاجة.
+•	الرسوم البيانية للمقارنة.
+•	تحليل مضمون المقابلات والملاحظات.
+ينبغي تفسير النتائج مع مراعاة حجم العينة، والفروق بين الاختبارات، والمدة الزمنية، والعوامل التربوية الأخرى.
+11.7. الضوابط الأخلاقية للبحث
+•	موافقة المؤسسة التعليمية والجهات المسؤولة.
+•	الحصول على موافقة أولياء الأمور حيثما يلزم.
+•	احترام مصلحة المتعلم وحقه في عدم المشاركة وفق الشروط المعتمدة.
+•	عدم التأثير سلباً على التقييم المدرسي الرسمي بسبب المشاركة البحثية.
+•	استعمال رموز مستعارة في التحليل.
+•	عدم نشر أسماء أو صور المتعلمين.
+•	تأمين البيانات وحذفها أو أرشفتها وفق سياسة واضحة.
+•	عدم مشاركة البيانات مع أطراف غير مخولة.
+الجزء الثاني عشر: خطة الإنجاز الزمنية
+12.1. الجدول الزمني (Planning – 24 semaines)
+المرحلة	المدة	الأعمال الرئيسية
+Étude préalable	3 أسابيع	دراسة الحاجيات والإطار النظري
+Conception	3 أسابيع	التصميم التربوي والتقني
+Développement	7 أسابيع	البرمجة
+Tests et validation	3 أسابيع	الاختبارات والتحقق
+Expérimentation	4 أسابيع	التجريب الميداني
+Analyse	أسبوعان	تحليل البيانات
+Finalisation	أسبوعان	التقرير والعرض
+المجموع	24 أسبوعاً	
+12.2. تفاصيل المراحل
+توزيع مدة المشروع
+عدد أسابيع كل مرحلة من أصل 24 أسبوعاً.
+ 
+12.3. المخرجات المطلوبة في كل مرحلة
+المرحلة	Livrable
+الدراسة	Cahier des besoins
+التصميم	MCD + UML + Maquettes
+التطوير	Application MVP
+الاختبار	Rapport de tests
+التجريب	Base de données expérimentale مجهولة الهوية
+التحليل	Rapport d'analyse
+الإنهاء	Mémoire + Documentation + Présentation
+الجزء الثالث عشر: إدارة المخاطر (Gestion des risques)
+الخطر	التأثير	الإجراء الوقائي
+ضعف الاتصال بالإنترنت	تعطيل الاختبارات	دعم Offline تدريجي
+صعوبة البرمجة	تأخر المشروع	البدء بنسخة مبسطة
+عدم دقة الأسئلة	نتائج غير موثوقة	مراجعة تربوية
+فقدان البيانات	ضياع النتائج	نسخ احتياطية
+كشف بيانات المتعلمين	خطر على الخصوصية	التشفير والصلاحيات
+ضعف استعمال المنصة	نتائج تجريب محدودة	تدريب الأستاذ
+ضيق الوقت	عدم إكمال الوظائف	إعطاء الأولوية لـ MVP
+ضعف عدد المشاركين	محدودية الاستنتاجات	توضيح حدود البحث
+عدم تكافؤ الاختبارات	مقارنة غير دقيقة	بناء اختبارات متكافئة
+13.1. الافتراضات الأولية (Hypothèses de départ)
+بما أن بعض التفاصيل التقنية والميدانية لم تحسم بعد، تعتمد الخطة على الافتراضات التالية:
+العنصر	الافتراض المؤقت
+عدد المتعلمين	25–30
+عدد الأقسام	قسم واحد
+المواد	الفرنسية والرياضيات
+الجهاز الأساسي للأستاذ	حاسوب أو هاتف
+أجهزة المتعلمين	هاتف أو لوحات أو أجهزة المؤسسة حسب المتاح
+الاتصال	إنترنت متقطع أو متوفر
+البرمجة	تطوير فردي تدريجي
+الاستضافة	محلية أثناء التطوير ثم بيئة آمنة عند التجريب
+هذه افتراضات تخطيطية وليست شروطاً إلزامية للمشروع.
+13.2. القرارات التي تحتاج إلى تأكيد
+•	مستوى الخبرة في React وLaravel.
+•	عدد المتعلمين الفعلي.
+•	الأجهزة المتوفرة داخل المؤسسة.
+•	توفر الإنترنت.
+•	طبيعة التجريب: فردي أم جماعي.
+•	مدة التجريب الحقيقية.
+•	الموارد الرسمية المعتمدة لتحديد المهارات.
+•	شروط المؤسسة والمشرف بخصوص البيانات والموافقات.
+الجزء الرابع عشر: التمييز بين MVP والنسخة المتقدمة
+من الضروري عدم محاولة تطوير جميع الوظائف دفعة واحدة.
+أقترح تقسيم المشروع إلى مرحلتين.
+Phase 1 – MVP
+الأولوية
+Minimum Viable Product – نسخة قابلة للاستعمال والتجريب
+Teacher Dashboard by Amanat Ali on Dribbble
+dribbble.com
+•	تسجيل الدخول والصلاحيات.
+•	إدارة قسم واحد أو أكثر.
+•	إدارة المتعلمين بالرموز.
+•	إدارة الفرنسية والرياضيات.
+•	إدارة المهارات.
+•	بنك أسئلة بسيط.
+•	إنشاء الاختبارات.
+•	أسئلة QCM وVrai/Faux وإجابات قصيرة.
+•	التصحيح الآلي واليدوي.
+•	تسجيل النتائج.
+•	لوحة القيادة.
+•	تتبع النتائج.
+•	تقارير PDF وExcel.
+•	اقتراح موارد دعم يدوياً أو وفق قواعد بسيطة.
+•	واجهة متجاوبة.
+Phase 2 – Version avancée
+التطوير المستقبلي
+Adaptive AI Learning Platform | Personalized AI Learning System
+adaptive.atlearnlms.com
+•	PWA متقدمة والعمل دون اتصال.
+•	مزامنة البيانات.
+•	اختبارات تكيفية (Évaluation adaptative).
+•	إنشاء الاختبارات عشوائياً.
+•	تقارير مقارنة متقدمة.
+•	مسارات تعلم فردية.
+•	موارد دعم أكثر تخصيصاً.
+•	تحليل أخطاء الإجابات.
+•	مساعد ذكي للأستاذ.
+•	توسيع المواد والمستويات.
+•	تطبيقات وتكاملات إضافية.
+توصية مهمة: يجب أن تكون النسخة الأولى قادرة على تنفيذ دورة كاملة من إنشاء اختبار إلى تحليل النتائج وإنتاج تقرير. هذا أهم من إضافة عدد كبير من الخصائص غير المكتملة.
+الجزء الخامس عشر: النتائج والمنتجات النهائية
+في نهاية المشروع يجب أن تتوفر المخرجات التالية:
+المخرج	الوصف
+01. Cahier des charges	دفتر التحملات
+02. Étude pédagogique	الدراسة التربوية
+03. MCD / MLD	تصميم قاعدة البيانات
+04. Maquettes UI/UX	نماذج الواجهات
+05. Application Web	المنصة الرقمية
+06. PWA	النسخة القابلة للتثبيت
+07. Banque de questions	بنك الأسئلة
+08. Grilles d'évaluation	شبكات التقويم
+09. Documentation	دليل الاستعمال
+10. Rapport de tests	تقرير الاختبارات
+11. Rapport expérimental	تقرير التجريب
+12. Mémoire	مذكرة الماستر
+13. Présentation	عرض المشروع أمام اللجنة
+15.1. مؤشرات النجاح النهائية
+يمكن اعتبار المشروع جاهزاً للتثمين والعرض عندما:
+•	تكون الوظائف الأساسية مكتملة.
+•	تنجح دورة التقويم من البداية إلى النهاية.
+•	تكون نتائج التصحيح والحسابات صحيحة.
+•	تكون المؤشرات واضحة وقابلة للتفسير.
+•	تكون الواجهات قابلة للاستعمال على الأجهزة المستهدفة.
+•	يتم احترام قواعد حماية البيانات.
+•	يتم التحقق من المحتوى التربوي.
+•	تتوفر نتائج تجربة ميدانية موثقة.
+•	تكون حدود التجربة واضحة في البحث العلمي.
+الجزء السادس عشر: تنظيم مذكرة الماستر
+أقترح الهيكلة الأكاديمية التالية:
+Titre proposé:
+Conception et expérimentation d'une plateforme numérique d'évaluation et de suivi des apprentissages en français et en mathématiques chez les élèves de quatrième année du primaire.
+الفصل	العنوان	المحتوى
+Chapitre 1	Cadre théorique	القياس والتقويم المدرسي
+Chapitre 2	Évaluation numérique	التقويم الرقمي وتتبع التعلمات
+Chapitre 3	Méthodologie	منهجية البحث والتجريب
+Chapitre 4	Conception de la plateforme	التحليل والتصميم وقاعدة البيانات
+Chapitre 5	Développement	تطوير المنصة واختبارها
+Chapitre 6	Expérimentation	التجريب وتحليل النتائج
+Chapitre 7	Discussion	مناقشة النتائج والتوصيات
+يمكن دمج بعض الفصول وفق توجيهات المشرف وحجم المذكرة.
+الجزء السابع عشر: ملف المشاركة في مسابقة الأستاذ المبتكر
+يجب تقديم المشروع باعتباره حلاً تربوياً رقمياً يعالج مشكلة واضحة داخل الفصل الدراسي.
+17.1. عناصر العرض
+Présentation du projet
+Professional Development
+townsvillepri.moe.edu.sg
+1. Le constat
+صعوبات تتبع المكتسبات وتحليل نتائج التقويم.
+2. La solution
+منصة رقمية لقياس وتحليل وتتبع التعلمات.
+3. L'innovation
+الربط بين نتائج التقويم ومؤشرات المهارات وأنشطة الدعم.
+4. L'expérimentation
+تجربة المنصة داخل القسم.
+5. Les résultats
+تقديم النتائج الفعلية التي تم الحصول عليها دون مبالغة.
+6. La transférabilité
+إمكانية توسيع التجربة إلى أقسام ومستويات أخرى.
+17.2. عناصر التميز
+•	استعمال التكنولوجيا لخدمة التقويم وليس فقط عرض الدروس.
+•	تقديم تحليل فردي للمهارات.
+•	الربط بين التقويم والدعم.
+•	توفير سجل زمني لتطور المكتسبات.
+•	قابلية التثبيت والاستعمال على الهاتف.
+•	إمكانية الاستعمال في بيئات تعليمية مختلفة بعد التحقق من ملاءمتها.
+الجزء الثامن عشر: التوصيات النهائية وخطة الانطلاق
+أقترح اعتماد الترتيب التالي لتجنب التشتت:
+خطة العمل التنفيذية
+1.	الأولوية الأولى: تثبيت الإطار التربوي
+مراجعة المنهاج والوثائق الرسمية للمستوى الرابع، وتحديد المهارات والمؤشرات والاختبارات.
+2.	الأولوية الثانية: بناء التصميم
+إنجاز MCD وMLD، وUse Case Diagram، وواجهات Figma.
+3.	الأولوية الثالثة: إنشاء قاعدة البيانات
+إنشاء الجداول والعلاقات والقيود.
+4.	الأولوية الرابعة: برمجة MVP
+إدارة الأقسام والأسئلة والاختبارات والنتائج.
+5.	الأولوية الخامسة: التحليل والتقارير
+حساب مؤشرات المهارات وإنتاج تقارير PDF وExcel.
+6.	الأولوية السادسة: التجريب
+تجربة النظام والتحقق من ملاءمته التربوية والتقنية.
+18.1. الملفات التي ينبغي إعدادها قبل البرمجة
+1.	01_Cahier_des_charges.docx
+2.	02_Referentiel_competences.xlsx
+3.	03_Banque_questions.xlsx
+4.	04_Grilles_evaluation.xlsx
+5.	05_MCD_MLD.pdf
+6.	06_Maquettes_UI_UX.fig
+7.	07_Planning_projet.xlsx
+هذه الملفات تشكل الأساس التنظيمي والتربوي والتقني للمشروع.
+18.2. القرار التقني النهائي المقترح
+الخيار الموصى به
+Laravel + React + Bootstrap + MySQL
+React – واجهات المستخدم
+Bootstrap – التصميم المتجاوب
+Laravel – Backend وREST API
+MySQL – قاعدة البيانات
+PWA – الاستعمال على الحاسوب والهاتف
+بيئة التطوير:
+•	Windows محلياً.
+•	Laravel Artisan.
+•	Vite.
+•	Git.
+•	MySQL محلياً.
+•	نشر آمن بعد انتهاء التجريب الأولي.
+الخلاصة
+يمثل ÉVAL'PROGRESS مشروعاً يجمع بين ثلاثة أبعاد متكاملة:
+1.	البعد التربوي: تطوير ممارسات القياس والتقويم وتتبع التعلمات.
+2.	البعد التقني: تصميم وتطوير منصة ويب وتطبيق PWA.
+3.	البعد العلمي: دراسة ميدانية لتقييم قابلية استعمال المنصة ومدى مساهمتها في تحسين عملية التتبع والتقويم.
+وتكمن القيمة الأساسية للمشروع في تحويل نتائج الاختبارات من مجرد نقاط إلى مؤشرات تربوية قابلة للتحليل والاستثمار في تخطيط الدعم.
+المبدأ الذي يجب أن يحكم المشروع:
+La technologie ne remplace pas le jugement pédagogique de l'enseignant ; elle lui fournit des données structurées pour mieux comprendre les apprentissages et orienter ses interventions.
+المراجع والوثائق التي يجب اعتمادها قبل المصادقة النهائية
+ينبغي جمع ومراجعة:
+•	المنهاج الدراسي المغربي المعمول به للمستوى الرابع ابتدائي.
+•	التوجيهات التربوية والوثائق الرسمية الخاصة بتدريس الفرنسية والرياضيات.
+•	الأطر المرجعية المعتمدة للتقويم إن توفرت.
+•	الدراسات الأكاديمية المتعلقة بـ Évaluation formative وÉvaluation par compétences.
+•	المراجع المتعلقة بتصميم أدوات القياس وصدق الاختبارات وثباتها.
+•	التشريعات المغربية المتعلقة بحماية البيانات الشخصية.
+•	شروط المؤسسة والمشرف الأكاديمي والتجريب الميداني.
+لا يمثل هذا الدفتر مصادقة رسمية على توافق الاختبارات مع المنهاج؛ فذلك يتطلب مراجعة الوثائق المرجعية الحالية واعتمادها من المختصين.
+الخطوة التالية: الانتقال من دفتر التحملات إلى التصميم والبرمجة
+أقترح أن نبدأ بإنجاز ثلاثة مكونات تقنية مترابطة:
+PPT - Use Case Diagram (UCD) PowerPoint Presentation, free download - ID:6697286
+01. UML – Diagrammes
+مخططات Use Case وClass Diagram وActivity Diagram لتحديد وظائف النظام والعلاقات.
+Top 5 free ER diagram design tools | dbdiagram Blog
+02. MCD / MLD / SQL
+تصميم قاعدة البيانات بالتفصيل ثم إنشاء جداول MySQL والعلاقات والمفاتيح.
+Dashboard Wireframe designs, themes, templates and downloadable graphic elements on Dribbble
+03. Maquettes UI/UX
+تصميم واجهات الأستاذ والمتعلم ولوحة القيادة قبل البرمجة.
+توصيتي: نبدأ بتصميم قاعدة البيانات وUML، ثم ننتقل إلى الواجهات، وبعدها نبرمج MVP باستخدام Laravel وReact.
+بهذا الترتيب ستكون البرمجة مبنية على تحليل واضح، وستكون المنصة قابلة للتطوير دون إعادة بناء هيكلها من الصفر.
+

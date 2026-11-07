@@ -1,0 +1,6 @@
+{
+  "name": "ÉVAL'PROGRESS",
+  "description": "Plateforme numérique d'évaluation et de suivi des apprentissages pour le 4ème primaire (Français & Mathématiques)",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
