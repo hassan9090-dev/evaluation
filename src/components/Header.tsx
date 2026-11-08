@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { translations } from '../locales/translations';
 import { 
-  GraduationCap, UserCheck, Languages, Wifi, WifiOff, 
-  RotateCcw, Sparkles, ShieldCheck, ChevronDown, LogOut, Lock,
-  QrCode
+  GraduationCap, Languages, Wifi, WifiOff, 
+  RotateCcw, ShieldCheck, ChevronDown, LogOut,
+  QrCode, PanelLeft
 } from 'lucide-react';
 import { LocalNetworkQrModal } from './network/LocalNetworkQrModal';
 
@@ -12,8 +12,8 @@ export const Header: React.FC = () => {
   const { 
     role, setRole, lang, setLang, isRtl, isOffline, setIsOffline, 
     currentStudent, setCurrentStudent, students, resetToDefaults,
-    isTeacherAuthenticated, teacherLogout, studentLogout,
-    serverConnected, lastSyncTime
+    teacherLogout, studentLogout, serverConnected, lastSyncTime, 
+    isSidebarCollapsed, toggleSidebar
   } = useApp();
 
   const [showStudentPicker, setShowStudentPicker] = useState(false);
@@ -63,25 +63,43 @@ export const Header: React.FC = () => {
       {/* Main Navigation Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo & Platform Info */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-              <GraduationCap className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-bold text-xl tracking-tight text-slate-900 flex items-center gap-1.5">
-                  <span>Suivi</span>
-                  <span className="text-blue-600">-Pédagogique</span>
-                </h1>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 uppercase tracking-wider">
-                  4AEP
-                </span>
+          {/* Sidebar Toggle & Logo */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              onClick={toggleSidebar}
+              className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition cursor-pointer"
+              title={isSidebarCollapsed ? t.nav.expandSidebar : t.nav.collapseSidebar}
+            >
+              <PanelLeft className="w-4 h-4 text-slate-700" />
+            </button>
+
+            <button
+              onClick={() => {
+                if (role === 'teacher') teacherLogout();
+                if (role === 'student') studentLogout();
+                setRole('home');
+              }}
+              className="flex items-center gap-2.5 text-left cursor-pointer group"
+              title="Aller à la page d'accueil"
+            >
+              <div className="w-9 h-9 rounded-xl bg-linear-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
+                <GraduationCap className="w-5 h-5" />
               </div>
-              <p className="text-xs text-slate-500 hidden sm:block">
-                {t.app.slogan}
-              </p>
-            </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h1 className="font-black text-lg tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+                    <span>Suivi</span>
+                    <span className="text-blue-600">-Pédagogique</span>
+                  </h1>
+                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-blue-100 text-blue-800 uppercase tracking-wider">
+                    4AEP
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-400 hidden lg:block leading-none">
+                  {t.app.slogan}
+                </p>
+              </div>
+            </button>
           </div>
 
           {/* Controls: Role Switcher, Student Selector, Language, Reset */}
@@ -139,44 +157,19 @@ export const Header: React.FC = () => {
               </div>
             )}
 
-            {/* Role Switcher Pill */}
-            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+            {/* Quitter vers l'accueil button */}
+            {role !== 'home' && (
               <button
-                onClick={() => setRole('teacher')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  role === 'teacher'
-                    ? 'bg-white text-blue-700 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
+                onClick={() => {
+                  if (role === 'teacher') teacherLogout();
+                  if (role === 'student') studentLogout();
+                  setRole('home');
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition shadow-2xs cursor-pointer"
+                title={t.nav.quitPrompt}
               >
-                <UserCheck className="w-3.5 h-3.5" />
-                <span>{t.app.roleTeacher}</span>
-                {isTeacherAuthenticated && (
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" title="Connecté" />
-                )}
-              </button>
-              <button
-                onClick={() => setRole('student')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  role === 'student'
-                    ? 'bg-white text-indigo-700 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                <span>{t.app.roleStudent}</span>
-              </button>
-            </div>
-
-            {/* Teacher Logout button if authenticated */}
-            {role === 'teacher' && isTeacherAuthenticated && (
-              <button
-                onClick={teacherLogout}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50/50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition"
-                title={isRtl ? 'تسجيل الخروج وقفل فضاء الأستاذ' : 'Verrouiller / Déconnexion'}
-              >
-                <Lock className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{isRtl ? 'قفل' : 'Verrouiller'}</span>
+                <LogOut className={`w-3.5 h-3.5 text-rose-600 ${isRtl ? 'rotate-180' : ''}`} />
+                <span>{t.nav.quit}</span>
               </button>
             )}
 

@@ -7,7 +7,6 @@ import {
   QrCode, Wifi, Monitor
 } from 'lucide-react';
 import { LocalNetworkQrModal } from '../network/LocalNetworkQrModal';
-import { LiveClassroomMonitor } from './LiveClassroomMonitor';
 
 export const TeacherDashboard: React.FC = () => {
   const { 
@@ -105,9 +104,6 @@ export const TeacherDashboard: React.FC = () => {
           <span>{isRtl ? 'فتح نافذة العرض والبطاقات' : 'Ouvrir l\'outil QR Code'}</span>
         </button>
       </div>
-
-      {/* Real-Time Classroom Copy Centralization & Live Monitor */}
-      <LiveClassroomMonitor />
 
       {/* 4 Stat Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

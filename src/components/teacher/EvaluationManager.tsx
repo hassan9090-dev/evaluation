@@ -4,18 +4,25 @@ import { translations } from '../../locales/translations';
 import { Evaluation, EvaluationType, SubjectId } from '../../types';
 import { 
   FileCheck2, PlusCircle, Clock, BookOpen, CheckCircle, 
-  PlayCircle, StopCircle, Eye, AlertCircle, X, CheckSquare, Layers
+  PlayCircle, StopCircle, Eye, AlertCircle, X, CheckSquare, Layers,
+  Radio, Wifi, MonitorCheck
 } from 'lucide-react';
+import { LiveClassroomMonitor } from './LiveClassroomMonitor';
 
 export const EvaluationManager: React.FC = () => {
   const { 
     lang, isRtl, evaluations, questions, skills, selectedClassId, 
-    addEvaluation, updateEvaluation, setActiveTeacherTab 
+    addEvaluation, updateEvaluation, setActiveTeacherTab,
+    activePresences, serverConnected
   } = useApp();
 
   const t = translations[lang];
+  const [activeSubTab, setActiveSubTab] = useState<'monitor' | 'list'>('monitor');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [previewEval, setPreviewEval] = useState<Evaluation | null>(null);
+
+  // Count active taking tests
+  const activeTakingCount = activePresences.filter(p => p.status === 'taking_test').length;
 
   // New Evaluation Form
   const [titleFr, setTitleFr] = useState('');
@@ -66,6 +73,7 @@ export const EvaluationManager: React.FC = () => {
 
     addEvaluation(newEval);
     setShowCreateModal(false);
+    setActiveSubTab('list');
 
     // Reset Form
     setTitleFr('');
@@ -84,18 +92,26 @@ export const EvaluationManager: React.FC = () => {
       {/* Top Banner */}
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-blue-50 text-blue-600">
-              <FileCheck2 className="w-5 h-5" />
+          <div className="flex items-center gap-3">
+            <span className="p-2.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
+              <FileCheck2 className="w-6 h-6" />
             </span>
             <div>
-              <h2 className="text-xl font-bold text-slate-900">
-                {isRtl ? 'إدارة الاختبارات والتقويمات التربوية' : 'Gestion des Sessions d\'Évaluation'}
-              </h2>
-              <p className="text-xs text-slate-500">
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-bold text-slate-900">
+                  {isRtl ? 'إدارة الاختبارات والمراقبة المباشرة للنسخ' : 'Évaluations & Surveillance des Copies'}
+                </h2>
+                {activeTakingCount > 0 && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-700 animate-pulse">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                    <span>{activeTakingCount} {isRtl ? 'يجتازون الآن' : 'en examen'}</span>
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
                 {isRtl 
-                  ? 'برمجة وإطلاق التقويم التشخيصي والتكويني والإجمالي للقسم' 
-                  : 'Création, activation et suivi des évaluations diagnostiques, formatives et sommatives'}
+                  ? 'مراقبة مركزية للوحات التلاميذ في الوقت الفعلي، تجميع فوري للإجابات، وبرمجة الجلسات التقويمية' 
+                  : 'Surveillance en direct des tablettes élèves, centralisation des copies et gestion des sessions d\'évaluation'}
               </p>
             </div>
           </div>
@@ -106,15 +122,62 @@ export const EvaluationManager: React.FC = () => {
             setSelectedQuestionIds(availableQuestions.slice(0, 3).map(q => q.id));
             setShowCreateModal(true);
           }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs transition"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs transition cursor-pointer shrink-0"
         >
           <PlusCircle className="w-4 h-4" />
           <span>{isRtl ? 'إنشاء اختبار جديد' : 'Nouvelle Évaluation'}</span>
         </button>
       </div>
 
-      {/* Evaluations Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {/* Sub-Navigation Tabs */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-1.5 bg-slate-100 rounded-2xl border border-slate-200">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={() => setActiveSubTab('monitor')}
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+              activeSubTab === 'monitor'
+                ? 'bg-white text-indigo-700 shadow-xs border border-indigo-100'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+            }`}
+          >
+            <Radio className={`w-4 h-4 text-indigo-600 ${activeTakingCount > 0 ? 'animate-pulse' : ''}`} />
+            <span>{isRtl ? 'المراقبة المباشرة وتجميع النسخ' : 'Surveillance en Direct & Copies'}</span>
+            <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+              activeTakingCount > 0 
+                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' 
+                : 'bg-indigo-50 text-indigo-700'
+            }`}>
+              {activeTakingCount > 0 ? `${activeTakingCount} en direct` : 'Live Room'}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('list')}
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+              activeSubTab === 'list'
+                ? 'bg-white text-blue-700 shadow-xs border border-blue-100'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+            }`}
+          >
+            <BookOpen className="w-4 h-4 text-blue-600" />
+            <span>{isRtl ? 'لائحة وبرمجة الاختبارات' : 'Sessions & Catalogue des Évaluations'}</span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] bg-blue-100 text-blue-800 font-black">
+              {evaluations.length}
+            </span>
+          </button>
+        </div>
+
+        <div className="text-[11px] text-slate-500 hidden sm:flex items-center gap-2 px-3">
+          <span className={`w-2 h-2 rounded-full ${serverConnected ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+          <span>{serverConnected ? (isRtl ? 'الاتصال بالشبكة نشط' : 'Réseau classe connecté') : (isRtl ? 'وضع محلي' : 'Mode local')}</span>
+        </div>
+      </div>
+
+      {/* Main Content Area based on Sub-Tab */}
+      {activeSubTab === 'monitor' ? (
+        <LiveClassroomMonitor />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {evaluations.map(ev => (
           <div
             key={ev.id}
@@ -208,6 +271,7 @@ export const EvaluationManager: React.FC = () => {
           </div>
         ))}
       </div>
+      )}
 
       {/* Preview Modal */}
       {previewEval && (

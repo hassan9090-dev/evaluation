@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'http';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import fs from 'fs';
@@ -186,12 +187,14 @@ async function startServer() {
   });
 
   // ==================== VITE SPA MIDDLEWARE / SERVE ====================
+  const httpServer = http.createServer(app);
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { 
         middlewareMode: true,
-        host: '0.0.0.0',
-        port: PORT,
+        hmr: false,
+        watch: null,
       },
       appType: 'spa',
     });
@@ -203,7 +206,7 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  httpServer.listen(PORT, '0.0.0.0', () => {
     console.log(`[Suivi-Pédagogique] Serveur Central PC Prof actif sur http://0.0.0.0:${PORT}`);
   });
 }

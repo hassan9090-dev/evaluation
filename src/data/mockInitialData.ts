@@ -24,7 +24,7 @@ export const initialStudents: Student[] = Array.from({ length: 25 }, (_, i) => {
     id: `std-${num}`,
     studentCode: `G1340${num}`,
     displayPseudonym: `Élève G1340${num}`,
-    classId: 'class-4aep-a',
+    classId: i < 15 ? 'class-4aep-a' : 'class-4aep-b',
     pin: `${1000 + i + 1}`,
     active: true,
     avatarIcon: avatars[i % avatars.length],

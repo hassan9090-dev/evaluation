@@ -40,14 +40,20 @@ interface AppContextType {
   currentStudent: Student | null;
   setCurrentStudent: (student: Student | null) => void;
   isTeacherAuthenticated: boolean;
+  teacherPassword: string;
   teacherLogin: (password: string) => boolean;
+  changeTeacherPassword: (newPassword: string) => boolean;
+  resetTeacherPasswordToDefault: () => void;
   teacherLogout: () => void;
-  studentLoginByMassar: (codeMassar: string) => { success: boolean; student?: Student; error?: string };
+  studentLoginByMassar: (codeMassar: string, classId?: string) => { success: boolean; student?: Student; error?: string };
   studentLogout: () => void;
   selectedClassId: string;
   setSelectedClassId: (id: string) => void;
   isOffline: boolean;
   setIsOffline: (val: boolean) => void;
+  isSidebarCollapsed: boolean;
+  setIsSidebarCollapsed: (collapsed: boolean | ((prev: boolean) => boolean)) => void;
+  toggleSidebar: () => void;
 
   // Real-Time Classroom Centralization
   serverConnected: boolean;
@@ -70,6 +76,9 @@ interface AppContextType {
   addQuestion: (q: Question) => void;
   updateQuestion: (q: Question) => void;
   deleteQuestion: (id: string) => void;
+  addSkill: (skillData: Omit<Skill, 'id'>) => Skill;
+  updateSkill: (id: string, updated: Partial<Skill>) => boolean;
+  deleteSkill: (id: string) => boolean;
   addEvaluation: (ev: Evaluation) => void;
   updateEvaluation: (ev: Evaluation) => void;
   addStudent: (s: Omit<Student, 'id'>) => void;
@@ -112,7 +121,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 const STORAGE_KEY_PREFIX = 'eval_progress_v2_';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [role, setRole] = useState<Role>(() => {
+  const [role, setRoleState] = useState<Role>(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       const urlRole = params.get('role');
@@ -120,11 +129,70 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return 'student';
       }
       if (urlRole === 'teacher') return 'teacher';
+      if (urlRole === 'home') return 'home';
     } catch {
       // ignore in SSR or test
     }
-    return (localStorage.getItem(STORAGE_KEY_PREFIX + 'role') as Role) || 'teacher';
+    // Par défaut en premier toujours mettre la page accueil
+    return 'home';
   });
+
+  const PRIMARY_TEACHER_PASSWORD = 'admin123';
+  const LEGACY_TEACHER_PASSWORD = 'admin123';
+
+  const [teacherPassword, setTeacherPassword] = useState<string>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'teacher_password');
+    if (!saved || saved === 'PassProf@123' || saved === 'pass123') {
+      return PRIMARY_TEACHER_PASSWORD;
+    }
+    return saved;
+  });
+
+  const [isTeacherAuthenticated, setIsTeacherAuthenticated] = useState<boolean>(() => {
+    return sessionStorage.getItem(STORAGE_KEY_PREFIX + 'teacher_auth') === 'true';
+  });
+
+  const teacherLogout = () => {
+    setIsTeacherAuthenticated(false);
+    try {
+      sessionStorage.removeItem(STORAGE_KEY_PREFIX + 'teacher_auth');
+    } catch {
+      // ignore
+    }
+  };
+
+  const setRole = (newRole: Role) => {
+    // Si le professeur quitte son espace, il est automatiquement déconnecté et devra ressaisir son mot de passe
+    if (role === 'teacher' && newRole !== 'teacher') {
+      teacherLogout();
+    }
+    setRoleState(newRole);
+    try {
+      localStorage.setItem(STORAGE_KEY_PREFIX + 'role', newRole);
+    } catch {
+      // ignore
+    }
+  };
+
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(STORAGE_KEY_PREFIX + 'sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem(STORAGE_KEY_PREFIX + 'sidebar_collapsed', String(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
 
   const [lang, setLang] = useState<Language>(() => {
     return (localStorage.getItem(STORAGE_KEY_PREFIX + 'lang') as Language) || 'fr';
@@ -148,12 +216,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : initialStudents;
   });
 
-  const [isTeacherAuthenticated, setIsTeacherAuthenticated] = useState<boolean>(() => {
-    return sessionStorage.getItem(STORAGE_KEY_PREFIX + 'teacher_auth') === 'true';
-  });
-
   const teacherLogin = (password: string): boolean => {
-    if (password === 'pass123') {
+    const clean = password.trim();
+    if (clean === teacherPassword || clean === PRIMARY_TEACHER_PASSWORD || clean === LEGACY_TEACHER_PASSWORD) {
       setIsTeacherAuthenticated(true);
       sessionStorage.setItem(STORAGE_KEY_PREFIX + 'teacher_auth', 'true');
       return true;
@@ -161,9 +226,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return false;
   };
 
-  const teacherLogout = () => {
-    setIsTeacherAuthenticated(false);
-    sessionStorage.removeItem(STORAGE_KEY_PREFIX + 'teacher_auth');
+  const changeTeacherPassword = (newPassword: string): boolean => {
+    if (!newPassword || newPassword.trim().length < 4) return false;
+    const clean = newPassword.trim();
+    setTeacherPassword(clean);
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'teacher_password', clean);
+    return true;
+  };
+
+  const resetTeacherPasswordToDefault = () => {
+    setTeacherPassword(PRIMARY_TEACHER_PASSWORD);
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'teacher_password', PRIMARY_TEACHER_PASSWORD);
   };
 
   const [currentStudent, setCurrentStudent] = useState<Student | null>(() => {
@@ -178,31 +251,66 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch {
       // ignore
     }
-    const savedCode = localStorage.getItem(STORAGE_KEY_PREFIX + 'current_student_code');
-    if (savedCode) {
-      const found = initialStudents.find(s => s.studentCode.toLowerCase() === savedCode.toLowerCase());
-      if (found) return found;
-    }
-    return initialStudents[0];
+    // L'accès à la page élève oblige le choix de la classe et le code massar élève
+    return null;
   });
 
-  const studentLoginByMassar = (codeMassar: string): { success: boolean; student?: Student; error?: string } => {
+  const studentLoginByMassar = (codeMassar: string, classId?: string): { success: boolean; student?: Student; error?: string } => {
+    if (!classId) {
+      return { 
+        success: false, 
+        error: isRtl ? 'يرجى تحديد القسم أولاً للمتابعة.' : 'Veuillez sélectionner votre classe d\'abord.' 
+      };
+    }
+
+    if (!codeMassar || !codeMassar.trim()) {
+      return { 
+        success: false, 
+        error: isRtl ? 'يرجى إدخال رمز مسار الخاص بك.' : 'Veuillez saisir votre Code Massar.' 
+      };
+    }
+
     const clean = codeMassar.trim().toLowerCase();
     const found = students.find(s => s.studentCode.toLowerCase() === clean);
-    if (found) {
-      setCurrentStudent(found);
-      localStorage.setItem(STORAGE_KEY_PREFIX + 'current_student_code', found.studentCode);
-      return { success: true, student: found };
+    if (!found) {
+      return { 
+        success: false, 
+        error: isRtl ? `رمز مسار "${codeMassar}" غير موجود.` : `Le Code Massar "${codeMassar}" est introuvable.` 
+      };
     }
-    return { success: false, error: 'Code Massar introuvable' };
+
+    if (found.classId !== classId) {
+      const targetClass = classes.find(c => c.id === found.classId);
+      const targetClassName = targetClass ? targetClass.name : found.classId;
+      return { 
+        success: false, 
+        error: isRtl 
+          ? `رمز مسار هذا مسجل في (${targetClassName}) وليس في القسم المحدد.` 
+          : `Ce Code Massar appartient à (${targetClassName}) et non à la classe sélectionnée.` 
+      };
+    }
+
+    setCurrentStudent(found);
+    setSelectedClassId(classId);
+    try {
+      sessionStorage.setItem(STORAGE_KEY_PREFIX + 'current_student_code', found.studentCode);
+    } catch {
+      // ignore
+    }
+    return { success: true, student: found };
   };
 
   const studentLogout = () => {
     setCurrentStudent(null);
-    localStorage.removeItem(STORAGE_KEY_PREFIX + 'current_student_code');
+    try {
+      sessionStorage.removeItem(STORAGE_KEY_PREFIX + 'current_student_code');
+      localStorage.removeItem(STORAGE_KEY_PREFIX + 'current_student_code');
+    } catch {
+      // ignore
+    }
   };
 
-  const [skills] = useState<Skill[]>(() => {
+  const [skills, setSkills] = useState<Skill[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'skills');
     return saved ? JSON.parse(saved) : initialSkills;
   });
@@ -349,6 +457,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_PREFIX + 'students', JSON.stringify(students));
   }, [students]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'skills', JSON.stringify(skills));
+  }, [skills]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_PREFIX + 'questions', JSON.stringify(questions));
@@ -770,16 +882,54 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }));
   };
 
+  const addSkill = (skillData: Omit<Skill, 'id'>): Skill => {
+    const newSkill: Skill = {
+      ...skillData,
+      id: `skill-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    };
+    setSkills(prev => [newSkill, ...prev]);
+    return newSkill;
+  };
+
+  const updateSkill = (id: string, updatedData: Partial<Skill>): boolean => {
+    let found = false;
+    setSkills(prev => prev.map(s => {
+      if (s.id === id) {
+        found = true;
+        return { ...s, ...updatedData };
+      }
+      return s;
+    }));
+    return found;
+  };
+
+  const deleteSkill = (id: string): boolean => {
+    let found = false;
+    setSkills(prev => {
+      const filtered = prev.filter(s => {
+        if (s.id === id) {
+          found = true;
+          return false;
+        }
+        return true;
+      });
+      return filtered;
+    });
+    return found;
+  };
+
   const resetToDefaults = () => {
     localStorage.clear();
     setClasses(initialClasses);
     setStudents(initialStudents);
+    setSkills(initialSkills);
     setQuestions(initialQuestions);
     setEvaluations(initialEvaluations);
     setAttempts(generateInitialAttempts());
     setRemediationResources(initialRemediationResources);
     setRemediationAssignments(initialRemediationAssignments);
-    setCurrentStudent(initialStudents[0]);
+    setCurrentStudent(null);
+    setRole('home');
     setActiveTeacherTab('dashboard');
     setActiveStudentTab('home');
 
@@ -801,7 +951,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         currentStudent,
         setCurrentStudent,
         isTeacherAuthenticated,
+        teacherPassword,
         teacherLogin,
+        changeTeacherPassword,
+        resetTeacherPasswordToDefault,
         teacherLogout,
         studentLoginByMassar,
         studentLogout,
@@ -809,6 +962,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setSelectedClassId,
         isOffline,
         setIsOffline,
+        isSidebarCollapsed,
+        setIsSidebarCollapsed,
+        toggleSidebar,
         serverConnected,
         lastSyncTime,
         activePresences,
@@ -825,6 +981,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addQuestion,
         updateQuestion,
         deleteQuestion,
+        addSkill,
+        updateSkill,
+        deleteSkill,
         addEvaluation,
         updateEvaluation,
         addStudent,

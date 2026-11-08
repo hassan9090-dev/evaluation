@@ -15,6 +15,7 @@ export const translations = {
       anonymousNotice: "Conformité CNDP & Loi 09-08 : Identifiants pseudonymes respectant la vie privée.",
     },
     nav: {
+      home: "Page d'Accueil",
       dashboard: "Tableau de bord",
       classes: "Classes & Élèves",
       skills: "Référentiel Compétences",
@@ -28,6 +29,10 @@ export const translations = {
       studentTests: "Mes Évaluations",
       studentResults: "Mes Résultats",
       studentRemediation: "Mes Activités de Soutien",
+      collapseSidebar: "Réduire le menu",
+      expandSidebar: "Développer le menu",
+      quit: "Quitter (Accueil)",
+      quitPrompt: "Quitter et revenir à la page d'accueil",
     },
     masteryLevels: {
       level1: "Non maîtrisé (<50%)",
@@ -172,6 +177,7 @@ export const translations = {
       anonymousNotice: "مطابق للقانون 09-08 واللجنة الوطنية CNDP: استعمال معرّفات مستعارة لحماية المعطيات الشخصية.",
     },
     nav: {
+      home: "الصفحة الرئيسية",
       dashboard: "لوحة القيادة",
       classes: "الأقسام والمتعلمون",
       skills: "شبكة المهارات المعتمدة",
@@ -185,6 +191,10 @@ export const translations = {
       studentTests: "اختباراتي",
       studentResults: "دفتر كفاياتي",
       studentRemediation: "أنشطة الدعم المخصصة لي",
+      collapseSidebar: "تصغير القائمة",
+      expandSidebar: "توسيع القائمة",
+      quit: "خروج (الرئيسية)",
+      quitPrompt: "الخروج والعودة إلى الصفحة الرئيسية",
     },
     masteryLevels: {
       level1: "غير متحكم فيه (< 50%)",

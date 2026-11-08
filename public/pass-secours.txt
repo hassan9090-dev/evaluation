@@ -1,0 +1,14 @@
+===================================================================
+SUIVI-PEDAGOGIQUE (4AEP) - MOT DE PASSE DE SECOURS ENSEIGNANT
+===================================================================
+
+Mot de passe de secours Enseignant :
+admin123
+
+رمز المرور الاحتياطي للأستاذ :
+admin123
+
+Date de configuration : 2026-11-08
+Remarque : Ce mot de passe permet la réinitialisation et l'accès d'urgence
+à l'Espace Enseignant en cas d'oubli du mot de passe personnalisé.
+===================================================================

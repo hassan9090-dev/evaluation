@@ -1,18 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { translations } from '../../locales/translations';
 import { 
   Wifi, CheckCircle2, Clock, Eye, AlertCircle, 
   RotateCcw, Sparkles, UserCheck, ShieldCheck, Layers,
-  FileCheck, ArrowRight
+  FileCheck, ArrowRight, School, Users
 } from 'lucide-react';
 
 export const LiveClassroomMonitor: React.FC = () => {
   const { 
-    lang, isRtl, students, attempts, evaluations, 
+    lang, isRtl, classes, selectedClassId, setSelectedClassId,
+    students, attempts, evaluations, 
     activePresences, serverConnected, lastSyncTime, syncNow,
     setActiveTeacherTab
   } = useApp();
+
+  const [filterClassId, setFilterClassId] = useState<string>(selectedClassId || 'all');
 
   const t = translations[lang];
 
@@ -21,6 +24,9 @@ export const LiveClassroomMonitor: React.FC = () => {
 
   // Count active taking tests
   const activeTakingTest = activePresences.filter(p => p.status === 'taking_test');
+
+  // Filter students by chosen class
+  const displayedStudents = students.filter(st => filterClassId === 'all' || st.classId === filterClassId);
 
   return (
     <div className="bg-white rounded-3xl p-6 border-2 border-indigo-100 shadow-md space-y-6">
@@ -77,11 +83,60 @@ export const LiveClassroomMonitor: React.FC = () => {
         </div>
       </div>
 
-      {/* 25 Students Live Grid */}
+      {/* Class Switcher Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+        <span className="text-xs font-bold text-slate-500 shrink-0 flex items-center gap-1">
+          <School className="w-3.5 h-3.5 text-indigo-600" />
+          <span>{isRtl ? 'تصنيف حسب القسم :' : 'Filtrer par classe :'}</span>
+        </span>
+
+        <button
+          onClick={() => {
+            setFilterClassId('all');
+          }}
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
+            filterClassId === 'all'
+              ? 'bg-slate-900 text-white shadow-2xs'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          {isRtl ? 'جميع الأقسام' : 'Toutes les classes'} ({students.length})
+        </button>
+
+        {classes.map(cls => {
+          const count = students.filter(s => s.classId === cls.id).length;
+          const isSelected = filterClassId === cls.id;
+          return (
+            <button
+              key={cls.id}
+              onClick={() => {
+                setFilterClassId(cls.id);
+                setSelectedClassId(cls.id);
+              }}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+                isSelected
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              <span>{cls.name}</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+              }`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Students Live Grid */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between text-xs text-slate-500">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-500 gap-2">
           <span className="font-bold">
-            {isRtl ? 'حالة لوحات جميع تلاميذ القسم (4AEP) :' : 'État des 25 tablettes de la classe (4AEP) :'}
+            {isRtl 
+              ? `حالة لوحات التلاميذ (${displayedStudents.length} لوحة) :` 
+              : `État des ${displayedStudents.length} tablettes (${filterClassId === 'all' ? 'Toutes sections' : classes.find(c => c.id === filterClassId)?.name || 'Classe'}) :`}
           </span>
           <div className="flex items-center gap-3 text-[11px]">
             <span className="flex items-center gap-1">
@@ -100,7 +155,7 @@ export const LiveClassroomMonitor: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {students.map((st) => {
+          {displayedStudents.map((st) => {
             // Find live presence
             const presence = activePresences.find(p => p.studentId === st.id);
             // Find submitted attempt

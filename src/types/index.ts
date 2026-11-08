@@ -1,4 +1,4 @@
-export type Role = 'teacher' | 'student';
+export type Role = 'home' | 'teacher' | 'student';
 export type Language = 'fr' | 'ar';
 
 export type SubjectId = 'francais' | 'mathematiques';
