@@ -601,7 +601,7 @@ export const initialEvaluations: Evaluation[] = [
     questionIds: ['q-fr-01', 'q-fr-02', 'q-fr-03', 'q-fr-04', 'q-ma-01', 'q-ma-02'],
     totalScore: 11,
     durationMinutes: 45,
-    status: 'closed',
+    status: 'active',
     createdAt: '2026-09-15T09:00:00Z',
   },
   {

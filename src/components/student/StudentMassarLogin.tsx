@@ -3,8 +3,10 @@ import { useApp } from '../../context/AppContext';
 import { translations } from '../../locales/translations';
 import { 
   Sparkles, GraduationCap, ArrowRight, UserCheck, 
-  Search, CheckCircle2, AlertCircle, KeyRound, ShieldCheck 
+  Search, CheckCircle2, AlertCircle, KeyRound, ShieldCheck,
+  Camera, QrCode
 } from 'lucide-react';
+import { StudentQrCameraScanner } from '../network/StudentQrCameraScanner';
 
 export const StudentMassarLogin: React.FC = () => {
   const { lang, isRtl, students, studentLoginByMassar, setRole } = useApp();
@@ -13,6 +15,20 @@ export const StudentMassarLogin: React.FC = () => {
   const [inputCode, setInputCode] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [filterQuery, setFilterQuery] = useState('');
+  const [showScanner, setShowScanner] = useState(false);
+
+  const handleQrScanSuccess = (scannedCode: string) => {
+    setInputCode(scannedCode);
+    setErrorMsg(null);
+    const res = studentLoginByMassar(scannedCode);
+    if (!res.success) {
+      setErrorMsg(
+        isRtl 
+          ? `رمز مسار "${scannedCode}" غير مسجل في لائحة القسم.`
+          : `Le Code Massar "${scannedCode}" est introuvable.`
+      );
+    }
+  };
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,18 +112,42 @@ export const StudentMassarLogin: React.FC = () => {
                 className="w-full py-3 px-4 font-mono font-bold text-base border-2 border-indigo-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50/50 uppercase placeholder:normal-case placeholder:font-normal placeholder:text-slate-400"
               />
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">
-              {isRtl ? 'مثال: G134001 إلى G134025' : 'Format : G134001 à G134025'}
-            </p>
+            <div className="flex items-center justify-between text-xs pt-1.5">
+              <span className="text-[11px] text-slate-400">
+                {isRtl ? 'مثال: G134001 إلى G134025' : 'Format : G134001 à G134025'}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setInputCode('G134001');
+                  studentLoginByMassar('G134001');
+                }}
+                className="text-[11px] font-mono font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded-lg border border-indigo-200 transition cursor-pointer"
+              >
+                G134001 (دخول سريع)
+              </button>
+            </div>
           </div>
 
-          <button
-            type="submit"
-            className="w-full py-3.5 rounded-2xl bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-sm shadow-lg shadow-indigo-500/20 transition flex items-center justify-center gap-2 group cursor-pointer"
-          >
-            <span>{t.student.accessTestButton}</span>
-            <ArrowRight className={`w-4 h-4 transition-transform ${isRtl ? 'group-hover:-translate-x-1 rotate-180' : 'group-hover:translate-x-1'}`} />
-          </button>
+          <div className="flex flex-col sm:flex-row gap-2 pt-1">
+            <button
+              type="submit"
+              className="flex-1 py-3.5 rounded-2xl bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-sm shadow-lg shadow-indigo-500/20 transition flex items-center justify-center gap-2 group cursor-pointer"
+            >
+              <span>{t.student.accessTestButton}</span>
+              <ArrowRight className={`w-4 h-4 transition-transform ${isRtl ? 'group-hover:-translate-x-1 rotate-180' : 'group-hover:translate-x-1'}`} />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowScanner(true)}
+              className="py-3.5 px-4 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-extrabold text-xs border border-indigo-200 transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+              title={isRtl ? 'مسح رمز QR للبطاقة بواسطة الكاميرا' : 'Scanner mon badge élève'}
+            >
+              <Camera className="w-4 h-4 text-indigo-600" />
+              <span>{isRtl ? 'مسح الرمز (QR)' : 'Scanner mon badge'}</span>
+            </button>
+          </div>
         </form>
 
         {/* Quick Clickable Massar List for 4AEP students */}
@@ -171,6 +211,14 @@ export const StudentMassarLogin: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Student QR Camera Scanner Modal */}
+      <StudentQrCameraScanner
+        isOpen={showScanner}
+        onClose={() => setShowScanner(false)}
+        onScanSuccess={handleQrScanSuccess}
+        isRtl={isRtl}
+      />
     </div>
   );
 };

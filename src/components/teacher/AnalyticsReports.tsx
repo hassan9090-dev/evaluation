@@ -70,7 +70,7 @@ export const AnalyticsReports: React.FC = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `Rapport_Classe_${currentClass.name.replace(/\s+/g, '_')}_EVAL_PROGRESS.csv`);
+    link.setAttribute('download', `Rapport_Classe_${currentClass.name.replace(/\s+/g, '_')}_Suivi_Pedagogique.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -344,7 +344,7 @@ export const AnalyticsReports: React.FC = () => {
           <div className="border-b-2 border-slate-900 pb-5 flex items-start justify-between">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-1">
-                ÉVAL'PROGRESS • RECHERCHE-DÉVELOPPEMENT EDTECH
+                SUIVI-PÉDAGOGIQUE • RECHERCHE-DÉVELOPPEMENT EDTECH
               </span>
               <h1 className="text-xl font-black tracking-tight text-slate-900">
                 RAPPORT SYNTHÉTIQUE COLLECTIF DU GROUPE-CLASSE (4AEP)
@@ -448,7 +448,7 @@ export const AnalyticsReports: React.FC = () => {
           {/* Research note footer */}
           <div className="pt-4 border-t border-slate-200 text-xs text-slate-500 flex items-center justify-between">
             <span>Données agrégées anonymes exploitables pour publication académique et mémoire de Master.</span>
-            <span>Généré par ÉVAL'PROGRESS v1.0</span>
+            <span>Généré par Suivi-Pédagogique v1.0</span>
           </div>
         </div>
       )}

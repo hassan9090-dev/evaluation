@@ -7,7 +7,7 @@ import {
   Sparkles, BookOpen, Award, CheckCircle2, Clock, 
   ArrowRight, ArrowLeft, Send, Check, Star, ShieldCheck, 
   HelpCircle, ChevronRight, AlertCircle, HeartHandshake, Smile,
-  ArrowUp, ArrowDown, Shuffle, Link2, FolderPlus, Eye, SearchCheck, LogOut
+  ArrowUp, ArrowDown, Shuffle, Link2, FolderPlus, Eye, SearchCheck, LogOut, RotateCcw
 } from 'lucide-react';
 import { StudentMassarLogin } from './StudentMassarLogin';
 
@@ -16,7 +16,7 @@ export const StudentPortal: React.FC = () => {
     lang, isRtl, currentStudent, evaluations, attempts, 
     questions, skills, remediationAssignments, remediationResources, 
     submitAttempt, completeRemediation, activeStudentTab, setActiveStudentTab,
-    studentLogout
+    studentLogout, sendStudentPresence
   } = useApp();
 
   const t = translations[lang];
@@ -40,20 +40,12 @@ export const StudentPortal: React.FC = () => {
   const [remQuizFeedback, setRemQuizFeedback] = useState<string | null>(null);
   const [selectedWordForPlacement, setSelectedWordForPlacement] = useState<string | null>(null);
 
-  if (!currentStudent) {
-    return <StudentMassarLogin />;
-  }
-
   // Student's completed & pending attempts
-  const studentAttempts = attempts.filter(a => a.studentId === currentStudent.id);
-  const studentAssignments = remediationAssignments.filter(a => a.studentId === currentStudent.id);
+  const studentAttempts = currentStudent ? attempts.filter(a => a.studentId === currentStudent.id) : [];
+  const studentAssignments = currentStudent ? remediationAssignments.filter(a => a.studentId === currentStudent.id) : [];
 
-  // Active tests available to take
-  const availableEvaluations = evaluations.filter(ev => {
-    if (ev.status !== 'active') return false;
-    const existingAttempt = studentAttempts.find(a => a.evaluationId === ev.id && a.status === 'corrected');
-    return !existingAttempt;
-  });
+  // Active tests available to take - always show all active evaluations!
+  const availableEvaluations = evaluations.filter(ev => ev.status === 'active');
 
   // Start an evaluation
   const handleStartTest = (ev: Evaluation) => {
@@ -96,7 +88,7 @@ export const StudentPortal: React.FC = () => {
 
   // Submit test
   const handleFinalSubmit = () => {
-    if (!activeTest) return;
+    if (!activeTest || !currentStudent) return;
 
     const newAttempt: EvaluationAttempt = {
       id: `att-${Date.now().toString().slice(-6)}`,
@@ -172,11 +164,37 @@ export const StudentPortal: React.FC = () => {
     return () => clearInterval(autoTimer);
   }, [isTimeUpModal, autoSubmitCountdown, activeTest]);
 
+  // Live Presence heartbeat to Teacher PC
+  useEffect(() => {
+    if (!currentStudent) return;
+    sendStudentPresence({
+      currentTestId: activeTest?.id,
+      currentQIndex: activeTest ? currentQuestionIndex + 1 : 0,
+      totalQuestions: activeTest ? activeTest.questionIds.length : 0,
+      status: activeTest ? 'taking_test' : 'online',
+    });
+
+    const pInterval = setInterval(() => {
+      sendStudentPresence({
+        currentTestId: activeTest?.id,
+        currentQIndex: activeTest ? currentQuestionIndex + 1 : 0,
+        totalQuestions: activeTest ? activeTest.questionIds.length : 0,
+        status: activeTest ? 'taking_test' : 'online',
+      });
+    }, 4000);
+
+    return () => clearInterval(pInterval);
+  }, [currentStudent?.id, activeTest?.id, currentQuestionIndex, sendStudentPresence]);
+
   const formatTime = (totalSeconds: number) => {
     const mins = Math.floor(Math.max(0, totalSeconds) / 60);
     const secs = Math.max(0, totalSeconds) % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
+
+  if (!currentStudent) {
+    return <StudentMassarLogin />;
+  }
 
   return (
     <div className="space-y-6">
@@ -284,7 +302,8 @@ export const StudentPortal: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {availableEvaluations.map(ev => {
               const existingAttempt = studentAttempts.find(a => a.evaluationId === ev.id);
-              const isSubmitted = existingAttempt && existingAttempt.status !== 'in_progress';
+              const isCorrected = existingAttempt && existingAttempt.status === 'corrected';
+              const isSubmitted = existingAttempt && existingAttempt.status === 'submitted';
 
               return (
                 <div
@@ -292,37 +311,75 @@ export const StudentPortal: React.FC = () => {
                   className="bg-white rounded-3xl p-6 border-2 border-slate-100 hover:border-blue-300 shadow-sm hover:shadow-md transition flex flex-col justify-between"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider ${
-                        ev.subjectId === 'francais' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'
-                      }`}>
-                        {ev.subjectId === 'francais' ? 'Français' : 'Mathématiques'}
-                      </span>
-                      <span className="text-xs text-slate-400 font-semibold flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5" />
-                        {ev.durationMinutes} min
+                    <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
+                          ev.subjectId === 'francais' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'
+                        }`}>
+                          {ev.subjectId === 'francais' ? 'Français' : 'Mathématiques'}
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                          {ev.type === 'diagnostic' ? (isRtl ? 'تشخيصي' : 'Diagnostique') : (isRtl ? 'تكويني' : 'Formatif')}
+                        </span>
+                      </div>
+                      <span className="text-xs text-slate-500 font-semibold flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-100">
+                        <Clock className="w-3.5 h-3.5 text-blue-600" />
+                        <span>{ev.durationMinutes} min</span>
                       </span>
                     </div>
 
-                    <h4 className="font-extrabold text-base text-slate-900 mb-2">
+                    <h4 className="font-extrabold text-base text-slate-900 mb-2 leading-snug">
                       {isRtl ? ev.titleAr : ev.titleFr}
                     </h4>
-                    <p className="text-xs text-slate-600 mb-5 leading-relaxed line-clamp-3">
+                    <p className="text-xs text-slate-600 mb-4 leading-relaxed line-clamp-3">
                       {isRtl ? ev.descriptionAr : ev.descriptionFr}
                     </p>
 
+                    {/* Attempt Status Banner if taken */}
+                    {isCorrected && (
+                      <div className="mb-4 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs">
+                        <span className="text-emerald-800 font-bold flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>{isRtl ? 'تم التصحيح :' : 'Corrigé :'}</span>
+                        </span>
+                        <span className="font-mono font-black text-emerald-700 bg-white px-2 py-0.5 rounded-md border border-emerald-200">
+                          {existingAttempt.totalScore} / {existingAttempt.maxScore} pts ({existingAttempt.percentage}%)
+                        </span>
+                      </div>
+                    )}
+
+                    {isSubmitted && !isCorrected && (
+                      <div className="mb-4 p-2.5 rounded-xl bg-amber-50 border border-amber-200 flex items-center gap-2 text-xs text-amber-800 font-bold">
+                        <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                        <span>{isRtl ? 'تم الإرسال (في انتظار تصحيح الأستاذ)' : 'Devoir envoyé (en attente de correction)'}</span>
+                      </div>
+                    )}
+
                     <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between text-xs font-bold text-slate-700 mb-6">
-                      <span>{ev.questionIds.length} questions</span>
-                      <span className="text-blue-700">{ev.totalScore} points</span>
+                      <span>{ev.questionIds.length} {isRtl ? 'أسئلة' : 'questions'}</span>
+                      <span className="text-blue-700">{ev.totalScore} {isRtl ? 'نقطة' : 'points'}</span>
                     </div>
                   </div>
 
                   <button
                     onClick={() => handleStartTest(ev)}
-                    className="w-full py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md shadow-blue-500/20 transition flex items-center justify-center gap-2 group"
+                    className={`w-full py-3 rounded-2xl text-white font-extrabold text-xs shadow-md transition flex items-center justify-center gap-2 group cursor-pointer ${
+                      isCorrected || isSubmitted
+                        ? 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/20'
+                        : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20'
+                    }`}
                   >
-                    <span>{isRtl ? 'بدء الاختبار الآن' : 'Commencer l\'évaluation'}</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    {isCorrected || isSubmitted ? (
+                      <>
+                        <RotateCcw className="w-4 h-4 group-hover:-rotate-45 transition-transform" />
+                        <span>{isRtl ? 'إعادة إنجاز الاختبار (للتدريب)' : 'Refaire l\'évaluation (Entraînement)'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{isRtl ? 'بدء الاختبار الآن' : 'Commencer l\'évaluation'}</span>
+                        <ArrowRight className={`w-4 h-4 transition-transform ${isRtl ? 'group-hover:-translate-x-1 rotate-180' : 'group-hover:translate-x-1'}`} />
+                      </>
+                    )}
                   </button>
                 </div>
               );

@@ -21,8 +21,8 @@ export const ResearchProtocolView: React.FC = () => {
         </div>
         <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white mb-2">
           {isRtl 
-            ? 'الإطار الأكاديمي والبروتوكول التجريبي لمشروع ÉVAL\'PROGRESS' 
-            : 'Cadre Épistémologique & Protocole Expérimental du Projet ÉVAL\'PROGRESS'}
+            ? 'الإطار الأكاديمي والبروتوكول التجريبي لمشروع Suivi-Pédagogique' 
+            : 'Cadre Épistémologique & Protocole Expérimental du Projet Suivi-Pédagogique'}
         </h2>
         <p className="text-slate-300 text-xs md:text-sm max-w-3xl leading-relaxed">
           {isRtl

@@ -3,17 +3,21 @@ import { useApp } from '../context/AppContext';
 import { translations } from '../locales/translations';
 import { 
   GraduationCap, UserCheck, Languages, Wifi, WifiOff, 
-  RotateCcw, Sparkles, ShieldCheck, ChevronDown, LogOut, Lock
+  RotateCcw, Sparkles, ShieldCheck, ChevronDown, LogOut, Lock,
+  QrCode
 } from 'lucide-react';
+import { LocalNetworkQrModal } from './network/LocalNetworkQrModal';
 
 export const Header: React.FC = () => {
   const { 
     role, setRole, lang, setLang, isRtl, isOffline, setIsOffline, 
     currentStudent, setCurrentStudent, students, resetToDefaults,
-    isTeacherAuthenticated, teacherLogout, studentLogout
+    isTeacherAuthenticated, teacherLogout, studentLogout,
+    serverConnected, lastSyncTime
   } = useApp();
 
   const [showStudentPicker, setShowStudentPicker] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
   const t = translations[lang];
 
   return (
@@ -25,6 +29,15 @@ export const Header: React.FC = () => {
           <span className="font-medium">{t.app.anonymousNotice}</span>
         </div>
         <div className="flex items-center gap-3 shrink-0">
+          {/* Central PC Prof status */}
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-bold bg-white/10 text-white border border-white/20" title={lastSyncTime ? `Dernière synchro: ${lastSyncTime}` : 'Connecté au serveur PC Prof'}>
+            <span className={`w-2 h-2 rounded-full ${serverConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+            <span className="hidden sm:inline">
+              {serverConnected 
+                ? (isRtl ? 'حاسوب الأستاذ متصل' : 'PC Prof Connecté')
+                : (isRtl ? 'حفظ محلي' : 'Mode Local')}
+            </span>
+          </div>
           <button
             onClick={() => setIsOffline(!isOffline)}
             className={`flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium transition-colors ${
@@ -58,8 +71,8 @@ export const Header: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="font-bold text-xl tracking-tight text-slate-900 flex items-center gap-1.5">
-                  <span>ÉVAL</span>
-                  <span className="text-blue-600">'PROGRESS</span>
+                  <span>Suivi</span>
+                  <span className="text-blue-600">-Pédagogique</span>
                 </h1>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 uppercase tracking-wider">
                   4AEP
@@ -167,6 +180,16 @@ export const Header: React.FC = () => {
               </button>
             )}
 
+            {/* Local Network QR Code Projector Button */}
+            <button
+              onClick={() => setShowQrModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-indigo-200 bg-indigo-50/80 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition shadow-2xs cursor-pointer"
+              title={isRtl ? 'عرض ومشاركة رمز QR لربط أجهزة التلاميذ' : 'Projeter le QR Code pour les tablettes (Réseau Local)'}
+            >
+              <QrCode className="w-3.5 h-3.5 text-indigo-600" />
+              <span className="hidden sm:inline">{isRtl ? 'رمز QR للقسم' : 'QR Code Tablettes'}</span>
+            </button>
+
             {/* Language Switcher */}
             <button
               onClick={() => setLang(lang === 'fr' ? 'ar' : 'fr')}
@@ -192,6 +215,12 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Local Network QR Code Projector Modal */}
+      <LocalNetworkQrModal 
+        isOpen={showQrModal} 
+        onClose={() => setShowQrModal(false)} 
+      />
     </header>
   );
 };

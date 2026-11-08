@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { 
   Role, Language, SchoolClass, Student, Skill, Question, 
-  Evaluation, EvaluationAttempt, RemediationResource, RemediationAssignment, MasteryLevel 
+  Evaluation, EvaluationAttempt, RemediationResource, RemediationAssignment, MasteryLevel,
+  LivePresence
 } from '../types';
 import { 
   initialClasses, initialStudents, initialSkills, initialQuestions, 
@@ -47,6 +48,13 @@ interface AppContextType {
   setSelectedClassId: (id: string) => void;
   isOffline: boolean;
   setIsOffline: (val: boolean) => void;
+
+  // Real-Time Classroom Centralization
+  serverConnected: boolean;
+  lastSyncTime: string | null;
+  activePresences: LivePresence[];
+  syncNow: () => Promise<void>;
+  sendStudentPresence: (data: Partial<LivePresence>) => void;
 
   // Data
   classes: SchoolClass[];
@@ -101,10 +109,20 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const STORAGE_KEY_PREFIX = 'eval_progress_v1_';
+const STORAGE_KEY_PREFIX = 'eval_progress_v2_';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [role, setRole] = useState<Role>(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlRole = params.get('role');
+      if (urlRole === 'student' || params.get('massar') || params.get('code')) {
+        return 'student';
+      }
+      if (urlRole === 'teacher') return 'teacher';
+    } catch {
+      // ignore in SSR or test
+    }
     return (localStorage.getItem(STORAGE_KEY_PREFIX + 'role') as Role) || 'teacher';
   });
 
@@ -149,12 +167,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const [currentStudent, setCurrentStudent] = useState<Student | null>(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlMassar = params.get('massar') || params.get('code');
+      if (urlMassar) {
+        const clean = urlMassar.trim().toLowerCase();
+        const found = initialStudents.find(s => s.studentCode.toLowerCase() === clean);
+        if (found) return found;
+      }
+    } catch {
+      // ignore
+    }
     const savedCode = localStorage.getItem(STORAGE_KEY_PREFIX + 'current_student_code');
     if (savedCode) {
       const found = initialStudents.find(s => s.studentCode.toLowerCase() === savedCode.toLowerCase());
       if (found) return found;
     }
-    return null;
+    return initialStudents[0];
   });
 
   const studentLoginByMassar = (codeMassar: string): { success: boolean; student?: Student; error?: string } => {
@@ -202,6 +231,105 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'rem_asg');
     return saved ? JSON.parse(saved) : initialRemediationAssignments;
   });
+
+  // Central Server Synchronization States
+  const [serverConnected, setServerConnected] = useState<boolean>(true);
+  const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
+  const [activePresences, setActivePresences] = useState<LivePresence[]>([]);
+
+  // 1. Synchronize attempts with PC Prof
+  const syncNow = useCallback(async () => {
+    try {
+      const res = await fetch('/api/attempts');
+      if (res.ok) {
+        const serverAttempts: EvaluationAttempt[] = await res.json();
+        setServerConnected(true);
+        setLastSyncTime(new Date().toLocaleTimeString());
+
+        if (Array.isArray(serverAttempts) && serverAttempts.length > 0) {
+          setAttempts(prev => {
+            const mergedMap = new Map<string, EvaluationAttempt>();
+            prev.forEach(a => mergedMap.set(a.id, a));
+            serverAttempts.forEach(sa => mergedMap.set(sa.id, sa));
+            return Array.from(mergedMap.values());
+          });
+        }
+      } else {
+        setServerConnected(false);
+      }
+    } catch {
+      setServerConnected(false);
+    }
+  }, []);
+
+  // Poll central server every 3.5 seconds
+  useEffect(() => {
+    syncNow();
+    const interval = setInterval(syncNow, 3500);
+    return () => clearInterval(interval);
+  }, [syncNow]);
+
+  // Poll live student presence if teacher
+  useEffect(() => {
+    if (role !== 'teacher') return;
+    const fetchPresence = async () => {
+      try {
+        const res = await fetch('/api/presence');
+        if (res.ok) {
+          const presences = await res.json();
+          if (Array.isArray(presences)) {
+            setActivePresences(presences);
+          }
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    fetchPresence();
+    const pInterval = setInterval(fetchPresence, 3000);
+    return () => clearInterval(pInterval);
+  }, [role]);
+
+  // Heartbeat sender from student tablet
+  const sendStudentPresence = useCallback(async (data: Partial<LivePresence>) => {
+    if (!currentStudent) return;
+    try {
+      await fetch('/api/presence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentId: currentStudent.id,
+          studentCode: currentStudent.studentCode,
+          ...data,
+        }),
+      });
+    } catch {
+      // ignore
+    }
+  }, [currentStudent]);
+
+  // Listen to scanned QR code URL params (?role=student&massar=CODE)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlRole = params.get('role');
+      const urlMassar = params.get('massar') || params.get('code');
+      if (urlRole === 'student' || urlMassar) {
+        setRole('student');
+        if (urlMassar) {
+          const clean = urlMassar.trim().toLowerCase();
+          const found = students.find(s => s.studentCode.toLowerCase() === clean);
+          if (found) {
+            setCurrentStudent(found);
+            localStorage.setItem(STORAGE_KEY_PREFIX + 'current_student_code', found.studentCode);
+          }
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, [students]);
 
   // LocalStorage Persistence
   useEffect(() => {
@@ -556,9 +684,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
       return [completedAttempt, ...prev];
     });
+
+    // Centralize directly to the Teacher's PC!
+    fetch('/api/attempts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(completedAttempt),
+    })
+      .then(res => {
+        if (res.ok) {
+          setServerConnected(true);
+          setLastSyncTime(new Date().toLocaleTimeString());
+        }
+      })
+      .catch(err => {
+        console.warn('Network issue reaching teacher server, stored locally:', err);
+      });
   };
 
   const saveGrading = (attemptId: string, updatedAnswers: Record<string, any>, generalFeedback?: string) => {
+    let updatedAttemptToSync: EvaluationAttempt | null = null;
+
     setAttempts(prev => prev.map(att => {
       if (att.id !== attemptId) return att;
 
@@ -571,15 +717,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       const percentage = Math.round((grandTotal / att.maxScore) * 100);
 
-      return {
+      const updated = {
         ...att,
-        status: 'corrected',
+        status: 'corrected' as const,
         answers: updatedAnswers,
         totalScore: grandTotal,
         percentage,
         generalFeedback: generalFeedback ?? att.generalFeedback,
       };
+
+      updatedAttemptToSync = updated;
+      return updated;
     }));
+
+    if (updatedAttemptToSync) {
+      fetch(`/api/attempts/${attemptId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedAttemptToSync),
+      })
+        .then(res => {
+          if (res.ok) {
+            setServerConnected(true);
+            setLastSyncTime(new Date().toLocaleTimeString());
+          }
+        })
+        .catch(err => console.warn('Could not sync grading with server:', err));
+    }
   };
 
   const assignRemediation = (studentId: string, resourceId: string, skillId: string) => {
@@ -618,6 +782,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCurrentStudent(initialStudents[0]);
     setActiveTeacherTab('dashboard');
     setActiveStudentTab('home');
+
+    fetch('/api/reset', { method: 'POST' }).catch(() => {});
   };
 
   return (
@@ -643,6 +809,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setSelectedClassId,
         isOffline,
         setIsOffline,
+        serverConnected,
+        lastSyncTime,
+        activePresences,
+        syncNow,
+        sendStudentPresence,
         classes,
         students,
         skills,

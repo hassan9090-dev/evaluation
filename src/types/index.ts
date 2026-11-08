@@ -198,3 +198,13 @@ export interface RemediationAssignment {
   completedAt?: string;
   studentNotes?: string;
 }
+
+export interface LivePresence {
+  studentId: string;
+  studentCode: string;
+  currentTestId?: string;
+  currentQIndex?: number;
+  totalQuestions?: number;
+  status: 'online' | 'taking_test' | 'submitted';
+  lastSeen: number;
+}

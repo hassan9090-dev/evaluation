@@ -1,7 +1,7 @@
 export const translations = {
   fr: {
     app: {
-      title: "ÉVAL'PROGRESS",
+      title: "Suivi-Pédagogique",
       subtitle: "Plateforme numérique d'évaluation et de suivi des apprentissages (4AEP)",
       slogan: "Évaluer pour comprendre, suivre pour progresser.",
       tagline: "منصة رقمية لتقويم وتتبع مكتسبات المتعلمين",
@@ -158,7 +158,7 @@ export const translations = {
   },
   ar: {
     app: {
-      title: "ÉVAL'PROGRESS",
+      title: "Suivi-Pédagogique",
       subtitle: "منصة رقمية لتقويم وتتبع مكتسبات المتعلمين (المستوى الرابع ابتدائي)",
       slogan: "Évaluer pour comprendre, suivre pour progresser. | نقوّم لنفهم، ونتتبع لنتقدم.",
       tagline: "منصة رقمية لتقويم وتتبع مكتسبات المتعلمين",

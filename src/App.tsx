@@ -13,9 +13,10 @@ import { AnalyticsReports } from './components/teacher/AnalyticsReports';
 import { ResearchProtocolView } from './components/teacher/ResearchProtocolView';
 import { TeacherLogin } from './components/teacher/TeacherLogin';
 import { StudentPortal } from './components/student/StudentPortal';
+import { StudentMassarLogin } from './components/student/StudentMassarLogin';
 
 const AppContent: React.FC = () => {
-  const { role, activeTeacherTab, isTeacherAuthenticated, lang, isRtl } = useApp();
+  const { role, activeTeacherTab, isTeacherAuthenticated, currentStudent, lang, isRtl } = useApp();
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col text-slate-800">
@@ -40,6 +41,8 @@ const AppContent: React.FC = () => {
               {activeTeacherTab === 'research' && <ResearchProtocolView />}
             </>
           )
+        ) : !currentStudent ? (
+          <StudentMassarLogin />
         ) : (
           <StudentPortal />
         )}
@@ -49,7 +52,7 @@ const AppContent: React.FC = () => {
       <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 no-print">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-900">ÉVAL'PROGRESS v1.0</span>
+            <span className="font-bold text-slate-900">Suivi-Pédagogique v1.0</span>
             <span>•</span>
             <span>{isRtl ? 'منصة تقويم وتتبع المكتسبات (4AEP)' : 'Plateforme d\'évaluation et de suivi des acquis (4AEP)'}</span>
           </div>

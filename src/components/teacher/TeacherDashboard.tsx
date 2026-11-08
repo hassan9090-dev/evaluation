@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { translations } from '../../locales/translations';
 import { 
   Users, CheckCircle2, TrendingUp, AlertTriangle, 
-  ArrowRight, PlusCircle, BookOpen, FileCheck, Layers
+  ArrowRight, PlusCircle, BookOpen, FileCheck, Layers,
+  QrCode, Wifi, Monitor
 } from 'lucide-react';
+import { LocalNetworkQrModal } from '../network/LocalNetworkQrModal';
+import { LiveClassroomMonitor } from './LiveClassroomMonitor';
 
 export const TeacherDashboard: React.FC = () => {
   const { 
@@ -12,6 +15,7 @@ export const TeacherDashboard: React.FC = () => {
     evaluations, setActiveTeacherTab 
   } = useApp();
 
+  const [showQrModal, setShowQrModal] = useState(false);
   const t = translations[lang];
   const overview = calculateClassOverview(selectedClassId);
 
@@ -46,21 +50,64 @@ export const TeacherDashboard: React.FC = () => {
         {/* Quick Actions */}
         <div className="flex flex-wrap items-center gap-2.5">
           <button
+            onClick={() => setShowQrModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-linear-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 font-extrabold text-xs shadow-md transition cursor-pointer"
+          >
+            <QrCode className="w-4 h-4 text-slate-900" />
+            <span>{isRtl ? 'عرض رمز QR للقسم' : 'Projeter QR Code Tablettes'}</span>
+          </button>
+          <button
             onClick={() => setActiveTeacherTab('evaluations')}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-blue-700 font-semibold text-xs shadow-md hover:bg-blue-50 transition"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-blue-700 font-semibold text-xs shadow-md hover:bg-blue-50 transition cursor-pointer"
           >
             <PlusCircle className="w-4 h-4 text-blue-600" />
             <span>{t.dashboard.quickActionNewEval}</span>
           </button>
           <button
             onClick={() => setActiveTeacherTab('remediation')}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-800/60 hover:bg-blue-800 text-white font-medium text-xs border border-white/20 transition"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-800/60 hover:bg-blue-800 text-white font-medium text-xs border border-white/20 transition cursor-pointer"
           >
             <AlertTriangle className="w-4 h-4 text-amber-300" />
             <span>{t.dashboard.quickActionRemediation}</span>
           </button>
         </div>
       </div>
+
+      {/* Classroom Local Wi-Fi & QR Connect Banner */}
+      <div className="bg-linear-to-r from-indigo-900 via-indigo-800 to-slate-900 rounded-2xl p-4 sm:p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4 border border-indigo-700/50 shadow-md">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-amber-300 shrink-0">
+            <QrCode className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                {isRtl ? 'جاهز للاستخدام في القسم' : 'Réseau Local Prêt'}
+              </span>
+              <span className="text-xs text-indigo-200">
+                {isRtl ? 'ربط لوحات التلاميذ بمسح رمز QR' : 'Connexion instantanée des tablettes élèves'}
+              </span>
+            </div>
+            <h4 className="font-extrabold text-sm sm:text-base text-white">
+              {isRtl ? 'عرض رمز QR لربط أجهزة التلاميذ على الشاشة أو طباعة بطاقاتهم' : 'Projeter le QR Code au tableau ou imprimer les badges de la classe'}
+            </h4>
+            <p className="text-xs text-indigo-200 mt-0.5">
+              {isRtl ? 'التلاميذ يمسحون الرمز بكاميرا اللوحة للولوج الفوري إلى الاختبارات دون الحاجة لكتابة العنوان' : 'Les élèves scannent le code avec la caméra de leur tablette et accèdent directement aux tests.'}
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setShowQrModal(true)}
+          className="px-4 py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-black text-xs transition flex items-center gap-2 shadow-sm shrink-0 cursor-pointer"
+        >
+          <Monitor className="w-4 h-4" />
+          <span>{isRtl ? 'فتح نافذة العرض والبطاقات' : 'Ouvrir l\'outil QR Code'}</span>
+        </button>
+      </div>
+
+      {/* Real-Time Classroom Copy Centralization & Live Monitor */}
+      <LiveClassroomMonitor />
 
       {/* 4 Stat Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -366,6 +413,12 @@ export const TeacherDashboard: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Local Network QR Code Projector Modal */}
+      <LocalNetworkQrModal 
+        isOpen={showQrModal} 
+        onClose={() => setShowQrModal(false)} 
+      />
     </div>
   );
 };
