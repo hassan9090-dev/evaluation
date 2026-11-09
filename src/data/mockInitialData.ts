@@ -596,7 +596,7 @@ export const initialEvaluations: Evaluation[] = [
     type: 'diagnostic',
     classId: 'class-4aep-a',
     questionIds: ['q-fr-01', 'q-fr-02', 'q-fr-03', 'q-fr-04', 'q-ma-01', 'q-ma-02'],
-    totalScore: 11,
+    totalScore: 10,
     durationMinutes: 45,
     status: 'active',
     createdAt: '2026-09-15T09:00:00Z',
@@ -612,7 +612,7 @@ export const initialEvaluations: Evaluation[] = [
     type: 'formatif',
     classId: 'class-4aep-a',
     questionIds: ['q-fr-01', 'q-fr-02', 'q-fr-03', 'q-fr-10', 'q-fr-06', 'q-fr-07', 'q-fr-08', 'q-fr-09', 'q-fr-04', 'q-fr-05'],
-    totalScore: 34,
+    totalScore: 10,
     durationMinutes: 45,
     status: 'active',
     createdAt: '2026-10-20T10:00:00Z',
@@ -628,7 +628,7 @@ export const initialEvaluations: Evaluation[] = [
     type: 'formatif',
     classId: 'class-4aep-a',
     questionIds: ['q-ma-01', 'q-ma-06', 'q-ma-02', 'q-ma-09', 'q-ma-10', 'q-ma-07', 'q-ma-08', 'q-ma-04', 'q-ma-05'],
-    totalScore: 28,
+    totalScore: 10,
     durationMinutes: 45,
     status: 'active',
     createdAt: '2026-10-25T11:00:00Z',
@@ -636,7 +636,7 @@ export const initialEvaluations: Evaluation[] = [
   }
 ];
 
-// Realistic attempts for class students to power dashboards and research analytics
+// Realistic attempts for class students to power dashboards and analytics
 export const generateInitialAttempts = (): EvaluationAttempt[] => {
   const attempts: EvaluationAttempt[] = [];
 
@@ -657,9 +657,11 @@ export const generateInitialAttempts = (): EvaluationAttempt[] => {
     const qma1Score = scoreMod > 0.5 ? 2 : 0;
     const qma2Score = scoreMod > 0.6 ? 2 : 0;
 
-    const total = q1Score + q2Score + q3Score + q4Score + qma1Score + qma2Score;
-    const maxScore = 11;
-    const percentage = Math.round((total / maxScore) * 100);
+    const rawTotal = q1Score + q2Score + q3Score + q4Score + qma1Score + qma2Score;
+    const rawMax = 11;
+    const maxScore = 10;
+    const noteSur10 = Math.round((rawTotal / rawMax) * 10 * 10) / 10;
+    const percentage = Math.round((rawTotal / rawMax) * 100);
 
     attempts.push({
       id: `att-diag-${student.studentCode}`,
@@ -668,7 +670,7 @@ export const generateInitialAttempts = (): EvaluationAttempt[] => {
       startedAt: '2026-09-15T09:05:00Z',
       submittedAt: '2026-09-15T09:40:00Z',
       maxScore,
-      totalScore: total,
+      totalScore: noteSur10,
       percentage,
       status: 'corrected',
       answers: {
@@ -701,8 +703,10 @@ export const generateInitialAttempts = (): EvaluationAttempt[] => {
     } : undefined;
 
     const rubricTotal = rubricScores ? Object.values(rubricScores).reduce((a, b) => a + b, 0) : 0;
-    const totalScore = isTeacherCorrected ? autoScore + rubricTotal : autoScore;
-    const maxScore = 17;
+    const rawTotal = isTeacherCorrected ? autoScore + rubricTotal : autoScore;
+    const rawMax = 17;
+    const maxScore = 10;
+    const noteSur10 = Math.round((rawTotal / rawMax) * 10 * 10) / 10;
 
     attempts.push({
       id: `att-form1-${student.studentCode}`,
@@ -711,8 +715,8 @@ export const generateInitialAttempts = (): EvaluationAttempt[] => {
       startedAt: '2026-10-20T10:05:00Z',
       submittedAt: '2026-10-20T10:35:00Z',
       maxScore,
-      totalScore: isTeacherCorrected ? totalScore : undefined,
-      percentage: isTeacherCorrected ? Math.round((totalScore / maxScore) * 100) : undefined,
+      totalScore: isTeacherCorrected ? noteSur10 : undefined,
+      percentage: isTeacherCorrected ? Math.round((rawTotal / rawMax) * 100) : undefined,
       status: isTeacherCorrected ? 'corrected' : 'submitted',
       answers: {
         'q-fr-01': { questionId: 'q-fr-01', studentResponse: 'opt-1', scoreObtained: 2, maxScore: 2, isCorrect: true },

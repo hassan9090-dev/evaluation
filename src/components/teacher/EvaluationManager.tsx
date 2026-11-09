@@ -83,7 +83,7 @@ export const EvaluationManager: React.FC = () => {
       type,
       classId: evalClassId || (classes[0]?.id || 'class-4aep-a'),
       questionIds: [],
-      totalScore: 0,
+      totalScore: 10,
       durationMinutes: Number(durationMinutes) || 45,
       status: 'active',
       createdAt: new Date().toISOString(),
@@ -122,15 +122,11 @@ export const EvaluationManager: React.FC = () => {
     addQuestion(newQuestion);
 
     const updatedQuestionIds = [...selectedEvalForQuestions.questionIds, newQuestion.id];
-    const newTotal = updatedQuestionIds.reduce((sum, qId) => {
-      const q = (qId === newQuestion.id) ? newQuestion : questions.find(item => item.id === qId);
-      return sum + (q ? q.maxScore : 0);
-    }, 0);
 
     const updated: Evaluation = {
       ...selectedEvalForQuestions,
       questionIds: updatedQuestionIds,
-      totalScore: newTotal,
+      totalScore: 10,
     };
 
     updateEvaluation(updated);
@@ -142,15 +138,11 @@ export const EvaluationManager: React.FC = () => {
   const handleDetachQuestionFromEval = (qId: string) => {
     if (!selectedEvalForQuestions) return;
     const updatedQuestionIds = selectedEvalForQuestions.questionIds.filter(id => id !== qId);
-    const newTotal = updatedQuestionIds.reduce((sum, id) => {
-      const q = questions.find(item => item.id === id);
-      return sum + (q ? q.maxScore : 0);
-    }, 0);
 
     const updated: Evaluation = {
       ...selectedEvalForQuestions,
       questionIds: updatedQuestionIds,
-      totalScore: newTotal,
+      totalScore: 10,
     };
 
     updateEvaluation(updated);
@@ -396,8 +388,8 @@ export const EvaluationManager: React.FC = () => {
                         </div>
                         <div>
                           <span className="text-[10px] text-slate-400 block font-medium">{t.evaluation.totalScore}</span>
-                          <span className="text-xs font-bold text-blue-700">
-                            {ev.totalScore} pts
+                          <span className="text-xs font-black text-blue-700">
+                            / 10
                           </span>
                         </div>
                       </div>
@@ -499,13 +491,13 @@ export const EvaluationManager: React.FC = () => {
 
             {/* Top Toolbar inside Evaluation Questions Modal */}
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-bold text-xs text-slate-700">
                   {selectedEvalForQuestions.questionIds.length} {isRtl ? 'أسئلة مضمنة' : 'questions incluses'}
                 </span>
                 <span className="text-slate-300">•</span>
-                <span className="font-bold text-xs text-blue-700 bg-blue-100/70 px-2.5 py-0.5 rounded-full">
-                  Total : {selectedEvalForQuestions.totalScore} pts
+                <span className="font-black text-xs text-blue-700 bg-blue-100/80 px-2.5 py-0.5 rounded-full">
+                  {isRtl ? 'التنقيط الرسمي : / 10' : 'Note sur / 10'}
                 </span>
               </div>
 

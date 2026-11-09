@@ -269,11 +269,11 @@ export const AnalyticsReports: React.FC = () => {
                 <span className="text-sm font-bold text-slate-900">{studentAttempts.length} sessions</span>
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">{isRtl ? 'المعدل العام للمكتسبات' : 'Taux Moyen'}</span>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">{isRtl ? 'المعدل العام (/10)' : 'Moyenne (/10)'}</span>
                 <span className="text-sm font-extrabold text-blue-700">
                   {studentAttempts.length > 0 
-                    ? Math.round(studentAttempts.reduce((s, a) => s + (a.percentage || 0), 0) / studentAttempts.length)
-                    : 0}%
+                    ? ((studentAttempts.reduce((s, a) => s + (a.percentage || 0), 0) / studentAttempts.length) * 0.1).toFixed(1)
+                    : '0.0'} / 10
                 </span>
               </div>
               <div>
@@ -421,6 +421,9 @@ export const AnalyticsReports: React.FC = () => {
                   <tbody className="divide-y divide-slate-100">
                     {studentAttempts.map(att => {
                       const ev = evaluations.find(e => e.id === att.evaluationId);
+                      const score10 = att.totalScore !== undefined
+                        ? (att.maxScore === 10 ? att.totalScore : Math.round((att.totalScore / (att.maxScore || 10)) * 10 * 10) / 10)
+                        : 0;
                       return (
                         <tr key={att.id}>
                           <td className="py-2.5 px-3 font-semibold text-slate-900">
@@ -429,7 +432,7 @@ export const AnalyticsReports: React.FC = () => {
                           <td className="py-2.5 px-3 capitalize">{ev?.type}</td>
                           <td className="py-2.5 px-3 text-slate-400">{new Date(att.startedAt).toLocaleDateString()}</td>
                           <td className="py-2.5 px-3 font-bold text-blue-700">
-                            {att.totalScore} / {att.maxScore}
+                            {score10} / 10
                           </td>
                           <td className="py-2.5 px-3 font-bold">{att.percentage}%</td>
                           <td className="py-2.5 px-3 text-slate-600 italic">

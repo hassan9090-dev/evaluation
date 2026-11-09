@@ -230,7 +230,7 @@ export const LiveClassroomMonitor: React.FC = () => {
                       </span>
                     </div>
                     <span className="font-mono font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] shrink-0">
-                      {latestAttempt.totalScore !== undefined ? `${latestAttempt.totalScore}/${latestAttempt.maxScore}` : 'En attente'}
+                      {latestAttempt.totalScore !== undefined ? `${latestAttempt.totalScore} / 10` : 'En attente'}
                     </span>
                   </div>
                 )}

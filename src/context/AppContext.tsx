@@ -337,14 +337,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : initialQuestions;
   });
 
+  const normalizeEvaluationTo10 = (ev: Evaluation): Evaluation => ({
+    ...ev,
+    totalScore: 10,
+  });
+
+  const normalizeAttemptTo10 = (att: EvaluationAttempt): EvaluationAttempt => {
+    if (att.maxScore === 10) return att;
+    const oldMax = att.maxScore > 0 ? att.maxScore : 10;
+    const normalizedTotal = att.totalScore !== undefined
+      ? Math.min(10, Math.round((att.totalScore / oldMax) * 10 * 10) / 10)
+      : undefined;
+    const pct = att.percentage !== undefined
+      ? att.percentage
+      : (normalizedTotal !== undefined ? Math.round(normalizedTotal * 10) : undefined);
+    return {
+      ...att,
+      maxScore: 10,
+      totalScore: normalizedTotal,
+      percentage: pct,
+    };
+  };
+
   const [evaluations, setEvaluations] = useState<Evaluation[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'evaluations');
-    return saved ? JSON.parse(saved) : initialEvaluations;
+    const list: Evaluation[] = saved ? JSON.parse(saved) : initialEvaluations;
+    return list.map(normalizeEvaluationTo10);
   });
 
   const [attempts, setAttempts] = useState<EvaluationAttempt[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'attempts');
-    return saved ? JSON.parse(saved) : generateInitialAttempts();
+    const list: EvaluationAttempt[] = saved ? JSON.parse(saved) : generateInitialAttempts();
+    return list.map(normalizeAttemptTo10);
   });
 
   const [remediationResources, setRemediationResources] = useState<RemediationResource[]>(() => {
@@ -374,8 +398,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (Array.isArray(serverAttempts) && serverAttempts.length > 0) {
           setAttempts(prev => {
             const mergedMap = new Map<string, EvaluationAttempt>();
-            prev.forEach(a => mergedMap.set(a.id, a));
-            serverAttempts.forEach(sa => mergedMap.set(sa.id, sa));
+            prev.forEach(a => mergedMap.set(a.id, normalizeAttemptTo10(a)));
+            serverAttempts.forEach(sa => mergedMap.set(sa.id, normalizeAttemptTo10(sa)));
             return Array.from(mergedMap.values());
           });
         }
@@ -832,14 +856,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     const isAllAuto = !hasManualQuestions;
-    const finalTotal = isAllAuto ? autoTotal : autoTotal;
-    const maxScore = ev?.totalScore || attempt.maxScore;
-    const percentage = isAllAuto ? Math.round((finalTotal / maxScore) * 100) : undefined;
+    const rawQuestionsMax = ev
+      ? ev.questionIds.reduce((sum, qId) => {
+          const q = getQuestionById(qId);
+          return sum + (q ? q.maxScore : 0);
+        }, 0)
+      : Object.values(scoredAnswers).reduce((sum: number, ans: any) => sum + Number(ans.maxScore || 1), 0);
+
+    const effectiveRawMax = rawQuestionsMax > 0 ? rawQuestionsMax : 10;
+    const noteSur10 = isAllAuto
+      ? Math.min(10, Math.round((autoTotal / effectiveRawMax) * 10 * 10) / 10)
+      : undefined;
+    const percentage = isAllAuto
+      ? Math.min(100, Math.round((autoTotal / effectiveRawMax) * 100))
+      : undefined;
 
     const completedAttempt: EvaluationAttempt = {
       ...attempt,
+      maxScore: 10,
       status: isAllAuto ? 'corrected' : 'submitted',
-      totalScore: isAllAuto ? finalTotal : undefined,
+      totalScore: noteSur10,
       percentage,
       answers: scoredAnswers,
       submittedAt: new Date().toISOString(),
@@ -878,20 +914,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAttempts(prev => prev.map(att => {
       if (att.id !== attemptId) return att;
 
-      let grandTotal = 0;
-      Object.values(updatedAnswers).forEach(ans => {
+      let rawTotal = 0;
+      let rawMax = 0;
+      Object.values(updatedAnswers).forEach((ans: any) => {
         if (ans.scoreObtained !== undefined) {
-          grandTotal += Number(ans.scoreObtained);
+          rawTotal += Number(ans.scoreObtained);
         }
+        const q = getQuestionById(ans.questionId);
+        rawMax += Number(ans.maxScore || q?.maxScore || 0);
       });
 
-      const percentage = Math.round((grandTotal / att.maxScore) * 100);
+      if (rawMax <= 0) {
+        const ev = getEvaluationById(att.evaluationId);
+        rawMax = ev
+          ? ev.questionIds.reduce((sum, qId) => {
+              const q = getQuestionById(qId);
+              return sum + (q ? q.maxScore : 0);
+            }, 0)
+          : 10;
+      }
+
+      const effectiveRawMax = rawMax > 0 ? rawMax : 10;
+      const noteSur10 = Math.min(10, Math.round((rawTotal / effectiveRawMax) * 10 * 10) / 10);
+      const percentage = Math.min(100, Math.round((rawTotal / effectiveRawMax) * 100));
 
       const updated = {
         ...att,
         status: 'corrected' as const,
         answers: updatedAnswers,
-        totalScore: grandTotal,
+        maxScore: 10,
+        totalScore: noteSur10,
         percentage,
         generalFeedback: generalFeedback ?? att.generalFeedback,
       };

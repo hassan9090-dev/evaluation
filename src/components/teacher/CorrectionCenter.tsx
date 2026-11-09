@@ -65,13 +65,29 @@ export const CorrectionCenter: React.FC = () => {
     setActiveAttempt(null);
   };
 
-  // Calculate current modal live total
-  const liveTotalScore = Object.values(editableAnswers).reduce((sum, ans) => {
+  // Calculate current modal live total and normalized /10 grade
+  const liveRawScore = Object.values(editableAnswers).reduce((sum, ans) => {
     return sum + Number(ans?.scoreObtained || 0);
   }, 0);
 
-  const maxTotalScore = currentEval?.totalScore || activeAttempt?.maxScore || 1;
-  const livePercentage = Math.min(100, Math.round((liveTotalScore / maxTotalScore) * 100));
+  const rawMaxScore = (() => {
+    const ansMax = Object.values(editableAnswers).reduce((sum: number, ans: any) => {
+      const q = questions.find(item => item.id === ans?.questionId);
+      return sum + Number(ans?.maxScore || q?.maxScore || 0);
+    }, 0);
+    if (ansMax > 0) return ansMax;
+    if (currentEval) {
+      const qMax = currentEval.questionIds.reduce((sum, qId) => {
+        const q = questions.find(item => item.id === qId);
+        return sum + (q ? q.maxScore : 0);
+      }, 0);
+      if (qMax > 0) return qMax;
+    }
+    return 10;
+  })();
+
+  const liveNoteSur10 = Math.min(10, Math.round((liveRawScore / rawMaxScore) * 10 * 10) / 10);
+  const livePercentage = Math.min(100, Math.round((liveRawScore / rawMaxScore) * 100));
   const { level: liveLevel } = getMasteryLevel(livePercentage);
 
   return (
@@ -140,7 +156,7 @@ export const CorrectionCenter: React.FC = () => {
                 <th className="py-3 px-4">{t.correction.studentCode}</th>
                 <th className="py-3 px-4">{isRtl ? 'تاريخ الإرسال' : 'Date d\'envoi'}</th>
                 <th className="py-3 px-4">{isRtl ? 'الحالة' : 'Statut'}</th>
-                <th className="py-3 px-4">{t.correction.finalScore}</th>
+                <th className="py-3 px-4">{t.correction.finalScore} (/10)</th>
                 <th className="py-3 px-4">{isRtl ? 'مستوى التحكم' : 'Niveau de maîtrise'}</th>
                 <th className="py-3 px-4 text-right">{isRtl ? 'الإجراء' : 'Actions'}</th>
               </tr>
@@ -150,7 +166,10 @@ export const CorrectionCenter: React.FC = () => {
                 const student = students.find(s => s.id === att.studentId);
                 const hasScore = att.totalScore !== undefined;
                 const pct = att.percentage ?? 0;
-                const { level, color, badgeBg } = getMasteryLevel(pct);
+                const { level, badgeBg } = getMasteryLevel(pct);
+                const displayScore10 = hasScore
+                  ? (att.maxScore === 10 ? att.totalScore : Math.round(((att.totalScore || 0) / (att.maxScore || 10)) * 10 * 10) / 10)
+                  : undefined;
 
                 return (
                   <tr key={att.id} className="hover:bg-slate-50/80 transition">
@@ -176,10 +195,10 @@ export const CorrectionCenter: React.FC = () => {
                     <td className="py-3 px-4 font-bold text-slate-900">
                       {hasScore ? (
                         <span>
-                          <strong className="text-blue-700 text-sm">{att.totalScore}</strong> / {att.maxScore}
+                          <strong className="text-blue-700 text-sm">{displayScore10}</strong> / 10
                         </span>
                       ) : (
-                        <span className="text-slate-400 italic">-- / {att.maxScore}</span>
+                        <span className="text-slate-400 italic">-- / 10</span>
                       )}
                     </td>
                     <td className="py-3 px-4">
@@ -237,7 +256,8 @@ export const CorrectionCenter: React.FC = () => {
                 <div className="text-right">
                   <span className="text-[10px] text-slate-400 block font-bold uppercase">{t.correction.finalScore}</span>
                   <div className="text-xl font-extrabold text-blue-700">
-                    {liveTotalScore} <span className="text-xs text-slate-400">/ {maxTotalScore} pts ({livePercentage}%)</span>
+                    {liveNoteSur10} <span className="text-xs text-slate-500 font-bold">/ 10</span>{' '}
+                    <span className="text-xs text-slate-400 font-normal">({livePercentage}%)</span>
                   </div>
                 </div>
                 <button

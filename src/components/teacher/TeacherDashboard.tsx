@@ -50,10 +50,10 @@ export const TeacherDashboard: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 bg-white/10 backdrop-blur-md p-3.5 rounded-xl border border-white/15">
           <div className="text-center sm:text-left px-2">
             <span className="text-[10px] text-blue-200 block uppercase font-semibold">
-              {isRtl ? 'المعدل العام' : 'Moyenne'}
+              {isRtl ? 'المعدل العام' : 'Moyenne (/10)'}
             </span>
             <span className="text-xl sm:text-2xl font-black text-white">
-              {overview.averageScorePct}%
+              {(overview.averageScorePct * 0.1).toFixed(1)}<span className="text-xs font-bold text-blue-200">/10</span>
             </span>
           </div>
           <div className="text-center sm:text-left px-2 border-l border-white/15">
@@ -158,9 +158,11 @@ export const TeacherDashboard: React.FC = () => {
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-slate-900">{overview.averageScorePct}%</span>
+            <span className="text-3xl font-extrabold text-slate-900">
+              {(overview.averageScorePct * 0.1).toFixed(1)} <span className="text-base font-bold text-slate-500">/ 10</span>
+            </span>
             <span className="text-xs text-slate-400 font-medium">
-              ≈ {(overview.averageScorePct * 0.1).toFixed(1)} / 10
+              ({overview.averageScorePct}%)
             </span>
           </div>
           <div className="mt-2 text-[11px] text-emerald-600 font-medium flex items-center gap-1">

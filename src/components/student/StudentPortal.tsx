@@ -95,7 +95,7 @@ export const StudentPortal: React.FC = () => {
       evaluationId: activeTest.id,
       studentId: currentStudent.id,
       startedAt: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
-      maxScore: activeTest.totalScore,
+      maxScore: 10,
       status: 'submitted',
       answers: answersDraft,
     };
@@ -340,10 +340,10 @@ export const StudentPortal: React.FC = () => {
                       <div className="mb-4 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs">
                         <span className="text-emerald-800 font-bold flex items-center gap-1.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>{isRtl ? 'تم التصحيح :' : 'Corrigé :'}</span>
+                          <span>{isRtl ? 'تم التصحيح :' : 'Note obtenue :'}</span>
                         </span>
                         <span className="font-mono font-black text-emerald-700 bg-white px-2 py-0.5 rounded-md border border-emerald-200">
-                          {existingAttempt.totalScore} / {existingAttempt.maxScore} pts ({existingAttempt.percentage}%)
+                          {existingAttempt.totalScore} / 10 ({existingAttempt.percentage}%)
                         </span>
                       </div>
                     )}
@@ -357,7 +357,7 @@ export const StudentPortal: React.FC = () => {
 
                     <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between text-xs font-bold text-slate-700 mb-6">
                       <span>{ev.questionIds.length} {isRtl ? 'أسئلة' : 'questions'}</span>
-                      <span className="text-blue-700">{ev.totalScore} {isRtl ? 'نقطة' : 'points'}</span>
+                      <span className="text-blue-700 font-black">{isRtl ? 'التنقيط : / 10' : 'Note sur / 10'}</span>
                     </div>
                   </div>
 
