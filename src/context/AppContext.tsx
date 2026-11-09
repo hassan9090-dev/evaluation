@@ -220,7 +220,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Core Data States
   const [classes, setClasses] = useState<SchoolClass[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'classes');
-    return saved ? JSON.parse(saved) : initialClasses;
+    const list: SchoolClass[] = saved ? JSON.parse(saved) : initialClasses;
+    return list.map(c => ({
+      ...c,
+      teacherName: !c.teacherName || /hassan/i.test(c.teacherName) ? 'Prof' : c.teacherName,
+    }));
   });
 
   const [students, setStudents] = useState<Student[]>(() => {

@@ -167,7 +167,7 @@ export const StudentMassarLogin: React.FC = () => {
                     </div>
                     <div className="text-[10px] text-slate-500 flex items-center gap-1">
                       <Users className="w-3 h-3 text-slate-400" />
-                      <span>{cls.teacherName || 'Prof. 4AEP'}</span>
+                      <span>{cls.teacherName || 'Prof'}</span>
                     </div>
                   </button>
                 );

@@ -58,7 +58,7 @@ export const ClassManager: React.FC = () => {
   const [newClassName, setNewClassName] = useState('');
   const [newSchoolYear, setNewSchoolYear] = useState('2026-2027');
   const [newInstitution, setNewInstitution] = useState('École Primaire Al-Massira');
-  const [newTeacherName, setNewTeacherName] = useState('M. Hassan');
+  const [newTeacherName, setNewTeacherName] = useState('Prof');
 
   // Make sure currentClass is valid
   const currentClass = classes.find(c => c.id === selectedClassId) || classes[0] || {
@@ -66,7 +66,7 @@ export const ClassManager: React.FC = () => {
     name: '4ème Année A (4AEP)',
     schoolYear: '2026-2027',
     institution: 'École Primaire Al-Massira',
-    teacherName: 'M. Hassan'
+    teacherName: 'Prof'
   };
 
   const classStudents = students.filter(s => s.classId === currentClass.id);
@@ -84,7 +84,7 @@ export const ClassManager: React.FC = () => {
       name: newClassName.trim(),
       schoolYear: newSchoolYear.trim() || '2026-2027',
       institution: newInstitution.trim() || 'École Primaire Al-Massira',
-      teacherName: newTeacherName.trim() || 'M. Hassan',
+      teacherName: newTeacherName.trim() || 'Prof',
     });
 
     setNewClassName('');

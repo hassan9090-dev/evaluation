@@ -6,14 +6,14 @@ export const initialClasses: SchoolClass[] = [
     name: '4ème Année Primaire - Section A (4AEP)',
     schoolYear: '2026 - 2027',
     institution: 'École Primaire Al-Massira (Académie Régionale)',
-    teacherName: 'Prof. Hassan Alami',
+    teacherName: 'Prof',
   },
   {
     id: 'class-4aep-b',
     name: '4ème Année Primaire - Section B (4AEP)',
     schoolYear: '2026 - 2027',
     institution: 'École Primaire Al-Massira (Académie Régionale)',
-    teacherName: 'Prof. Hassan Alami',
+    teacherName: 'Prof',
   }
 ];
 
