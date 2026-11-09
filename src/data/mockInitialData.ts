@@ -19,15 +19,12 @@ export const initialClasses: SchoolClass[] = [
 
 export const initialStudents: Student[] = Array.from({ length: 25 }, (_, i) => {
   const num = (i + 1).toString().padStart(2, '0');
-  const avatars = ['🦊', '🐼', '🦁', '🦉', '🐬', '🐯', '🐨', '🦅', '🦄', '🐝'];
   return {
     id: `std-${num}`,
     studentCode: `G1340${num}`,
     displayPseudonym: `Élève G1340${num}`,
     classId: i < 15 ? 'class-4aep-a' : 'class-4aep-b',
-    pin: `${1000 + i + 1}`,
     active: true,
-    avatarIcon: avatars[i % avatars.length],
   };
 });
 
@@ -603,6 +600,7 @@ export const initialEvaluations: Evaluation[] = [
     durationMinutes: 45,
     status: 'active',
     createdAt: '2026-09-15T09:00:00Z',
+    dateRealisation: '2026-09-20',
   },
   {
     id: 'eval-form-01',
@@ -618,6 +616,7 @@ export const initialEvaluations: Evaluation[] = [
     durationMinutes: 45,
     status: 'active',
     createdAt: '2026-10-20T10:00:00Z',
+    dateRealisation: '2026-10-25',
   },
   {
     id: 'eval-form-02',
@@ -633,6 +632,7 @@ export const initialEvaluations: Evaluation[] = [
     durationMinutes: 45,
     status: 'active',
     createdAt: '2026-10-25T11:00:00Z',
+    dateRealisation: '2026-11-02',
   }
 ];
 

@@ -1,7 +1,16 @@
 export type Role = 'home' | 'teacher' | 'student';
 export type Language = 'fr' | 'ar';
 
-export type SubjectId = 'francais' | 'mathematiques';
+export type SubjectId = string;
+
+export interface Subject {
+  id: string;
+  nameFr: string;
+  nameAr: string;
+  code: string;
+  icon?: string;
+  isDefault?: boolean;
+}
 
 export type EvaluationType = 'diagnostic' | 'formatif' | 'sommatif';
 
@@ -124,6 +133,7 @@ export interface Evaluation {
   createdAt: string;
   startDate?: string;
   endDate?: string;
+  dateRealisation?: string; // Date de réalisation de l'évaluation
 }
 
 export interface StudentAnswer {
@@ -155,9 +165,9 @@ export interface Student {
   studentCode: string; // Code Massar (e.g. 'G134001')
   displayPseudonym: string; // e.g. 'Élève G134001'
   classId: string;
-  pin: string; // e.g., '1234'
+  pin?: string;
   active: boolean;
-  avatarIcon: string;
+  avatarIcon?: string;
 }
 
 export interface SchoolClass {

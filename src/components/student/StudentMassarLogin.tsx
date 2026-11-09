@@ -4,7 +4,7 @@ import { translations } from '../../locales/translations';
 import { 
   Sparkles, GraduationCap, ArrowRight, UserCheck, 
   Search, CheckCircle2, AlertCircle, KeyRound, ShieldCheck,
-  Camera, QrCode, School, Users, Check
+  Camera, QrCode, School, Users, Check, User
 } from 'lucide-react';
 import { StudentQrCameraScanner } from '../network/StudentQrCameraScanner';
 
@@ -278,7 +278,9 @@ export const StudentMassarLogin: React.FC = () => {
                 onClick={() => handleSelectStudentCard(st.studentCode)}
                 className="p-2 rounded-xl border border-slate-200 hover:border-indigo-400 bg-white hover:bg-indigo-50/50 transition flex items-center gap-2 text-left group shadow-2xs cursor-pointer"
               >
-                <span className="text-base shrink-0">{st.avatarIcon}</span>
+                <div className="w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
+                  <User className="w-3.5 h-3.5" />
+                </div>
                 <div className="truncate">
                   <span className="font-mono font-bold text-xs text-indigo-700 group-hover:text-indigo-900 block truncate">
                     {st.studentCode}

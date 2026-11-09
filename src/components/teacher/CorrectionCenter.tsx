@@ -4,7 +4,7 @@ import { translations } from '../../locales/translations';
 import { EvaluationAttempt, Question } from '../../types';
 import { 
   CheckCircle, FileEdit, Award, MessageSquare, Save, 
-  CheckCircle2, Clock, X, AlertCircle, ChevronRight, Sliders
+  CheckCircle2, Clock, X, AlertCircle, ChevronRight, Sliders, User
 } from 'lucide-react';
 
 export const CorrectionCenter: React.FC = () => {
@@ -155,8 +155,8 @@ export const CorrectionCenter: React.FC = () => {
                 return (
                   <tr key={att.id} className="hover:bg-slate-50/80 transition">
                     <td className="py-3 px-4 font-semibold text-slate-900 flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs">
-                        {student?.avatarIcon || '👤'}
+                      <span className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
+                        <User className="w-3.5 h-3.5" />
                       </span>
                       <span className="font-mono font-bold text-blue-700">{student?.studentCode}</span>
                       <span className="text-slate-400 font-normal">({student?.displayPseudonym})</span>

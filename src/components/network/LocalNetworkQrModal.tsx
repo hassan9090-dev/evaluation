@@ -5,7 +5,7 @@ import QRCode from 'qrcode';
 import { 
   QrCode, Wifi, Monitor, Printer, Copy, Check, Download, 
   ExternalLink, Smartphone, AlertCircle, Info, Maximize2, 
-  Minimize2, X, RefreshCw, BookOpen, UserCheck, Sparkles
+  Minimize2, X, RefreshCw, BookOpen, UserCheck, Sparkles, User
 } from 'lucide-react';
 
 interface LocalNetworkQrModalProps {
@@ -393,8 +393,10 @@ export const LocalNetworkQrModal: React.FC<LocalNetworkQrModalProps> = ({ isOpen
                       <span className="text-[10px] text-slate-400 font-semibold">4AEP</span>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{st.avatarIcon}</span>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700 shrink-0">
+                        <User className="w-4 h-4" />
+                      </div>
                       <div className="text-left">
                         <div className="font-extrabold text-sm text-slate-900 leading-tight">
                           {st.displayPseudonym}

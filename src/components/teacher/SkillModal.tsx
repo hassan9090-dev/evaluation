@@ -51,7 +51,7 @@ export const SkillModal: React.FC<SkillModalProps> = ({
   skillToEdit,
   defaultSubject = 'francais',
 }) => {
-  const { isRtl, addSkill, updateSkill, skills } = useApp();
+  const { isRtl, addSkill, updateSkill, skills, subjects } = useApp();
 
   const isEditing = !!skillToEdit;
 
@@ -83,23 +83,25 @@ export const SkillModal: React.FC<SkillModalProps> = ({
       } else {
         // Suggest a new sequential code based on existing skills
         const subjectSkills = skills.filter(s => s.subjectId === defaultSubject);
-        const prefix = defaultSubject === 'francais' ? 'FR' : 'MA';
+        const currentSubj = subjects.find(s => s.id === defaultSubject);
+        const prefix = currentSubj?.code || 'CP';
         const nextNum = (subjectSkills.length + 1).toString().padStart(2, '0');
         
         setSubjectId(defaultSubject);
         setCode(`${prefix}-${nextNum}`);
         setNameFr('');
         setNameAr('');
-        const defaultDomain = COMMON_DOMAINS_FR[defaultSubject][0];
+        const domains = COMMON_DOMAINS_FR[defaultSubject] || ['Général', 'Apprentissages'];
+        const defaultDomain = domains[0];
         setDomainFr(defaultDomain);
-        setDomainAr(DOMAIN_AR_MAP[defaultDomain] || '');
+        setDomainAr(DOMAIN_AR_MAP[defaultDomain] || defaultDomain);
         setDescriptionFr('');
         setDescriptionAr('');
         setTargetLevel('4AEP');
       }
       setErrorMsg(null);
     }
-  }, [isOpen, skillToEdit, defaultSubject, skills]);
+  }, [isOpen, skillToEdit, defaultSubject, skills, subjects]);
 
   if (!isOpen) return null;
 
@@ -114,12 +116,14 @@ export const SkillModal: React.FC<SkillModalProps> = ({
     setSubjectId(newSubject);
     if (!isEditing) {
       const subjectSkills = skills.filter(s => s.subjectId === newSubject);
-      const prefix = newSubject === 'francais' ? 'FR' : 'MA';
+      const currentSubj = subjects.find(s => s.id === newSubject);
+      const prefix = currentSubj?.code || 'CP';
       const nextNum = (subjectSkills.length + 1).toString().padStart(2, '0');
       setCode(`${prefix}-${nextNum}`);
-      const defDomain = COMMON_DOMAINS_FR[newSubject][0];
+      const domains = COMMON_DOMAINS_FR[newSubject] || ['Général', 'Apprentissages'];
+      const defDomain = domains[0];
       setDomainFr(defDomain);
-      setDomainAr(DOMAIN_AR_MAP[defDomain] || '');
+      setDomainAr(DOMAIN_AR_MAP[defDomain] || defDomain);
     }
   };
 
@@ -225,31 +229,26 @@ export const SkillModal: React.FC<SkillModalProps> = ({
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 {isRtl ? 'المادة الدراسية :' : 'Matière :'}
               </label>
-              <div className="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
-                <button
-                  type="button"
-                  onClick={() => handleSubjectChange('francais')}
-                  className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
-                    subjectId === 'francais'
-                      ? 'bg-white text-blue-700 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <BookMarked className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Français</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSubjectChange('mathematiques')}
-                  className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
-                    subjectId === 'mathematiques'
-                      ? 'bg-white text-indigo-700 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <Calculator className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>Maths</span>
-                </button>
+              <div className="flex flex-wrap gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                {subjects.map(s => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => handleSubjectChange(s.id)}
+                    className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-bold transition cursor-pointer flex-1 min-w-[90px] ${
+                      subjectId === s.id
+                        ? 'bg-white text-blue-700 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    {s.icon === 'calculator' ? (
+                      <Calculator className="w-3.5 h-3.5 text-indigo-600" />
+                    ) : (
+                      <BookMarked className="w-3.5 h-3.5 text-blue-600" />
+                    )}
+                    <span>{isRtl ? s.nameAr : s.nameFr}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -260,7 +259,7 @@ export const SkillModal: React.FC<SkillModalProps> = ({
               <input
                 type="text"
                 required
-                placeholder={subjectId === 'francais' ? 'FR-07' : 'MA-06'}
+                placeholder="FR-01"
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 className="w-full py-2 px-3 font-mono font-bold text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50 uppercase"
@@ -274,7 +273,7 @@ export const SkillModal: React.FC<SkillModalProps> = ({
               {isRtl ? 'اختيار مجال مقترح أو كتابة مجال مخصص :' : 'Domaines courants du curriculum :'}
             </label>
             <div className="flex flex-wrap gap-1.5 mb-2">
-              {COMMON_DOMAINS_FR[subjectId].map((dom) => (
+              {(COMMON_DOMAINS_FR[subjectId] || ['Général', 'Apprentissages fondamentaux', 'Activités pratiques']).map((dom) => (
                 <button
                   key={dom}
                   type="button"

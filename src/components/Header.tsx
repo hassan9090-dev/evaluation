@@ -4,7 +4,7 @@ import { translations } from '../locales/translations';
 import { 
   GraduationCap, Languages, Wifi, WifiOff, 
   RotateCcw, ShieldCheck, ChevronDown, LogOut,
-  QrCode, PanelLeft
+  QrCode, PanelLeft, User
 } from 'lucide-react';
 import { LocalNetworkQrModal } from './network/LocalNetworkQrModal';
 
@@ -112,7 +112,7 @@ export const Header: React.FC = () => {
                     onClick={() => setShowStudentPicker(!showStudentPicker)}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-medium transition"
                   >
-                    <span className="text-base">{currentStudent.avatarIcon || '👤'}</span>
+                    <User className="w-3.5 h-3.5 text-blue-600" />
                     <span className="font-semibold text-blue-700">{currentStudent.studentCode}</span>
                     <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                   </button>
@@ -135,7 +135,7 @@ export const Header: React.FC = () => {
                               : 'hover:bg-slate-50 text-slate-700'
                           }`}
                         >
-                          <span className="text-sm">{st.avatarIcon}</span>
+                          <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                           <div className="flex-1 truncate">
                             <span className="font-bold">{st.studentCode}</span>
                             <span className="text-[10px] text-slate-400 block">{st.displayPseudonym}</span>

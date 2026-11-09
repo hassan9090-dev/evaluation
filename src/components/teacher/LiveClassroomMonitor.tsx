@@ -4,7 +4,7 @@ import { translations } from '../../locales/translations';
 import { 
   Wifi, CheckCircle2, Clock, Eye, AlertCircle, 
   RotateCcw, Sparkles, UserCheck, ShieldCheck, Layers,
-  FileCheck, ArrowRight, School, Users
+  FileCheck, ArrowRight, School, Users, User
 } from 'lucide-react';
 
 export const LiveClassroomMonitor: React.FC = () => {
@@ -181,8 +181,10 @@ export const LiveClassroomMonitor: React.FC = () => {
               >
                 {/* Student Info Bar */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 truncate">
-                    <span className="text-xl">{st.avatarIcon}</span>
+                  <div className="flex items-center gap-2.5 truncate">
+                    <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 shrink-0">
+                      <User className="w-4 h-4" />
+                    </div>
                     <div className="truncate">
                       <span className="font-bold text-xs text-slate-900 block truncate">
                         {st.displayPseudonym}

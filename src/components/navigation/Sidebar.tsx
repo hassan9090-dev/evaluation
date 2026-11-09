@@ -5,7 +5,7 @@ import {
   Home, LayoutDashboard, Users, Target, Database, FileCheck2, 
   CheckCircle, HeartHandshake, BarChart3, GraduationCap, KeyRound, 
   Lock, Sparkles, QrCode, LogOut, ChevronLeft, ChevronRight, 
-  PanelLeftClose, PanelLeftOpen, Award
+  PanelLeftClose, PanelLeftOpen, Award, User
 } from 'lucide-react';
 import { ChangePasswordModal } from '../teacher/ChangePasswordModal';
 import { LocalNetworkQrModal } from '../network/LocalNetworkQrModal';
@@ -33,12 +33,10 @@ export const Sidebar: React.FC = () => {
     { tab: 'dashboard', label: t.nav.dashboard, icon: LayoutDashboard },
     { tab: 'classes', label: t.nav.classes, icon: Users },
     { tab: 'skills', label: t.nav.skills, icon: Target },
-    { tab: 'questionBank', label: t.nav.questionBank, icon: Database },
     { tab: 'evaluations', label: t.nav.evaluations, icon: FileCheck2 },
     { tab: 'correction', label: t.nav.correction, icon: CheckCircle, badge: pendingGradingCount },
     { tab: 'remediation', label: t.nav.remediation, icon: HeartHandshake, badge: pendingRemCount },
     { tab: 'analytics', label: t.nav.analytics, icon: BarChart3 },
-    { tab: 'research', label: t.nav.research, icon: GraduationCap },
   ];
 
   const studentNavItems: { tab: StudentTab; label: string; icon: React.FC<{ className?: string }> }[] = [
@@ -258,8 +256,9 @@ export const Sidebar: React.FC = () => {
                     </div>
                   )}
                   {!isSidebarCollapsed && currentStudent && (
-                    <div className="text-xs font-bold text-slate-800 truncate mb-1">
-                      {currentStudent.avatarIcon} {currentStudent.displayPseudonym}
+                    <div className="text-xs font-bold text-slate-800 truncate mb-1 flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                      <span className="truncate">{currentStudent.displayPseudonym}</span>
                     </div>
                   )}
                 </div>

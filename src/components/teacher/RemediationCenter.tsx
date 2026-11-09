@@ -4,7 +4,7 @@ import { translations } from '../../locales/translations';
 import { RemediationResource, Student } from '../../types';
 import { 
   HeartHandshake, AlertTriangle, BookOpen, UserPlus, 
-  CheckCircle2, Clock, Eye, Sparkles, X, Send, Award
+  CheckCircle2, Clock, Eye, Sparkles, X, Send, Award, User
 } from 'lucide-react';
 
 export const RemediationCenter: React.FC = () => {
@@ -115,7 +115,7 @@ export const RemediationCenter: React.FC = () => {
                           key={student.id}
                           className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-slate-800 shadow-2xs"
                         >
-                          <span>{student.avatarIcon}</span>
+                          <User className="w-3.5 h-3.5 text-blue-600" />
                           <span className="font-mono text-blue-700">{student.studentCode}</span>
                           <span className="text-[10px] text-rose-600 font-bold bg-rose-50 px-1 rounded">
                             {pct}%
@@ -214,7 +214,7 @@ export const RemediationCenter: React.FC = () => {
                 return (
                   <tr key={asg.id} className="hover:bg-slate-50/80 transition">
                     <td className="py-3 px-4 font-semibold text-slate-900 flex items-center gap-2">
-                      <span>{student?.avatarIcon}</span>
+                      <User className="w-3.5 h-3.5 text-blue-600" />
                       <span className="font-mono font-bold text-blue-700">{student?.studentCode}</span>
                     </td>
                     <td className="py-3 px-4">

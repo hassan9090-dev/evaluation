@@ -7,7 +7,7 @@ import {
   Sparkles, BookOpen, Award, CheckCircle2, Clock, 
   ArrowRight, ArrowLeft, Send, Check, Star, ShieldCheck, 
   HelpCircle, ChevronRight, AlertCircle, HeartHandshake, Smile,
-  ArrowUp, ArrowDown, Shuffle, Link2, FolderPlus, Eye, SearchCheck, LogOut, RotateCcw
+  ArrowUp, ArrowDown, Shuffle, Link2, FolderPlus, Eye, SearchCheck, LogOut, RotateCcw, User
 } from 'lucide-react';
 import { StudentMassarLogin } from './StudentMassarLogin';
 
@@ -201,8 +201,8 @@ export const StudentPortal: React.FC = () => {
       {/* Friendly Student Header Banner */}
       <div className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-3xl p-6 md:p-8 text-white shadow-lg shadow-indigo-500/10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-3xl shadow-inner border border-white/30">
-            {currentStudent.avatarIcon}
+          <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white shadow-inner border border-white/30">
+            <User className="w-8 h-8" />
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1 flex-wrap">

@@ -6,12 +6,10 @@ import { HomePage } from './components/home/HomePage';
 import { TeacherDashboard } from './components/teacher/TeacherDashboard';
 import { ClassManager } from './components/teacher/ClassManager';
 import { SkillsRepository } from './components/teacher/SkillsRepository';
-import { QuestionBank } from './components/teacher/QuestionBank';
 import { EvaluationManager } from './components/teacher/EvaluationManager';
 import { CorrectionCenter } from './components/teacher/CorrectionCenter';
 import { RemediationCenter } from './components/teacher/RemediationCenter';
 import { AnalyticsReports } from './components/teacher/AnalyticsReports';
-import { ResearchProtocolView } from './components/teacher/ResearchProtocolView';
 import { TeacherLogin } from './components/teacher/TeacherLogin';
 import { StudentPortal } from './components/student/StudentPortal';
 import { StudentMassarLogin } from './components/student/StudentMassarLogin';
@@ -41,12 +39,10 @@ const AppContent: React.FC = () => {
                   {activeTeacherTab === 'dashboard' && <TeacherDashboard />}
                   {activeTeacherTab === 'classes' && <ClassManager />}
                   {activeTeacherTab === 'skills' && <SkillsRepository />}
-                  {activeTeacherTab === 'questionBank' && <QuestionBank />}
-                  {activeTeacherTab === 'evaluations' && <EvaluationManager />}
+                  {(activeTeacherTab === 'evaluations' || (activeTeacherTab as string) === 'questionBank') && <EvaluationManager />}
                   {activeTeacherTab === 'correction' && <CorrectionCenter />}
                   {activeTeacherTab === 'remediation' && <RemediationCenter />}
                   {activeTeacherTab === 'analytics' && <AnalyticsReports />}
-                  {activeTeacherTab === 'research' && <ResearchProtocolView />}
                 </>
               )
             ) : !currentStudent ? (
@@ -66,8 +62,8 @@ const AppContent: React.FC = () => {
               </div>
               <div className="text-[11px] text-slate-400">
                 {isRtl 
-                  ? 'مشروع بحث تطبيقي وتطوير تربوي - مطابق لضوابط حماية المعطيات الشخصية (CNDP)' 
-                  : 'Recherche-Action EdTech • Évaluation formative & Remédiation individualisée'}
+                  ? 'التقويم التكويني والدعم الفردي - مطابق لضوابط حماية المعطيات الشخصية (CNDP)' 
+                  : 'Évaluation formative & Remédiation individualisée'}
               </div>
             </div>
           </footer>

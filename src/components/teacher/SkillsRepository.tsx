@@ -1,32 +1,60 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { translations } from '../../locales/translations';
-import { Skill, SubjectId } from '../../types';
+import { Skill, Subject, SubjectId } from '../../types';
 import { 
   BookMarked, Calculator, CheckCircle2, AlertCircle, 
   Target, Info, ArrowUpRight, Plus, Pencil, Trash2, 
-  Search, Filter, Sparkles, Check 
+  Search, Filter, Sparkles, Check, X, AlertTriangle, Layers, BookOpen
 } from 'lucide-react';
 import { SkillModal } from './SkillModal';
+
+// Moroccan Primary Curriculum Subjects Quick Suggestions
+const SUGGESTED_SUBJECTS = [
+  { nameFr: 'Éveil Scientifique', nameAr: 'النشاط العلمي', code: 'ES', icon: 'book' },
+  { nameFr: 'Langue Arabe', nameAr: 'اللغة العربية', code: 'AR', icon: 'book' },
+  { nameFr: 'Éducation Islamique', nameAr: 'التربية الإسلامية', code: 'EI', icon: 'book' },
+  { nameFr: 'Histoire & Géographie', nameAr: 'الاجتماعيات', code: 'HG', icon: 'book' },
+  { nameFr: 'Éducation Artistique', nameAr: 'التربية الفنية', code: 'EA', icon: 'book' },
+];
 
 export const SkillsRepository: React.FC = () => {
   const { 
     lang, isRtl, skills, deleteSkill, 
+    subjects, addSubject, deleteSubject,
     calculateSkillMasteryForClass, setActiveTeacherTab 
   } = useApp();
 
-  const [activeSubject, setActiveSubject] = useState<SubjectId>('francais');
+  const [activeSubject, setActiveSubject] = useState<SubjectId>(() => subjects[0]?.id || 'francais');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDomain, setSelectedDomain] = useState<string>('all');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [skillToEdit, setSkillToEdit] = useState<Skill | null>(null);
-  const [notification, setNotification] = useState<{ type: 'success' | 'info'; text: string } | null>(null);
+  const [skillToDelete, setSkillToDelete] = useState<Skill | null>(null);
+
+  // Subject Modals & Form
+  const [showAddSubjectModal, setShowAddSubjectModal] = useState(false);
+  const [subjectToDelete, setSubjectToDelete] = useState<Subject | null>(null);
+  const [newSubjNameFr, setNewSubjNameFr] = useState('');
+  const [newSubjNameAr, setNewSubjNameAr] = useState('');
+  const [newSubjCode, setNewSubjCode] = useState('');
+  const [newSubjIcon, setNewSubjIcon] = useState<'book' | 'calculator'>('book');
+
+  const [notification, setNotification] = useState<{ type: 'success' | 'info' | 'error'; text: string } | null>(null);
 
   const t = translations[lang];
 
+  // Make sure activeSubject exists in subjects list
+  const currentSubjectObj = subjects.find(s => s.id === activeSubject) || subjects[0] || {
+    id: 'francais',
+    nameFr: 'Français',
+    nameAr: 'اللغة الفرنسية',
+    code: 'FR'
+  };
+
   // Subject skills
-  const subjectSkills = skills.filter(s => s.subjectId === activeSubject);
+  const subjectSkills = skills.filter(s => s.subjectId === currentSubjectObj.id);
 
   // Available unique domains for current subject
   const availableDomains = Array.from(new Set(subjectSkills.map(s => isRtl ? s.domainAr : s.domainFr))).filter(Boolean);
@@ -62,23 +90,83 @@ export const SkillsRepository: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteSkill = (skill: Skill) => {
-    const skillName = isRtl ? skill.nameAr : skill.nameFr;
-    const confirmText = isRtl
-      ? `هل أنت متأكد من حذف المهارة [${skill.code}]: "${skillName}" من شبكة الكفايات؟`
-      : `Voulez-vous vraiment supprimer la compétence [${skill.code}] : "${skillName}" du référentiel ?`;
+  const handleOpenDeleteSkill = (skill: Skill) => {
+    setSkillToDelete(skill);
+  };
 
-    if (window.confirm(confirmText)) {
-      const ok = deleteSkill(skill.id);
-      if (ok) {
-        setNotification({
-          type: 'info',
-          text: isRtl 
-            ? `تم حذف المهارة (${skill.code}) بنجاح.` 
-            : `La compétence (${skill.code}) a été supprimée avec succès.`
-        });
-        setTimeout(() => setNotification(null), 4000);
-      }
+  const handleConfirmDeleteSkill = () => {
+    if (!skillToDelete) return;
+    const code = skillToDelete.code;
+    const ok = deleteSkill(skillToDelete.id);
+    setSkillToDelete(null);
+    if (ok) {
+      setNotification({
+        type: 'info',
+        text: isRtl 
+          ? `تم حذف المهارة (${code}) بنجاح.` 
+          : `La compétence (${code}) a été supprimée avec succès.`
+      });
+      setTimeout(() => setNotification(null), 4000);
+    }
+  };
+
+  // Handle Add Subject Submit
+  const handleCreateSubject = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newSubjNameFr.trim()) return;
+
+    const created = addSubject({
+      nameFr: newSubjNameFr.trim(),
+      nameAr: newSubjNameAr.trim() || newSubjNameFr.trim(),
+      code: (newSubjCode.trim() || newSubjNameFr.trim().slice(0, 3)).toUpperCase(),
+      icon: newSubjIcon,
+    });
+
+    setActiveSubject(created.id);
+    setSelectedDomain('all');
+    setShowAddSubjectModal(false);
+    setNewSubjNameFr('');
+    setNewSubjNameAr('');
+    setNewSubjCode('');
+    setNotification({
+      type: 'success',
+      text: isRtl 
+        ? `تمت إضافة المادة الدراسية "${created.nameAr}" بنجاح.` 
+        : `La matière "${created.nameFr}" a été ajoutée avec succès au référentiel.`
+    });
+    setTimeout(() => setNotification(null), 4000);
+  };
+
+  // Handle Confirm Delete Subject
+  const handleConfirmDeleteSubject = () => {
+    if (!subjectToDelete) return;
+
+    const name = isRtl ? subjectToDelete.nameAr : subjectToDelete.nameFr;
+    const res = deleteSubject(subjectToDelete.id);
+    setSubjectToDelete(null);
+
+    if (!res.success) {
+      setNotification({
+        type: 'error',
+        text: res.error || 'Impossible de supprimer cette matière.'
+      });
+      setTimeout(() => setNotification(null), 4000);
+      return;
+    }
+
+    setNotification({
+      type: 'info',
+      text: isRtl 
+        ? `تم حذف المادة الدراسية "${name}" وكفاياتها المرتبطة بنجاح.` 
+        : `La matière "${name}" et ses compétences associées ont été supprimées.`
+    });
+    setTimeout(() => setNotification(null), 4000);
+
+    // Switch to another existing subject
+    const remaining = subjects.filter(s => s.id !== subjectToDelete.id);
+    if (remaining.length > 0) {
+      setActiveSubject(remaining[0].id);
+      setSelectedDomain('all');
     }
   };
 
@@ -102,8 +190,8 @@ export const SkillsRepository: React.FC = () => {
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
                 {isRtl 
-                  ? 'إدارة، إضافة، تعديل وحذف كفايات المنهاج الدراسي للتعليم الابتدائي - الفرنسية والرياضيات' 
-                  : 'Gestion, ajout, modification et suppression des compétences du curriculum national (Français & Maths)'}
+                  ? 'إدارة المواد الدراسية، وإضافة وتعديل وحذف كفايات المنهاج الدراسي للتعليم الابتدائي' 
+                  : 'Gestion des matières, ajout, modification et suppression des compétences du curriculum national'}
               </p>
             </div>
           </div>
@@ -111,42 +199,70 @@ export const SkillsRepository: React.FC = () => {
 
         {/* Right Controls: Subject Switcher & New Skill Button */}
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* Subject Switcher Tabs */}
-          <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200">
+          {/* Dynamic Subject Switcher Tabs */}
+          <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 p-1 rounded-2xl border border-slate-200 max-w-full overflow-x-auto">
+            {subjects.map(subj => {
+              const isSelected = (currentSubjectObj.id === subj.id);
+              const count = skills.filter(s => s.subjectId === subj.id).length;
+
+              return (
+                <div key={subj.id} className="flex items-center">
+                  <button
+                    onClick={() => {
+                      setActiveSubject(subj.id);
+                      setSelectedDomain('all');
+                    }}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-white text-blue-700 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    {subj.icon === 'calculator' ? (
+                      <Calculator className="w-3.5 h-3.5 text-indigo-600" />
+                    ) : (
+                      <BookMarked className="w-3.5 h-3.5 text-blue-600" />
+                    )}
+                    <span>{isRtl ? subj.nameAr : subj.nameFr}</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                      isSelected ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-200 text-slate-600'
+                    }`}>
+                      {count}
+                    </span>
+                  </button>
+
+                  {/* Delete Subject Button (Visible if more than 1 subject exists) */}
+                  {subjects.length > 1 && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSubjectToDelete(subj);
+                      }}
+                      className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition ml-0.5 mr-1 cursor-pointer"
+                      title={isRtl ? `حذف مادة ${subj.nameAr}` : `Supprimer la matière "${subj.nameFr}"`}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Add Subject Button */}
             <button
-              onClick={() => {
-                setActiveSubject('francais');
-                setSelectedDomain('all');
-              }}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                activeSubject === 'francais'
-                  ? 'bg-white text-blue-700 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+              onClick={() => setShowAddSubjectModal(true)}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-white/70 hover:bg-white text-indigo-700 border border-dashed border-indigo-300 hover:border-indigo-500 transition cursor-pointer"
+              title={isRtl ? 'إضافة مادة دراسية جديدة' : 'Ajouter une nouvelle matière'}
             >
-              <BookMarked className="w-3.5 h-3.5 text-blue-600" />
-              <span>{t.evaluation.francais}</span>
-            </button>
-            <button
-              onClick={() => {
-                setActiveSubject('mathematiques');
-                setSelectedDomain('all');
-              }}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                activeSubject === 'mathematiques'
-                  ? 'bg-white text-indigo-700 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Calculator className="w-3.5 h-3.5 text-indigo-600" />
-              <span>{t.evaluation.mathematiques}</span>
+              <Plus className="w-3.5 h-3.5" />
+              <span>{isRtl ? 'إضافة مادة' : '+ Matière'}</span>
             </button>
           </div>
 
           {/* Add Skill Button */}
           <button
             onClick={handleOpenAdd}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-500/20 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-500/20 transition cursor-pointer shrink-0"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>{isRtl ? 'إضافة مهارة جديدة' : 'Nouvelle Compétence'}</span>
@@ -312,7 +428,7 @@ export const SkillsRepository: React.FC = () => {
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
                     <button
-                      onClick={() => handleDeleteSkill(skill)}
+                      onClick={() => handleOpenDeleteSkill(skill)}
                       className="p-1.5 rounded-lg border border-slate-200 hover:border-rose-300 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition cursor-pointer"
                       title={isRtl ? 'حذف المهارة' : 'Supprimer cette compétence'}
                     >
@@ -401,6 +517,216 @@ export const SkillsRepository: React.FC = () => {
         skillToEdit={skillToEdit}
         defaultSubject={activeSubject}
       />
+
+      {/* Modal: Add New Subject */}
+      {showAddSubjectModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <Plus className="w-4 h-4" />
+                </div>
+                <h3 className="font-bold text-slate-900 text-base">
+                  {isRtl ? 'إضافة مادة دراسية جديدة' : 'Ajouter une nouvelle matière'}
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowAddSubjectModal(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Quick Suggestions Pills */}
+            <div className="mb-4">
+              <label className="block text-[11px] font-bold text-slate-500 mb-1.5">
+                {isRtl ? 'مقترحات سريعة للمنهاج المغربي :' : 'Suggestions rapides (Curriculum Marocain) :'}
+              </label>
+              <div className="flex flex-wrap gap-1.5">
+                {SUGGESTED_SUBJECTS.map((sug, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      setNewSubjNameFr(sug.nameFr);
+                      setNewSubjNameAr(sug.nameAr);
+                      setNewSubjCode(sug.code);
+                    }}
+                    className="text-[11px] px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold border border-indigo-200 transition cursor-pointer"
+                  >
+                    + {isRtl ? sug.nameAr : sug.nameFr}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <form onSubmit={handleCreateSubject} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  {isRtl ? 'اسم المادة بالفرنسية :' : 'Nom de la matière en Français :'}
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ex: Éveil Scientifique"
+                  value={newSubjNameFr}
+                  onChange={(e) => setNewSubjNameFr(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-800"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  {isRtl ? 'اسم المادة بالعربية :' : 'Nom de la matière en Arabe :'}
+                </label>
+                <input
+                  type="text"
+                  placeholder="مثال: النشاط العلمي"
+                  value={newSubjNameAr}
+                  onChange={(e) => setNewSubjNameAr(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    {isRtl ? 'الرمز المختصر (Code) :' : 'Code abrégé :'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="ES, AR, EI..."
+                    value={newSubjCode}
+                    onChange={(e) => setNewSubjCode(e.target.value.toUpperCase())}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase font-mono font-bold text-indigo-700"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    {isRtl ? 'الأيقونة :' : 'Icône :'}
+                  </label>
+                  <select
+                    value={newSubjIcon}
+                    onChange={(e) => setNewSubjIcon(e.target.value as 'book' | 'calculator')}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-slate-700"
+                  >
+                    <option value="book">{isRtl ? 'كتاب (علوم / لغات)' : 'Livre (Langues / Éveil)'}</option>
+                    <option value="calculator">{isRtl ? 'حاسبة (رياضيات / منطق)' : 'Calculatrice (Maths / Logique)'}</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-4 flex items-center justify-end gap-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowAddSubjectModal(false)}
+                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold transition"
+                >
+                  {t.common.cancel}
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xs transition"
+                >
+                  {isRtl ? 'إنشاء المادة' : 'Créer la matière'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Confirm Delete Subject */}
+      {subjectToDelete && (
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+
+            <h3 className="text-center font-bold text-slate-900 text-base mb-1">
+              {isRtl ? 'تأكيد حذف المادة الدراسية' : 'Supprimer cette matière ?'}
+            </h3>
+            <p className="text-center text-xs text-slate-500 mb-4 leading-relaxed">
+              {isRtl ? (
+                <>
+                  هل أنت متأكد من حذف مادة <span className="font-bold text-slate-800">{subjectToDelete.nameAr}</span> ؟
+                  تحتوي حالياً على <span className="font-bold text-rose-700">{skills.filter(s => s.subjectId === subjectToDelete.id).length}</span> كفايات سيتم حذفها أيضاً من الشبكة.
+                </>
+              ) : (
+                <>
+                  Voulez-vous vraiment supprimer la matière <span className="font-bold text-slate-800">{subjectToDelete.nameFr}</span> ?
+                  Cette matière contient <span className="font-bold text-rose-700">{skills.filter(s => s.subjectId === subjectToDelete.id).length}</span> compétence(s) qui seront également supprimées.
+                </>
+              )}
+            </p>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setSubjectToDelete(null)}
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs transition"
+              >
+                {t.common.cancel}
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteSubject}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition"
+              >
+                {isRtl ? 'حذف المادة' : 'Supprimer la matière'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Confirm Delete Skill */}
+      {skillToDelete && (
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
+              <Trash2 className="w-6 h-6" />
+            </div>
+
+            <h3 className="text-center font-bold text-slate-900 text-base mb-1">
+              {isRtl ? 'تأكيد حذف المهارة' : 'Supprimer cette compétence ?'}
+            </h3>
+            <p className="text-center text-xs text-slate-500 mb-4 leading-relaxed">
+              {isRtl ? (
+                <>
+                  هل أنت متأكد من حذف المهارة [<span className="font-mono font-bold text-blue-700">{skillToDelete.code}</span>] : <span className="font-bold text-slate-800">{skillToDelete.nameAr}</span> ؟
+                </>
+              ) : (
+                <>
+                  Voulez-vous vraiment supprimer la compétence [<span className="font-mono font-bold text-blue-700">{skillToDelete.code}</span>] : <span className="font-bold text-slate-800">{skillToDelete.nameFr}</span> ?
+                </>
+              )}
+            </p>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setSkillToDelete(null)}
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs transition"
+              >
+                {t.common.cancel}
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteSkill}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition"
+              >
+                {isRtl ? 'حذف المهارة' : 'Supprimer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

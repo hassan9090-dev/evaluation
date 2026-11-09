@@ -2,13 +2,18 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { 
   Role, Language, SchoolClass, Student, Skill, Question, 
   Evaluation, EvaluationAttempt, RemediationResource, RemediationAssignment, MasteryLevel,
-  LivePresence
+  LivePresence, Subject
 } from '../types';
 import { 
   initialClasses, initialStudents, initialSkills, initialQuestions, 
   initialEvaluations, generateInitialAttempts, initialRemediationResources, 
   initialRemediationAssignments 
 } from '../data/mockInitialData';
+
+export const initialSubjects: Subject[] = [
+  { id: 'francais', nameFr: 'Français', nameAr: 'اللغة الفرنسية', code: 'FR', icon: 'book', isDefault: true },
+  { id: 'mathematiques', nameFr: 'Mathématiques', nameAr: 'الرياضيات', code: 'MA', icon: 'calculator', isDefault: true },
+];
 
 export type TeacherTab = 
   | 'dashboard' 
@@ -18,8 +23,7 @@ export type TeacherTab =
   | 'evaluations' 
   | 'correction' 
   | 'remediation' 
-  | 'analytics' 
-  | 'research';
+  | 'analytics';
 
 export type StudentTab = 
   | 'home' 
@@ -65,6 +69,7 @@ interface AppContextType {
   // Data
   classes: SchoolClass[];
   students: Student[];
+  subjects: Subject[];
   skills: Skill[];
   questions: Question[];
   evaluations: Evaluation[];
@@ -76,13 +81,20 @@ interface AppContextType {
   addQuestion: (q: Question) => void;
   updateQuestion: (q: Question) => void;
   deleteQuestion: (id: string) => void;
+  addSubject: (subj: Omit<Subject, 'id'> & { id?: string }) => Subject;
+  deleteSubject: (id: string) => { success: boolean; error?: string };
   addSkill: (skillData: Omit<Skill, 'id'>) => Skill;
   updateSkill: (id: string, updated: Partial<Skill>) => boolean;
   deleteSkill: (id: string) => boolean;
   addEvaluation: (ev: Evaluation) => void;
   updateEvaluation: (ev: Evaluation) => void;
+  deleteEvaluation: (id: string) => void;
   addStudent: (s: Omit<Student, 'id'>) => void;
   updateStudent: (s: Student) => void;
+  deleteStudent: (id: string) => void;
+  addClass: (cls: Omit<SchoolClass, 'id'>) => SchoolClass;
+  updateClass: (cls: SchoolClass) => void;
+  deleteClass: (id: string) => boolean;
   submitAttempt: (attempt: EvaluationAttempt) => void;
   saveGrading: (attemptId: string, updatedAnswers: Record<string, any>, generalFeedback?: string) => void;
   assignRemediation: (studentId: string, resourceId: string, skillId: string) => void;
@@ -310,6 +322,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const [subjects, setSubjects] = useState<Subject[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'subjects');
+    return saved ? JSON.parse(saved) : initialSubjects;
+  });
+
   const [skills, setSkills] = useState<Skill[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'skills');
     return saved ? JSON.parse(saved) : initialSkills;
@@ -457,6 +474,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_PREFIX + 'students', JSON.stringify(students));
   }, [students]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PREFIX + 'subjects', JSON.stringify(subjects));
+  }, [subjects]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_PREFIX + 'skills', JSON.stringify(skills));
@@ -666,16 +687,53 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setEvaluations(prev => prev.map(item => item.id === ev.id ? ev : item));
   };
 
+  const deleteEvaluation = (id: string) => {
+    setEvaluations(prev => prev.filter(item => item.id !== id));
+  };
+
   const addStudent = (s: Omit<Student, 'id'>) => {
     const newStudent: Student = {
       ...s,
-      id: `std-${Date.now().toString().slice(-4)}`
+      id: `std-${Date.now().toString().slice(-4)}-${Math.random().toString(36).substring(2, 6)}`
     };
     setStudents(prev => [...prev, newStudent]);
   };
 
   const updateStudent = (s: Student) => {
     setStudents(prev => prev.map(st => st.id === s.id ? s : st));
+  };
+
+  const deleteStudent = (id: string) => {
+    setStudents(prev => prev.filter(st => st.id !== id));
+    if (currentStudent?.id === id) {
+      setCurrentStudent(null);
+    }
+  };
+
+  const addClass = (clsData: Omit<SchoolClass, 'id'>): SchoolClass => {
+    const newClass: SchoolClass = {
+      ...clsData,
+      id: `class-${Date.now().toString().slice(-6)}`
+    };
+    setClasses(prev => [...prev, newClass]);
+    setSelectedClassId(newClass.id);
+    return newClass;
+  };
+
+  const updateClass = (cls: SchoolClass) => {
+    setClasses(prev => prev.map(c => c.id === cls.id ? cls : c));
+  };
+
+  const deleteClass = (id: string): boolean => {
+    if (classes.length <= 1) return false;
+    setClasses(prev => prev.filter(c => c.id !== id));
+    if (selectedClassId === id) {
+      const remaining = classes.filter(c => c.id !== id);
+      if (remaining.length > 0) {
+        setSelectedClassId(remaining[0].id);
+      }
+    }
+    return true;
   };
 
   const submitAttempt = (attempt: EvaluationAttempt) => {
@@ -918,10 +976,49 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return found;
   };
 
+  const addSubject = (subj: Omit<Subject, 'id'> & { id?: string }): Subject => {
+    const rawId = subj.id || subj.nameFr.toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
+    const safeBaseId = rawId || `subj_${Date.now().toString(36)}`;
+
+    let finalId = safeBaseId;
+    let count = 1;
+    while (subjects.some(s => s.id === finalId)) {
+      finalId = `${safeBaseId}_${count++}`;
+    }
+
+    const newSubj: Subject = {
+      ...subj,
+      id: finalId,
+      code: (subj.code || finalId.slice(0, 3)).toUpperCase(),
+    };
+
+    setSubjects(prev => [...prev, newSubj]);
+    return newSubj;
+  };
+
+  const deleteSubject = (id: string): { success: boolean; error?: string } => {
+    if (subjects.length <= 1) {
+      return {
+        success: false,
+        error: isRtl 
+          ? 'لا يمكن حذف المادة الدراسية الوحيدة المتبقية في المنصة.' 
+          : 'Impossible de supprimer la seule matière restante dans le référentiel.'
+      };
+    }
+
+    // Cascade: remove skills associated with this subject
+    setSkills(prev => prev.filter(s => s.subjectId !== id));
+
+    // Remove subject
+    setSubjects(prev => prev.filter(s => s.id !== id));
+    return { success: true };
+  };
+
   const resetToDefaults = () => {
     localStorage.clear();
     setClasses(initialClasses);
     setStudents(initialStudents);
+    setSubjects(initialSubjects);
     setSkills(initialSkills);
     setQuestions(initialQuestions);
     setEvaluations(initialEvaluations);
@@ -972,6 +1069,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         sendStudentPresence,
         classes,
         students,
+        subjects,
         skills,
         questions,
         evaluations,
@@ -981,13 +1079,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addQuestion,
         updateQuestion,
         deleteQuestion,
+        addSubject,
+        deleteSubject,
         addSkill,
         updateSkill,
         deleteSkill,
         addEvaluation,
         updateEvaluation,
+        deleteEvaluation,
         addStudent,
         updateStudent,
+        deleteStudent,
+        addClass,
+        updateClass,
+        deleteClass,
         submitAttempt,
         saveGrading,
         assignRemediation,

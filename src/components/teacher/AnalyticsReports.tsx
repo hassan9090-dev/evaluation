@@ -4,7 +4,8 @@ import { translations } from '../../locales/translations';
 import { Student } from '../../types';
 import { 
   BarChart3, Printer, Download, UserCheck, Users, 
-  TrendingUp, Award, CheckCircle2, AlertTriangle, FileSpreadsheet, Shield
+  TrendingUp, Award, CheckCircle2, AlertTriangle, FileSpreadsheet, Shield,
+  BookOpen, Calculator
 } from 'lucide-react';
 
 export const AnalyticsReports: React.FC = () => {
@@ -26,6 +27,26 @@ export const AnalyticsReports: React.FC = () => {
 
   // Student Attempts
   const studentAttempts = attempts.filter(a => a.studentId === activeStudent?.id && a.status === 'corrected');
+
+  // Filter by subject
+  const [subjectFilter, setSubjectFilter] = useState<'all' | 'francais' | 'mathematiques'>('all');
+
+  // Grouped skills by subject
+  const frenchSkills = skills.filter(s => s.subjectId === 'francais');
+  const mathSkills = skills.filter(s => s.subjectId === 'mathematiques');
+
+  // Subject Averages for current active student
+  const calculateSubjectAvg = (skillList: typeof skills) => {
+    if (!activeStudent || skillList.length === 0) return 0;
+    const total = skillList.reduce((sum, sk) => {
+      const stats = calculateStudentMastery(activeStudent.id, sk.id);
+      return sum + stats.percentage;
+    }, 0);
+    return Math.round(total / skillList.length);
+  };
+
+  const frenchAvg = calculateSubjectAvg(frenchSkills);
+  const mathAvg = calculateSubjectAvg(mathSkills);
 
   // Trigger browser print
   const handlePrint = () => {
@@ -74,6 +95,50 @@ export const AnalyticsReports: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const renderSkillCard = (skill: typeof skills[0]) => {
+    if (!activeStudent) return null;
+    const stats = calculateStudentMastery(activeStudent.id, skill.id);
+    const { level, badgeBg } = getMasteryLevel(stats.percentage);
+
+    return (
+      <div key={skill.id} className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs hover:border-slate-300 transition-all">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <span className={`font-mono text-xs font-bold px-2 py-0.5 rounded ${
+              skill.subjectId === 'francais' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-700'
+            }`}>
+              {skill.code}
+            </span>
+            <span className="font-bold text-xs text-slate-900">
+              {isRtl ? skill.nameAr : skill.nameFr}
+            </span>
+          </div>
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${badgeBg}`}>
+            {stats.percentage}%
+          </span>
+        </div>
+
+        <div className="w-full bg-slate-100 rounded-full h-2 mb-2 overflow-hidden">
+          <div
+            className={`h-full transition-all duration-300 ${
+              level === 4 ? 'bg-indigo-600' :
+              level === 3 ? 'bg-emerald-600' :
+              level === 2 ? 'bg-amber-500' : 'bg-rose-500'
+            }`}
+            style={{ width: `${stats.percentage}%` }}
+          />
+        </div>
+
+        <div className="flex items-center justify-between text-[10px] text-slate-500">
+          <span className="capitalize">{skill.subjectId === 'francais' ? (isRtl ? 'اللغة الفرنسية' : 'Français') : (isRtl ? 'الرياضيات' : 'Mathématiques')}</span>
+          <span className="font-semibold text-slate-700">
+            {t.masteryLevels[`level${level}` as keyof typeof t.masteryLevels]}
+          </span>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -217,54 +282,122 @@ export const AnalyticsReports: React.FC = () => {
               </div>
             </div>
 
-            {/* Competency Mastery Breakdown */}
+            {/* Competency Mastery Breakdown Grouped by Subject */}
             <div className="space-y-6 mb-8">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-2">
-                1. Analyse Détaillée par Compétence Fondamentale (Français & Mathématiques)
-              </h3>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-2.5">
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900">
+                    {isRtl 
+                      ? '1. تحليل مفصل حسب الكفاية الأساسية (الفرنسية والرياضيات)' 
+                      : '1. Analyse Détaillée par Compétence Fondamentale (Français & Mathématiques)'}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {isRtl ? 'عرض منفصل ومبوب حسب كل مادة دراسية' : 'Affichage ventilé par discipline'}
+                  </p>
+                </div>
+                
+                {/* Subject Switcher Filter (Screen Only) */}
+                <div className="flex items-center gap-1.5 no-print self-start sm:self-auto">
+                  <button
+                    onClick={() => setSubjectFilter('all')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
+                      subjectFilter === 'all'
+                        ? 'bg-slate-900 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {isRtl ? 'جميع المواد' : 'Toutes les matières'}
+                  </button>
+                  <button
+                    onClick={() => setSubjectFilter('francais')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition ${
+                      subjectFilter === 'francais'
+                        ? 'bg-blue-600 text-white shadow-xs'
+                        : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                    }`}
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>{isRtl ? 'اللغة الفرنسية' : 'Français'}</span>
+                  </button>
+                  <button
+                    onClick={() => setSubjectFilter('mathematiques')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition ${
+                      subjectFilter === 'mathematiques'
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                    }`}
+                  >
+                    <Calculator className="w-3.5 h-3.5" />
+                    <span>{isRtl ? 'الرياضيات' : 'Mathématiques'}</span>
+                  </button>
+                </div>
+              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {skills.map(skill => {
-                  const stats = calculateStudentMastery(activeStudent.id, skill.id);
-                  const { level, badgeBg } = getMasteryLevel(stats.percentage);
-
-                  return (
-                    <div key={skill.id} className="p-4 rounded-xl border border-slate-200 bg-white">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700">
-                            {skill.code}
-                          </span>
-                          <span className="font-bold text-xs text-slate-900">
-                            {isRtl ? skill.nameAr : skill.nameFr}
-                          </span>
-                        </div>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${badgeBg}`}>
-                          {stats.percentage}%
-                        </span>
+              {/* Français Section */}
+              {(subjectFilter === 'all' || subjectFilter === 'francais') && (
+                <div className="space-y-3.5">
+                  <div className="flex items-center justify-between bg-blue-50/80 border border-blue-200 rounded-xl px-4 py-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-2xs">
+                        <BookOpen className="w-4 h-4" />
                       </div>
-
-                      <div className="w-full bg-slate-100 rounded-full h-2 mb-2 overflow-hidden">
-                        <div
-                          className={`h-full ${
-                            level === 4 ? 'bg-indigo-600' :
-                            level === 3 ? 'bg-emerald-600' :
-                            level === 2 ? 'bg-amber-500' : 'bg-rose-500'
-                          }`}
-                          style={{ width: `${stats.percentage}%` }}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between text-[10px] text-slate-400">
-                        <span>{skill.subjectId === 'francais' ? 'Français' : 'Mathématiques'}</span>
-                        <span className="font-semibold text-slate-600">
-                          {t.masteryLevels[`level${level}` as keyof typeof t.masteryLevels]}
-                        </span>
+                      <div>
+                        <h4 className="text-xs font-extrabold text-blue-950 uppercase tracking-wide">
+                          {isRtl ? 'مادة : اللغة الفرنسية' : 'Discipline : Français'}
+                        </h4>
+                        <p className="text-[11px] text-blue-700 font-medium">
+                          {frenchSkills.length} {isRtl ? 'كفايات أساسية معتمدة' : 'compétences fondamentales évaluées'}
+                        </p>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-blue-900">
+                        {isRtl ? 'معدل التحكم في المادة :' : 'Moyenne matière :'}
+                      </span>
+                      <span className="text-sm font-black px-3 py-1 rounded-lg bg-blue-600 text-white shadow-xs">
+                        {frenchAvg}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    {frenchSkills.map(renderSkillCard)}
+                  </div>
+                </div>
+              )}
+
+              {/* Mathématiques Section */}
+              {(subjectFilter === 'all' || subjectFilter === 'mathematiques') && (
+                <div className="space-y-3.5 pt-1">
+                  <div className="flex items-center justify-between bg-emerald-50/80 border border-emerald-200 rounded-xl px-4 py-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-2xs">
+                        <Calculator className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-extrabold text-emerald-950 uppercase tracking-wide">
+                          {isRtl ? 'مادة : الرياضيات' : 'Discipline : Mathématiques'}
+                        </h4>
+                        <p className="text-[11px] text-emerald-700 font-medium">
+                          {mathSkills.length} {isRtl ? 'كفايات أساسية معتمدة' : 'compétences fondamentales évaluées'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-emerald-900">
+                        {isRtl ? 'معدل التحكم في المادة :' : 'Moyenne matière :'}
+                      </span>
+                      <span className="text-sm font-black px-3 py-1 rounded-lg bg-emerald-600 text-white shadow-xs">
+                        {mathAvg}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    {mathSkills.map(renderSkillCard)}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Historical Evaluations Attempt Table */}
@@ -396,58 +529,126 @@ export const AnalyticsReports: React.FC = () => {
             </div>
           </div>
 
-          {/* Table of Skill Mastery Matrix TM_s */}
-          <div className="space-y-4">
+          {/* Table of Skill Mastery Matrix TM_s Grouped by Subject */}
+          <div className="space-y-6">
             <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-2">
-              Taux de Maîtrise par Compétence (TM<sub>s</sub> = Σ S<sub>obtenus</sub> / Σ S<sub>max</sub> × 100)
+              {isRtl ? 'نسبة التحكم في الكفايات حسب المادة' : 'Taux de Maîtrise par Compétence & par Discipline'} (TM<sub>s</sub> = Σ S<sub>obtenus</sub> / Σ S<sub>max</sub> × 100)
             </h3>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-600">
-                <thead className="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px]">
-                  <tr>
-                    <th className="py-2.5 px-4">Code</th>
-                    <th className="py-2.5 px-4">Compétence</th>
-                    <th className="py-2.5 px-4">Matière</th>
-                    <th className="py-2.5 px-4">Questions Évaluées</th>
-                    <th className="py-2.5 px-4">Taux TM<sub>s</sub></th>
-                    <th className="py-2.5 px-4">Niveau de Maîtrise Global</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {skills.map(skill => {
-                    const stats = calculateSkillMasteryForClass(skill.id);
-                    const { level, badgeBg } = getMasteryLevel(stats.percentage);
+            {/* Français Collective Table */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between bg-blue-50/80 border border-blue-200 rounded-xl px-4 py-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-md bg-blue-600 text-white flex items-center justify-center">
+                    <BookOpen className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="text-xs font-bold text-blue-900 uppercase">
+                    {isRtl ? 'مادة : اللغة الفرنسية' : 'Discipline : Français'}
+                  </span>
+                  <span className="text-[11px] text-blue-600 font-medium">
+                    ({frenchSkills.length} {isRtl ? 'كفايات' : 'compétences'})
+                  </span>
+                </div>
+              </div>
 
-                    return (
-                      <tr key={skill.id} className="hover:bg-slate-50">
-                        <td className="py-2.5 px-4 font-mono font-bold text-blue-700">{skill.code}</td>
-                        <td className="py-2.5 px-4 font-semibold text-slate-900">
-                          {isRtl ? skill.nameAr : skill.nameFr}
-                        </td>
-                        <td className="py-2.5 px-4">
-                          <span className="capitalize">{skill.subjectId}</span>
-                        </td>
-                        <td className="py-2.5 px-4">{stats.testedCount}</td>
-                        <td className="py-2.5 px-4 font-extrabold text-slate-900">
-                          {stats.percentage}%
-                        </td>
-                        <td className="py-2.5 px-4">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${badgeBg}`}>
-                            {t.masteryLevels[`level${level}` as keyof typeof t.masteryLevels]}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <table className="w-full text-left text-xs text-slate-600">
+                  <thead className="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px]">
+                    <tr>
+                      <th className="py-2.5 px-4">Code</th>
+                      <th className="py-2.5 px-4">{isRtl ? 'الكفاية المستهدفة' : 'Compétence Fondamentale'}</th>
+                      <th className="py-2.5 px-4">{isRtl ? 'الأسئلة المقومة' : 'Questions Évaluées'}</th>
+                      <th className="py-2.5 px-4">Taux TM<sub>s</sub></th>
+                      <th className="py-2.5 px-4">{isRtl ? 'مستوى التحكم الجماعي' : 'Niveau de Maîtrise Global'}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 bg-white">
+                    {frenchSkills.map(skill => {
+                      const stats = calculateSkillMasteryForClass(skill.id);
+                      const { level, badgeBg } = getMasteryLevel(stats.percentage);
+
+                      return (
+                        <tr key={skill.id} className="hover:bg-slate-50">
+                          <td className="py-2.5 px-4 font-mono font-bold text-blue-700">{skill.code}</td>
+                          <td className="py-2.5 px-4 font-semibold text-slate-900">
+                            {isRtl ? skill.nameAr : skill.nameFr}
+                          </td>
+                          <td className="py-2.5 px-4">{stats.testedCount}</td>
+                          <td className="py-2.5 px-4 font-extrabold text-slate-900">
+                            {stats.percentage}%
+                          </td>
+                          <td className="py-2.5 px-4">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${badgeBg}`}>
+                              {t.masteryLevels[`level${level}` as keyof typeof t.masteryLevels]}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Mathématiques Collective Table */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between bg-emerald-50/80 border border-emerald-200 rounded-xl px-4 py-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-md bg-emerald-600 text-white flex items-center justify-center">
+                    <Calculator className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="text-xs font-bold text-emerald-900 uppercase">
+                    {isRtl ? 'مادة : الرياضيات' : 'Discipline : Mathématiques'}
+                  </span>
+                  <span className="text-[11px] text-emerald-600 font-medium">
+                    ({mathSkills.length} {isRtl ? 'كفايات' : 'compétences'})
+                  </span>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <table className="w-full text-left text-xs text-slate-600">
+                  <thead className="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px]">
+                    <tr>
+                      <th className="py-2.5 px-4">Code</th>
+                      <th className="py-2.5 px-4">{isRtl ? 'الكفاية المستهدفة' : 'Compétence Fondamentale'}</th>
+                      <th className="py-2.5 px-4">{isRtl ? 'الأسئلة المقومة' : 'Questions Évaluées'}</th>
+                      <th className="py-2.5 px-4">Taux TM<sub>s</sub></th>
+                      <th className="py-2.5 px-4">{isRtl ? 'مستوى التحكم الجماعي' : 'Niveau de Maîtrise Global'}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 bg-white">
+                    {mathSkills.map(skill => {
+                      const stats = calculateSkillMasteryForClass(skill.id);
+                      const { level, badgeBg } = getMasteryLevel(stats.percentage);
+
+                      return (
+                        <tr key={skill.id} className="hover:bg-slate-50">
+                          <td className="py-2.5 px-4 font-mono font-bold text-emerald-700">{skill.code}</td>
+                          <td className="py-2.5 px-4 font-semibold text-slate-900">
+                            {isRtl ? skill.nameAr : skill.nameFr}
+                          </td>
+                          <td className="py-2.5 px-4">{stats.testedCount}</td>
+                          <td className="py-2.5 px-4 font-extrabold text-slate-900">
+                            {stats.percentage}%
+                          </td>
+                          <td className="py-2.5 px-4">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${badgeBg}`}>
+                              {t.masteryLevels[`level${level}` as keyof typeof t.masteryLevels]}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
-          {/* Research note footer */}
+          {/* Report footer */}
           <div className="pt-4 border-t border-slate-200 text-xs text-slate-500 flex items-center justify-between">
-            <span>Données agrégées anonymes exploitables pour publication académique et mémoire de Master.</span>
+            <span>{isRtl ? 'بيانات إحصائية شاملة لتتبع تطور الكفايات ومستويات التحكم.' : 'Données agrégées de suivi pédagogique et de maîtrise des compétences.'}</span>
             <span>Généré par Suivi-Pédagogique v1.0</span>
           </div>
         </div>
