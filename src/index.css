@@ -1,8 +1,52 @@
 @import "tailwindcss";
 
+@theme {
+  /* Soothing Matte Paper Neutrals (replaces cold clinical slate with restful warm-sage paper tones) */
+  --color-slate-50: #f6f8f7;
+  --color-slate-100: #ecf1ef;
+  --color-slate-200: #d9e2de;
+  --color-slate-300: #bccac4;
+  --color-slate-400: #8fa19a;
+  --color-slate-500: #63756e;
+  --color-slate-600: #495852;
+  --color-slate-700: #36423d;
+  --color-slate-800: #232c28;
+  --color-slate-900: #151c19;
+  --color-slate-950: #0b100e;
+
+  /* Primary Accent: Restful Academic Teal-Emerald (replaces harsh electric blue) */
+  --color-blue-50: #f0fdfa;
+  --color-blue-100: #ccfbf1;
+  --color-blue-200: #99f6e4;
+  --color-blue-300: #5eead4;
+  --color-blue-400: #2dd4bf;
+  --color-blue-500: #14b8a6;
+  --color-blue-600: #0d8a7c;
+  --color-blue-700: #0f766e;
+  --color-blue-800: #115e59;
+  --color-blue-900: #134e4a;
+  --color-blue-950: #042f2e;
+
+  /* Secondary Accent: Calm Ocean Slate-Azure (replaces harsh neon indigo/purple) */
+  --color-indigo-50: #f1f7fa;
+  --color-indigo-100: #dfeef5;
+  --color-indigo-200: #c3dfed;
+  --color-indigo-300: #96c7df;
+  --color-indigo-400: #62a8cc;
+  --color-indigo-500: #3e8cb5;
+  --color-indigo-600: #2b7097;
+  --color-indigo-700: #235b7c;
+  --color-indigo-800: #204c67;
+  --color-indigo-900: #1e4057;
+  --color-indigo-950: #13293a;
+}
+
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: var(--color-slate-50);
+    color: var(--color-slate-800);
+    -webkit-font-smoothing: antialiased;
   }
   
   [dir="rtl"] body,
@@ -23,3 +67,4 @@
     color: black !important;
   }
 }
+

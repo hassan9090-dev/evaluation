@@ -22,14 +22,12 @@ export type TeacherTab =
   | 'questionBank' 
   | 'evaluations' 
   | 'correction' 
-  | 'remediation' 
   | 'analytics';
 
 export type StudentTab = 
   | 'home' 
   | 'tests' 
-  | 'results' 
-  | 'remediation';
+  | 'results';
 
 interface AppContextType {
   role: Role;
@@ -130,7 +128,7 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const STORAGE_KEY_PREFIX = 'eval_progress_v2_';
+const STORAGE_KEY_PREFIX = 'eval_progress_v3_';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [role, setRoleState] = useState<Role>(() => {
@@ -343,6 +341,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const normalizeEvaluationTo10 = (ev: Evaluation): Evaluation => ({
     ...ev,
+    type: 'sommatif',
+    titleFr: ev.titleFr
+      .replace(/Diagnostique Initiale \(Pré-Test 4AEP\)/i, 'Sommative 1 : Synthèse des Acquis (4AEP)')
+      .replace(/Formative/gi, 'Sommative')
+      .replace(/Diagnostique/gi, 'Sommative'),
+    titleAr: ev.titleAr
+      .replace(/التشخيصي الأولي \(الروائز القبلية للمستوى الرابع\)/, 'الإجمالي الأول : حصيلة المكتسبات (4AEP)')
+      .replace(/تكويني/g, 'إجمالي')
+      .replace(/تشخيصي/g, 'إجمالي'),
     totalScore: 10,
   });
 
@@ -363,10 +370,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   };
 
+  const enforceSingleActiveEvaluation = (list: Evaluation[], preferredActiveId?: string): Evaluation[] => {
+    if (preferredActiveId) {
+      return list.map(ev => ({
+        ...ev,
+        status: ev.id === preferredActiveId ? 'active' : (ev.status === 'active' ? 'closed' : ev.status),
+      }));
+    }
+    let foundActive = false;
+    return list.map(ev => {
+      if (ev.status === 'active') {
+        if (!foundActive) {
+          foundActive = true;
+          return ev;
+        }
+        return { ...ev, status: 'closed' };
+      }
+      return ev;
+    });
+  };
+
   const [evaluations, setEvaluations] = useState<Evaluation[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'evaluations');
     const list: Evaluation[] = saved ? JSON.parse(saved) : initialEvaluations;
-    return list.map(normalizeEvaluationTo10);
+    return enforceSingleActiveEvaluation(list.map(normalizeEvaluationTo10));
   });
 
   const [attempts, setAttempts] = useState<EvaluationAttempt[]>(() => {
@@ -708,11 +735,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const addEvaluation = (ev: Evaluation) => {
-    setEvaluations(prev => [ev, ...prev]);
+    setEvaluations(prev => {
+      const next = [ev, ...prev];
+      return ev.status === 'active' ? enforceSingleActiveEvaluation(next, ev.id) : next;
+    });
   };
 
   const updateEvaluation = (ev: Evaluation) => {
-    setEvaluations(prev => prev.map(item => item.id === ev.id ? ev : item));
+    setEvaluations(prev => {
+      const next = prev.map(item => item.id === ev.id ? ev : item);
+      return ev.status === 'active' ? enforceSingleActiveEvaluation(next, ev.id) : next;
+    });
   };
 
   const deleteEvaluation = (id: string) => {

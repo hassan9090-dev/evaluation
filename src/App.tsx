@@ -8,7 +8,6 @@ import { ClassManager } from './components/teacher/ClassManager';
 import { SkillsRepository } from './components/teacher/SkillsRepository';
 import { EvaluationManager } from './components/teacher/EvaluationManager';
 import { CorrectionCenter } from './components/teacher/CorrectionCenter';
-import { RemediationCenter } from './components/teacher/RemediationCenter';
 import { AnalyticsReports } from './components/teacher/AnalyticsReports';
 import { TeacherLogin } from './components/teacher/TeacherLogin';
 import { StudentPortal } from './components/student/StudentPortal';
@@ -41,7 +40,6 @@ const AppContent: React.FC = () => {
                   {activeTeacherTab === 'skills' && <SkillsRepository />}
                   {(activeTeacherTab === 'evaluations' || (activeTeacherTab as string) === 'questionBank') && <EvaluationManager />}
                   {activeTeacherTab === 'correction' && <CorrectionCenter />}
-                  {activeTeacherTab === 'remediation' && <RemediationCenter />}
                   {activeTeacherTab === 'analytics' && <AnalyticsReports />}
                 </>
               )

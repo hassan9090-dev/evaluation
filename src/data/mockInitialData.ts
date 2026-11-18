@@ -17,13 +17,13 @@ export const initialClasses: SchoolClass[] = [
   }
 ];
 
-export const initialStudents: Student[] = Array.from({ length: 25 }, (_, i) => {
+export const initialStudents: Student[] = Array.from({ length: 20 }, (_, i) => {
   const num = (i + 1).toString().padStart(2, '0');
   return {
     id: `std-${num}`,
     studentCode: `G1340${num}`,
     displayPseudonym: `Élève G1340${num}`,
-    classId: i < 15 ? 'class-4aep-a' : 'class-4aep-b',
+    classId: i < 10 ? 'class-4aep-a' : 'class-4aep-b',
     active: true,
   };
 });
@@ -586,114 +586,85 @@ export const initialQuestions: Question[] = [
 ];
 
 export const initialEvaluations: Evaluation[] = [
+  // 2 Évaluations en Français
   {
-    id: 'eval-diag-01',
-    titleFr: 'Évaluation Diagnostique Initiale (Pré-Test 4AEP)',
-    titleAr: 'التقويم التشخيصي الأولي (الروائز القبلية للمستوى الرابع)',
-    descriptionFr: 'Mesure des prérequis fondamentaux en compréhension, calcul et numération en début d\'année.',
-    descriptionAr: 'قياس المكتسبات القبلية في الفهم والحساب والأعداد عند انطلاق الموسم الدراسي.',
+    id: 'eval-fr-01',
+    titleFr: 'Évaluation Sommative 1 : Français - Unité 1',
+    titleAr: 'التقويم الإجمالي 1 : اللغة الفرنسية - الوحدة الأولى',
+    descriptionFr: 'Évaluation sommative en compréhension de l\'écrit, grammaire, conjugaison et expression écrite.',
+    descriptionAr: 'تقويم إجمالي في فهم المقروء، التراكيب، الصرف والتحويل والإنتاج الكتابي.',
     subjectId: 'francais',
-    type: 'diagnostic',
+    type: 'sommatif',
     classId: 'class-4aep-a',
-    questionIds: ['q-fr-01', 'q-fr-02', 'q-fr-03', 'q-fr-04', 'q-ma-01', 'q-ma-02'],
+    questionIds: ['q-fr-01', 'q-fr-02', 'q-fr-03', 'q-fr-04', 'q-fr-05'],
     totalScore: 10,
     durationMinutes: 45,
     status: 'active',
-    createdAt: '2026-09-15T09:00:00Z',
-    dateRealisation: '2026-09-20',
+    createdAt: '2026-10-15T09:00:00Z',
+    dateRealisation: '2026-10-20',
   },
   {
-    id: 'eval-form-01',
-    titleFr: 'Évaluation Formative : Français - Unité 1 (Diversifiée)',
-    titleAr: 'تقويم تكويني متنوع: اللغة الفرنسية - الوحدة الأولى',
-    descriptionFr: 'Vérification complète : Compréhension, Grammaire, Ordre des mots, Appariement, Classification et Expression.',
-    descriptionAr: 'تقويم شامل يجمع بين الفهم، التراكيب، ترتيب الكلمات، المزاوجة، التصنيف، والإنتاج الكتابي.',
+    id: 'eval-fr-02',
+    titleFr: 'Évaluation Sommative 2 : Français - Unité 2',
+    titleAr: 'التقويم الإجمالي 2 : اللغة الفرنسية - الوحدة الثانية',
+    descriptionFr: 'Évaluation sommative de synthèse en lecture, vocabulaire, orthographe et structuration de phrases.',
+    descriptionAr: 'تقويم إجمالي تركيبي في القراءة، المعجم، الإملاء وبناء الجمل.',
     subjectId: 'francais',
-    type: 'formatif',
-    classId: 'class-4aep-a',
-    questionIds: ['q-fr-01', 'q-fr-02', 'q-fr-03', 'q-fr-10', 'q-fr-06', 'q-fr-07', 'q-fr-08', 'q-fr-09', 'q-fr-04', 'q-fr-05'],
+    type: 'sommatif',
+    classId: 'class-4aep-b',
+    questionIds: ['q-fr-01', 'q-fr-02', 'q-fr-03', 'q-fr-06', 'q-fr-07', 'q-fr-08'],
     totalScore: 10,
     durationMinutes: 45,
-    status: 'active',
-    createdAt: '2026-10-20T10:00:00Z',
-    dateRealisation: '2026-10-25',
+    status: 'closed',
+    createdAt: '2026-10-22T10:00:00Z',
+    dateRealisation: '2026-10-27',
   },
+  // 2 Évaluations en Mathématiques
   {
-    id: 'eval-form-02',
-    titleFr: 'Évaluation Formative : Mathématiques (Diversifiée)',
-    titleAr: 'تقويم تكويني متنوع: الرياضيات والمهارات المتعددة',
-    descriptionFr: 'Contrôle continu : Numération, Rangement croissant, Calcul, Intrus, Géométrie, Mesures, Texte à trous et Problèmes.',
-    descriptionAr: 'مراقبة مستمرة تشمل الأعداد، الترتيب التزايدي، الحساب، العنصر الدخيل، الهندسة، وحدات القياس، إتمام النص والمسائل.',
+    id: 'eval-ma-01',
+    titleFr: 'Évaluation Sommative 1 : Mathématiques - Numération & Calcul',
+    titleAr: 'التقويم الإجمالي 1 : الرياضيات - الأعداد والحساب',
+    descriptionFr: 'Évaluation sommative sur les grands nombres, le rangement croissant, les opérations et problèmes.',
+    descriptionAr: 'تقويم إجمالي حول الأعداد الكبيرة، الترتيب التزايدي، العمليات الحسابية وحل المسائل.',
     subjectId: 'mathematiques',
-    type: 'formatif',
+    type: 'sommatif',
     classId: 'class-4aep-a',
-    questionIds: ['q-ma-01', 'q-ma-06', 'q-ma-02', 'q-ma-09', 'q-ma-10', 'q-ma-07', 'q-ma-08', 'q-ma-04', 'q-ma-05'],
+    questionIds: ['q-ma-01', 'q-ma-02', 'q-ma-04', 'q-ma-05', 'q-ma-06'],
     totalScore: 10,
     durationMinutes: 45,
-    status: 'active',
-    createdAt: '2026-10-25T11:00:00Z',
+    status: 'closed',
+    createdAt: '2026-10-28T11:00:00Z',
     dateRealisation: '2026-11-02',
+  },
+  {
+    id: 'eval-ma-02',
+    titleFr: 'Évaluation Sommative 2 : Mathématiques - Géométrie & Mesures',
+    titleAr: 'التقويم الإجمالي 2 : الرياضيات - الهندسة والقياس',
+    descriptionFr: 'Évaluation sommative portant sur la géométrie, les conversions de mesures et la résolution de problèmes.',
+    descriptionAr: 'تقويم إجمالي يخص الهندسة، تحويلات القياس وحل المسائل الرياضية.',
+    subjectId: 'mathematiques',
+    type: 'sommatif',
+    classId: 'class-4aep-b',
+    questionIds: ['q-ma-01', 'q-ma-02', 'q-ma-07', 'q-ma-08', 'q-ma-09', 'q-ma-10'],
+    totalScore: 10,
+    durationMinutes: 45,
+    status: 'closed',
+    createdAt: '2026-11-05T11:00:00Z',
+    dateRealisation: '2026-11-10',
   }
 ];
 
-// Realistic attempts for class students to power dashboards and analytics
+// Realistic attempts for the 20 students (10 per class) across the 4 evaluations
 export const generateInitialAttempts = (): EvaluationAttempt[] => {
   const attempts: EvaluationAttempt[] = [];
+  const classAStudents = initialStudents.filter(s => s.classId === 'class-4aep-a');
+  const classBStudents = initialStudents.filter(s => s.classId === 'class-4aep-b');
 
-  // 1. Diagnostic attempts for all 25 students (closed & corrected)
-  initialStudents.forEach((student, index) => {
-    // Generate realistic grades spanning our 4 tiers
-    // A few students struggling (<50%), some developing (50-74%), many proficient (75-89%), and some mastery (>=90%)
-    let scoreMod = 0;
-    if (index < 4) scoreMod = 0.42; // struggling (<50%)
-    else if (index < 11) scoreMod = 0.65; // en cours (50-74%)
-    else if (index < 20) scoreMod = 0.82; // maîtrisé (75-89%)
-    else scoreMod = 0.95; // très bien maîtrisé (>=90%)
-
-    const q1Score = scoreMod > 0.5 ? 2 : 0;
-    const q2Score = scoreMod > 0.4 ? 1 : 0;
-    const q3Score = scoreMod > 0.6 ? 2 : (scoreMod > 0.45 ? 1 : 0);
-    const q4Score = scoreMod > 0.65 ? 2 : 0;
-    const qma1Score = scoreMod > 0.5 ? 2 : 0;
-    const qma2Score = scoreMod > 0.6 ? 2 : 0;
-
-    const rawTotal = q1Score + q2Score + q3Score + q4Score + qma1Score + qma2Score;
-    const rawMax = 11;
-    const maxScore = 10;
-    const noteSur10 = Math.round((rawTotal / rawMax) * 10 * 10) / 10;
-    const percentage = Math.round((rawTotal / rawMax) * 100);
-
-    attempts.push({
-      id: `att-diag-${student.studentCode}`,
-      evaluationId: 'eval-diag-01',
-      studentId: student.id,
-      startedAt: '2026-09-15T09:05:00Z',
-      submittedAt: '2026-09-15T09:40:00Z',
-      maxScore,
-      totalScore: noteSur10,
-      percentage,
-      status: 'corrected',
-      answers: {
-        'q-fr-01': { questionId: 'q-fr-01', studentResponse: q1Score === 2 ? 'opt-1' : 'opt-2', scoreObtained: q1Score, maxScore: 2, isCorrect: q1Score === 2 },
-        'q-fr-02': { questionId: 'q-fr-02', studentResponse: q2Score === 1 ? false : true, scoreObtained: q2Score, maxScore: 1, isCorrect: q2Score === 1 },
-        'q-fr-03': { questionId: 'q-fr-03', studentResponse: q3Score === 2 ? 'opt-1' : 'opt-2', scoreObtained: q3Score, maxScore: 2, isCorrect: q3Score === 2 },
-        'q-fr-04': { questionId: 'q-fr-04', studentResponse: q4Score === 2 ? 'ons' : 'ez', scoreObtained: q4Score, maxScore: 2, isCorrect: q4Score === 2 },
-        'q-ma-01': { questionId: 'q-ma-01', studentResponse: qma1Score === 2 ? 'opt-1' : 'opt-3', scoreObtained: qma1Score, maxScore: 2, isCorrect: qma1Score === 2 },
-        'q-ma-02': { questionId: 'q-ma-02', studentResponse: qma2Score === 2 ? '500' : '450', scoreObtained: qma2Score, maxScore: 2, isCorrect: qma2Score === 2 },
-      },
-      generalFeedback: percentage >= 75 
-        ? "Très bon travail en début d'année. Poursuis sur cette dynamique."
-        : percentage >= 50
-        ? "Bases convenables mais vigilance requise sur la conjugaison et la multiplication."
-        : "Difficultés repérées en compréhension et numération. Programme de soutien recommandé."
-    });
-  });
-
-  // 2. Formative French test attempts (15 students already submitted, some corrected, some waiting for teacher rubric)
-  initialStudents.slice(0, 15).forEach((student, index) => {
-    const isTeacherCorrected = index < 10;
-    const basePct = 0.55 + ((index % 6) * 0.08);
-    const autoScore = (basePct > 0.6 ? 2 : 0) + 1 + (basePct > 0.5 ? 2 : 0) + (basePct > 0.7 ? 2 : 0);
+  // 1. Section A - Français (eval-fr-01): 10 students (8 corrected, 2 submitted awaiting grading)
+  classAStudents.forEach((student, index) => {
+    const isTeacherCorrected = index < 8;
+    const basePct = 0.45 + ((index % 5) * 0.12);
+    const autoScore = (basePct > 0.5 ? 2 : 0) + 1 + (basePct > 0.55 ? 2 : 0) + (basePct > 0.65 ? 2 : 0);
     const rubricScores = isTeacherCorrected ? {
       'crit-1': basePct > 0.6 ? 2 : 1,
       'crit-2': basePct > 0.7 ? 2 : 1,
@@ -705,34 +676,124 @@ export const generateInitialAttempts = (): EvaluationAttempt[] => {
     const rubricTotal = rubricScores ? Object.values(rubricScores).reduce((a, b) => a + b, 0) : 0;
     const rawTotal = isTeacherCorrected ? autoScore + rubricTotal : autoScore;
     const rawMax = 17;
-    const maxScore = 10;
     const noteSur10 = Math.round((rawTotal / rawMax) * 10 * 10) / 10;
 
     attempts.push({
-      id: `att-form1-${student.studentCode}`,
-      evaluationId: 'eval-form-01',
+      id: `att-fr1-${student.studentCode}`,
+      evaluationId: 'eval-fr-01',
       studentId: student.id,
-      startedAt: '2026-10-20T10:05:00Z',
-      submittedAt: '2026-10-20T10:35:00Z',
-      maxScore,
+      startedAt: '2026-10-20T09:05:00Z',
+      submittedAt: '2026-10-20T09:40:00Z',
+      maxScore: 10,
       totalScore: isTeacherCorrected ? noteSur10 : undefined,
       percentage: isTeacherCorrected ? Math.round((rawTotal / rawMax) * 100) : undefined,
       status: isTeacherCorrected ? 'corrected' : 'submitted',
       answers: {
-        'q-fr-01': { questionId: 'q-fr-01', studentResponse: 'opt-1', scoreObtained: 2, maxScore: 2, isCorrect: true },
+        'q-fr-01': { questionId: 'q-fr-01', studentResponse: basePct > 0.5 ? 'opt-1' : 'opt-2', scoreObtained: basePct > 0.5 ? 2 : 0, maxScore: 2, isCorrect: basePct > 0.5 },
         'q-fr-02': { questionId: 'q-fr-02', studentResponse: false, scoreObtained: 1, maxScore: 1, isCorrect: true },
-        'q-fr-03': { questionId: 'q-fr-03', studentResponse: 'opt-1', scoreObtained: 2, maxScore: 2, isCorrect: true },
-        'q-fr-04': { questionId: 'q-fr-04', studentResponse: 'ons', scoreObtained: 2, maxScore: 2, isCorrect: true },
+        'q-fr-03': { questionId: 'q-fr-03', studentResponse: basePct > 0.55 ? 'opt-1' : 'opt-2', scoreObtained: basePct > 0.55 ? 2 : 0, maxScore: 2, isCorrect: basePct > 0.55 },
+        'q-fr-04': { questionId: 'q-fr-04', studentResponse: basePct > 0.65 ? 'ons' : 'ez', scoreObtained: basePct > 0.65 ? 2 : 0, maxScore: 2, isCorrect: basePct > 0.65 },
         'q-fr-05': {
           questionId: 'q-fr-05',
-          studentResponse: "Mon école est grande et fleurie. J'aime lire des livres dans la cour pendant la récréation avec mes amis. J'adore les cours de mathématiques.",
+          studentResponse: "Mon école est grande et fleurie. J'aime lire des livres dans la cour pendant la récréation avec mes amis.",
           scoreObtained: isTeacherCorrected ? rubricTotal : undefined,
           maxScore: 10,
           rubricScores,
-          teacherComment: isTeacherCorrected ? "Bon paragraphe descriptif. Veille aux accords en nombre des adjectifs." : undefined,
         }
       },
-      generalFeedback: isTeacherCorrected ? "Progression notable dans l'expression écrite." : undefined
+      generalFeedback: isTeacherCorrected ? "Bonne maîtrise globale des compétences évaluées." : undefined
+    });
+  });
+
+  // 2. Section A - Mathématiques (eval-ma-01): 10 students (all corrected)
+  classAStudents.forEach((student, index) => {
+    const scoreMod = index < 2 ? 0.45 : index < 5 ? 0.68 : index < 8 ? 0.84 : 0.96;
+    const q1 = scoreMod > 0.5 ? 2 : 0;
+    const q2 = scoreMod > 0.6 ? 2 : 0;
+    const q4 = scoreMod > 0.4 ? 2 : 0;
+    const q5 = scoreMod > 0.7 ? 3 : 2;
+    const q6 = scoreMod > 0.65 ? 2 : 0;
+    const rawTotal = q1 + q2 + q4 + q5 + q6;
+    const rawMax = 11;
+    const noteSur10 = Math.round((rawTotal / rawMax) * 10 * 10) / 10;
+    const percentage = Math.round((rawTotal / rawMax) * 100);
+
+    attempts.push({
+      id: `att-ma1-${student.studentCode}`,
+      evaluationId: 'eval-ma-01',
+      studentId: student.id,
+      startedAt: '2026-11-02T10:05:00Z',
+      submittedAt: '2026-11-02T10:42:00Z',
+      maxScore: 10,
+      totalScore: noteSur10,
+      percentage,
+      status: 'corrected',
+      answers: {
+        'q-ma-01': { questionId: 'q-ma-01', studentResponse: q1 === 2 ? 'opt-1' : 'opt-3', scoreObtained: q1, maxScore: 2, isCorrect: q1 === 2 },
+        'q-ma-02': { questionId: 'q-ma-02', studentResponse: q2 === 2 ? '500' : '450', scoreObtained: q2, maxScore: 2, isCorrect: q2 === 2 },
+        'q-ma-04': { questionId: 'q-ma-04', studentResponse: q4 === 2 ? 'opt-2' : 'opt-1', scoreObtained: q4, maxScore: 2, isCorrect: q4 === 2 },
+        'q-ma-05': { questionId: 'q-ma-05', studentResponse: '375 + 250 = 625 DH', scoreObtained: q5, maxScore: 3, isCorrect: q5 === 3 },
+        'q-ma-06': { questionId: 'q-ma-06', studentResponse: ['4 500', '12 300', '45 000', '120 000'], scoreObtained: q6, maxScore: 2, isCorrect: q6 === 2 },
+      },
+      generalFeedback: percentage >= 75 ? "Très bon niveau en numération et résolution de problèmes." : "Attention aux retenues dans les opérations."
+    });
+  });
+
+  // 3. Section B - Français (eval-fr-02): 10 students (all corrected)
+  classBStudents.forEach((student, index) => {
+    const scoreMod = index < 2 ? 0.42 : index < 6 ? 0.66 : index < 9 ? 0.82 : 0.94;
+    const q1 = scoreMod > 0.5 ? 2 : 0;
+    const q2 = scoreMod > 0.4 ? 1 : 0;
+    const q3 = scoreMod > 0.6 ? 2 : 0;
+    const rawTotal = q1 + q2 + q3 + (scoreMod > 0.65 ? 4 : 2);
+    const rawMax = 11;
+    const noteSur10 = Math.round((rawTotal / rawMax) * 10 * 10) / 10;
+    const percentage = Math.round((rawTotal / rawMax) * 100);
+
+    attempts.push({
+      id: `att-fr2-${student.studentCode}`,
+      evaluationId: 'eval-fr-02',
+      studentId: student.id,
+      startedAt: '2026-10-27T09:05:00Z',
+      submittedAt: '2026-10-27T09:40:00Z',
+      maxScore: 10,
+      totalScore: noteSur10,
+      percentage,
+      status: 'corrected',
+      answers: {
+        'q-fr-01': { questionId: 'q-fr-01', studentResponse: q1 === 2 ? 'opt-1' : 'opt-2', scoreObtained: q1, maxScore: 2, isCorrect: q1 === 2 },
+        'q-fr-02': { questionId: 'q-fr-02', studentResponse: q2 === 1 ? false : true, scoreObtained: q2, maxScore: 1, isCorrect: q2 === 1 },
+        'q-fr-03': { questionId: 'q-fr-03', studentResponse: q3 === 2 ? 'opt-1' : 'opt-2', scoreObtained: q3, maxScore: 2, isCorrect: q3 === 2 },
+      },
+      generalFeedback: percentage >= 75 ? "Acquis solides en compréhension et grammaire." : "Poursuivre les efforts en lecture et vocabulaire."
+    });
+  });
+
+  // 4. Section B - Mathématiques (eval-ma-02): 10 students (all corrected)
+  classBStudents.forEach((student, index) => {
+    const scoreMod = index < 2 ? 0.48 : index < 5 ? 0.64 : index < 8 ? 0.85 : 0.95;
+    const q1 = scoreMod > 0.5 ? 2 : 0;
+    const q2 = scoreMod > 0.6 ? 2 : 0;
+    const rawTotal = q1 + q2 + (scoreMod > 0.7 ? 5 : 3);
+    const rawMax = 10;
+    const noteSur10 = Math.round((rawTotal / rawMax) * 10 * 10) / 10;
+    const percentage = Math.round((rawTotal / rawMax) * 100);
+
+    attempts.push({
+      id: `att-ma2-${student.studentCode}`,
+      evaluationId: 'eval-ma-02',
+      studentId: student.id,
+      startedAt: '2026-11-10T11:05:00Z',
+      submittedAt: '2026-11-10T11:40:00Z',
+      maxScore: 10,
+      totalScore: noteSur10,
+      percentage,
+      status: 'corrected',
+      answers: {
+        'q-ma-01': { questionId: 'q-ma-01', studentResponse: q1 === 2 ? 'opt-1' : 'opt-3', scoreObtained: q1, maxScore: 2, isCorrect: q1 === 2 },
+        'q-ma-02': { questionId: 'q-ma-02', studentResponse: q2 === 2 ? '500' : '450', scoreObtained: q2, maxScore: 2, isCorrect: q2 === 2 },
+      },
+      generalFeedback: percentage >= 75 ? "Très bonne maîtrise des mesures et de la géométrie." : "Revoir le tableau de conversion des unités."
     });
   });
 

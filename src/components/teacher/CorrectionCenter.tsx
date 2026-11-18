@@ -1,28 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { translations } from '../../locales/translations';
-import { EvaluationAttempt, Question } from '../../types';
+import { EvaluationAttempt } from '../../types';
 import { 
-  CheckCircle, FileEdit, Award, MessageSquare, Save, 
-  CheckCircle2, Clock, X, AlertCircle, ChevronRight, Sliders, User
+  CheckCircle, FileEdit, MessageSquare, Save, 
+  CheckCircle2, Clock, X, User, School, BookOpen, Calendar
 } from 'lucide-react';
 
 export const CorrectionCenter: React.FC = () => {
   const { 
-    lang, isRtl, evaluations, attempts, students, questions, 
-    skills, saveGrading, getMasteryLevel 
+    lang, isRtl, classes, selectedClassId, setSelectedClassId,
+    evaluations, attempts, students, questions, 
+    saveGrading, getMasteryLevel 
   } = useApp();
 
   const t = translations[lang];
-  const [selectedEvalId, setSelectedEvalId] = useState<string>('eval-form-01');
+
+  // 1. Class Selection State (defaults to current selectedClassId or first class)
+  const [selectedClassFilter, setSelectedClassFilter] = useState<string>(
+    selectedClassId || classes[0]?.id || ''
+  );
+
+  // Filter evaluations belonging strictly to the selected class
+  const classEvaluations = evaluations.filter(ev => ev.classId === selectedClassFilter);
+
+  // 2. Evaluation Selection State (scoped to the selected class)
+  const [selectedEvalId, setSelectedEvalId] = useState<string>(
+    classEvaluations[0]?.id || ''
+  );
+
+  // Keep selectedEvalId in sync whenever selectedClassFilter or evaluations change
+  useEffect(() => {
+    const validForClass = classEvaluations.some(ev => ev.id === selectedEvalId);
+    if (!validForClass) {
+      setSelectedEvalId(classEvaluations[0]?.id || '');
+    }
+  }, [selectedClassFilter, evaluations]);
+
   const [activeAttempt, setActiveAttempt] = useState<EvaluationAttempt | null>(null);
 
   // Rubric edit state when grading an attempt
   const [editableAnswers, setEditableAnswers] = useState<Record<string, any>>({});
   const [feedbackText, setFeedbackText] = useState('');
 
-  const currentEval = evaluations.find(e => e.id === selectedEvalId) || evaluations[0];
-  const evalAttempts = attempts.filter(a => a.evaluationId === selectedEvalId);
+  const currentEval = classEvaluations.find(e => e.id === selectedEvalId) || classEvaluations[0] || null;
+  const currentEvalClass = classes.find(c => c.id === selectedClassFilter) || null;
+
+  // Attempts filtered by both the selected evaluation and the selected class
+  const evalAttempts = currentEval
+    ? attempts.filter(a => {
+        if (a.evaluationId !== currentEval.id) return false;
+        const st = students.find(s => s.id === a.studentId);
+        if (st && st.classId !== selectedClassFilter) return false;
+        return true;
+      })
+    : [];
 
   const openGradingModal = (att: EvaluationAttempt) => {
     setActiveAttempt(att);
@@ -92,48 +124,86 @@ export const CorrectionCenter: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-blue-50 text-blue-600">
-              <CheckCircle className="w-5 h-5" />
-            </span>
-            <div>
-              <h2 className="text-xl font-bold text-slate-900">{t.correction.title}</h2>
-              <p className="text-xs text-slate-500">{t.correction.subtitle}</p>
-            </div>
+      {/* Top Banner with Title on top & Class / Evaluation Filters below */}
+      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+        <div className="flex items-center gap-3">
+          <span className="p-2.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
+            <CheckCircle className="w-5 h-5" />
+          </span>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">{t.correction.title}</h2>
+            <p className="text-xs text-slate-500">{t.correction.subtitle}</p>
           </div>
         </div>
 
-        {/* Evaluation Picker Dropdown */}
-        <div className="flex items-center gap-2">
-          <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">
-            {t.correction.filterByEval} :
-          </label>
-          <select
-            value={selectedEvalId}
-            onChange={(e) => setSelectedEvalId(e.target.value)}
-            className="px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {evaluations.map(ev => (
-              <option key={ev.id} value={ev.id}>
-                {isRtl ? ev.titleAr : ev.titleFr} ({ev.subjectId === 'francais' ? 'Français' : 'Maths'})
-              </option>
-            ))}
-          </select>
+        {/* Class & Evaluation Selectors placed below the title */}
+        <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center gap-4">
+          {/* 1. Class Dropdown */}
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-bold text-slate-600 whitespace-nowrap flex items-center gap-1">
+              <School className="w-3.5 h-3.5 text-indigo-600" />
+              <span>{isRtl ? 'القسم :' : 'Classe :'}</span>
+            </label>
+            <select
+              value={selectedClassFilter}
+              onChange={(e) => {
+                const newCls = e.target.value;
+                setSelectedClassFilter(newCls);
+                setSelectedClassId(newCls);
+              }}
+              className="px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {classes.map(cls => (
+                <option key={cls.id} value={cls.id}>
+                  {cls.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* 2. Evaluation Dropdown (filtered by chosen class) */}
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-bold text-slate-600 whitespace-nowrap flex items-center gap-1">
+              <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+              <span>{isRtl ? 'الاختبار :' : 'Évaluation :'}</span>
+            </label>
+            <select
+              value={currentEval?.id || ''}
+              onChange={(e) => setSelectedEvalId(e.target.value)}
+              disabled={classEvaluations.length === 0}
+              className="px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            >
+              {classEvaluations.length === 0 ? (
+                <option value="">
+                  {isRtl ? 'لا يوجد اختبار لهذا القسم' : 'Aucune évaluation pour cette classe'}
+                </option>
+              ) : (
+                classEvaluations.map(ev => (
+                  <option key={ev.id} value={ev.id}>
+                    {isRtl ? ev.titleAr : ev.titleFr} ({ev.subjectId === 'francais' ? 'Français' : 'Maths'})
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
         </div>
       </div>
 
       {/* Submissions Table */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="p-4 bg-slate-50/70 border-b border-slate-200 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="p-4 bg-slate-50/70 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="font-bold text-xs text-slate-800">
-              {isRtl ? 'قائمة محاولات المتعلمين' : 'Feuilles d\'examen remises'}
+              {isRtl ? 'أوراق المتعلمين المرسلة' : 'Copies des élèves remises'}
             </span>
+            {currentEval && (
+              <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-lg border border-blue-100">
+                {isRtl ? currentEval.titleAr : currentEval.titleFr}
+                {currentEvalClass ? ` • ${currentEvalClass.name}` : ''}
+              </span>
+            )}
             <span className="text-xs text-slate-500 font-medium">
-              ({evalAttempts.length} {isRtl ? 'محاولة مسجلة' : 'copies'})
+              ({evalAttempts.length} {isRtl ? 'ورقة مسجلة' : 'copie(s)'})
             </span>
           </div>
 
@@ -154,6 +224,7 @@ export const CorrectionCenter: React.FC = () => {
             <thead className="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
               <tr>
                 <th className="py-3 px-4">{t.correction.studentCode}</th>
+                <th className="py-3 px-4">{isRtl ? 'القسم' : 'Classe'}</th>
                 <th className="py-3 px-4">{isRtl ? 'تاريخ الإرسال' : 'Date d\'envoi'}</th>
                 <th className="py-3 px-4">{isRtl ? 'الحالة' : 'Statut'}</th>
                 <th className="py-3 px-4">{t.correction.finalScore} (/10)</th>
@@ -162,92 +233,115 @@ export const CorrectionCenter: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {evalAttempts.map(att => {
-                const student = students.find(s => s.id === att.studentId);
-                const hasScore = att.totalScore !== undefined;
-                const pct = att.percentage ?? 0;
-                const { level, badgeBg } = getMasteryLevel(pct);
-                const displayScore10 = hasScore
-                  ? (att.maxScore === 10 ? att.totalScore : Math.round(((att.totalScore || 0) / (att.maxScore || 10)) * 10 * 10) / 10)
-                  : undefined;
+              {evalAttempts.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-10 px-4 text-center text-slate-400">
+                    {isRtl
+                      ? 'لا توجد أوراق مرسلة لهذا الاختبار في هذا القسم حالياً.'
+                      : 'Aucune copie remise pour cette évaluation et cette classe.'}
+                  </td>
+                </tr>
+              ) : (
+                evalAttempts.map(att => {
+                  const student = students.find(s => s.id === att.studentId);
+                  const studentClass = classes.find(c => c.id === student?.classId) || currentEvalClass;
+                  const hasScore = att.totalScore !== undefined;
+                  const pct = att.percentage ?? 0;
+                  const { level, badgeBg } = getMasteryLevel(pct);
+                  const displayScore10 = hasScore
+                    ? (att.maxScore === 10 ? att.totalScore : Math.round(((att.totalScore || 0) / (att.maxScore || 10)) * 10 * 10) / 10)
+                    : undefined;
 
-                return (
-                  <tr key={att.id} className="hover:bg-slate-50/80 transition">
-                    <td className="py-3 px-4 font-semibold text-slate-900 flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
-                        <User className="w-3.5 h-3.5" />
-                      </span>
-                      <span className="font-mono font-bold text-blue-700">{student?.studentCode}</span>
-                      <span className="text-slate-400 font-normal">({student?.displayPseudonym})</span>
-                    </td>
-                    <td className="py-3 px-4 text-slate-500">
-                      {att.submittedAt ? new Date(att.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '---'}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                        att.status === 'corrected' 
-                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
-                          : 'bg-amber-50 text-amber-800 border border-amber-200'
-                      }`}>
-                        {att.status === 'corrected' ? t.evaluation.corrected : t.evaluation.pendingGrading}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 font-bold text-slate-900">
-                      {hasScore ? (
-                        <span>
-                          <strong className="text-blue-700 text-sm">{displayScore10}</strong> / 10
+                  return (
+                    <tr key={att.id} className="hover:bg-slate-50/80 transition">
+                      <td className="py-3 px-4 font-semibold text-slate-900 flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
+                          <User className="w-3.5 h-3.5" />
                         </span>
-                      ) : (
-                        <span className="text-slate-400 italic">-- / 10</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4">
-                      {hasScore ? (
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${badgeBg}`}>
-                          {t.masteryLevels[`level${level}` as keyof typeof t.masteryLevels]}
+                        <span className="font-mono font-bold text-blue-700">{student?.studentCode}</span>
+                        <span className="text-slate-400 font-normal">({student?.displayPseudonym})</span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 font-semibold text-[11px]">
+                          <School className="w-3 h-3 text-indigo-600" />
+                          <span>{studentClass ? studentClass.name : '---'}</span>
                         </span>
-                      ) : (
-                        <span className="text-slate-400">---</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <button
-                        onClick={() => openGradingModal(att)}
-                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl font-semibold text-[11px] transition ${
-                          att.status === 'corrected'
-                            ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                            : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
-                        }`}
-                      >
-                        <FileEdit className="w-3.5 h-3.5" />
-                        <span>{att.status === 'corrected' ? (isRtl ? 'مراجعة التصحيح' : 'Revoir la note') : (isRtl ? 'تصحيح الورقة' : 'Noter la copie')}</span>
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+                      </td>
+                      <td className="py-3 px-4 text-slate-500">
+                        {att.submittedAt ? new Date(att.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '---'}
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                          att.status === 'corrected' 
+                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
+                            : 'bg-amber-50 text-amber-800 border border-amber-200'
+                        }`}>
+                          {att.status === 'corrected' ? t.evaluation.corrected : t.evaluation.pendingGrading}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 font-bold text-slate-900">
+                        {hasScore ? (
+                          <span>
+                            <strong className="text-blue-700 text-sm">{displayScore10}</strong> / 10
+                          </span>
+                        ) : (
+                          <span className="text-slate-400 italic">-- / 10</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4">
+                        {hasScore ? (
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${badgeBg}`}>
+                            {t.masteryLevels[`level${level}` as keyof typeof t.masteryLevels]}
+                          </span>
+                        ) : (
+                          <span className="text-slate-400">---</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <button
+                          onClick={() => openGradingModal(att)}
+                          className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl font-semibold text-[11px] transition cursor-pointer ${
+                            att.status === 'corrected'
+                              ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
+                          }`}
+                        >
+                          <FileEdit className="w-3.5 h-3.5" />
+                          <span>{att.status === 'corrected' ? (isRtl ? 'مراجعة التصحيح' : 'Revoir la note') : (isRtl ? 'تصحيح الورقة' : 'Noter la copie')}</span>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
       {/* Detailed Grading Modal with Rubric */}
-      {activeAttempt && (
+      {activeAttempt && currentEval && (
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full p-6 border border-slate-200 max-h-[92vh] flex flex-col animate-in fade-in zoom-in-95 duration-150">
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-mono font-bold text-sm bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-lg">
                     {students.find(s => s.id === activeAttempt.studentId)?.studentCode}
                   </span>
+                  {currentEvalClass && (
+                    <span className="inline-flex items-center gap-1 text-xs font-bold bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-lg border border-indigo-100">
+                      <School className="w-3.5 h-3.5" />
+                      <span>{currentEvalClass.name}</span>
+                    </span>
+                  )}
                   <span className="text-xs text-slate-500 font-medium">
                     {isRtl ? currentEval.titleAr : currentEval.titleFr}
                   </span>
                 </div>
                 <h3 className="font-bold text-slate-900 text-base mt-1">
-                  {isRtl ? 'تصحيح ورقة المتعلم وتقييم المعايير' : 'Évaluation formative et notation détaillée'}
+                  {isRtl ? 'تصحيح ورقة المتعلم وتقييم المعايير' : 'Correction détaillée et barème critérié'}
                 </h3>
               </div>
 

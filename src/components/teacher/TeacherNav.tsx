@@ -14,7 +14,6 @@ export const TeacherNav: React.FC = () => {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   const pendingGradingCount = attempts.filter(a => a.status === 'submitted').length;
-  const pendingRemCount = remediationAssignments.filter(a => a.status === 'pending').length;
 
   const navItems: { tab: TeacherTab; label: string; icon: React.FC<{ className?: string }>; badge?: number }[] = [
     { tab: 'dashboard', label: t.nav.dashboard, icon: LayoutDashboard },
@@ -22,7 +21,6 @@ export const TeacherNav: React.FC = () => {
     { tab: 'skills', label: t.nav.skills, icon: Target },
     { tab: 'evaluations', label: t.nav.evaluations, icon: FileCheck2 },
     { tab: 'correction', label: t.nav.correction, icon: CheckCircle, badge: pendingGradingCount },
-    { tab: 'remediation', label: t.nav.remediation, icon: HeartHandshake, badge: pendingRemCount },
     { tab: 'analytics', label: t.nav.analytics, icon: BarChart3 },
   ];
 

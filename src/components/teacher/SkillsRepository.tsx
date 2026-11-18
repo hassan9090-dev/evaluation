@@ -182,16 +182,13 @@ export const SkillsRepository: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-black text-slate-900">
-                  {isRtl ? 'شبكة المهارات والكفايات المعتمدة (4AEP)' : 'Référentiel des Compétences (4AEP)'}
+                  {isRtl ? 'المجالات والكفايات المعتمدة (4AEP)' : 'Domaines & Compétences (4AEP)'}
                 </h2>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 font-mono">
-                  {filteredSkills.length} {isRtl ? 'مهارة' : 'compétences'}
-                </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
                 {isRtl 
-                  ? 'إدارة المواد الدراسية، وإضافة وتعديل وحذف كفايات المنهاج الدراسي للتعليم الابتدائي' 
-                  : 'Gestion des matières, ajout, modification et suppression des compétences du curriculum national'}
+                  ? 'إدارة المواد الدراسية، المجالات، وإضافة وتعديل وحذف كفايات المنهاج الدراسي' 
+                  : 'Gestion des matières, domaines, ajout, modification et suppression des compétences du curriculum'}
               </p>
             </div>
           </div>
@@ -224,11 +221,6 @@ export const SkillsRepository: React.FC = () => {
                       <BookMarked className="w-3.5 h-3.5 text-blue-600" />
                     )}
                     <span>{isRtl ? subj.nameAr : subj.nameFr}</span>
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                      isSelected ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-200 text-slate-600'
-                    }`}>
-                      {count}
-                    </span>
                   </button>
 
                   {/* Delete Subject Button (Visible if more than 1 subject exists) */}
@@ -310,11 +302,6 @@ export const SkillsRepository: React.FC = () => {
               </button>
             )}
           </div>
-
-          <div className="text-xs text-slate-500 font-medium">
-            <span>{isRtl ? 'إجمالي المهارات بالمادة :' : 'Total dans cette matière :'} </span>
-            <strong className="text-slate-900 font-mono">{subjectSkills.length}</strong>
-          </div>
         </div>
 
         {/* Domain Filter Pills */}
@@ -351,26 +338,6 @@ export const SkillsRepository: React.FC = () => {
         </div>
       </div>
 
-      {/* Mastery Threshold Legend */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200">
-          <div className="text-[11px] font-bold text-rose-800">{t.masteryLevels.level1}</div>
-          <p className="text-[10px] text-rose-600 mt-0.5">{t.masteryLevels.desc1}</p>
-        </div>
-        <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200">
-          <div className="text-[11px] font-bold text-amber-800">{t.masteryLevels.level2}</div>
-          <p className="text-[10px] text-amber-600 mt-0.5">{t.masteryLevels.desc2}</p>
-        </div>
-        <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200">
-          <div className="text-[11px] font-bold text-emerald-800">{t.masteryLevels.level3}</div>
-          <p className="text-[10px] text-emerald-600 mt-0.5">{t.masteryLevels.desc3}</p>
-        </div>
-        <div className="p-3 rounded-2xl bg-indigo-50 border border-indigo-200">
-          <div className="text-[11px] font-bold text-indigo-800">{t.masteryLevels.level4}</div>
-          <p className="text-[10px] text-indigo-600 mt-0.5">{t.masteryLevels.desc4}</p>
-        </div>
-      </div>
-
       {/* Empty State */}
       {filteredSkills.length === 0 && (
         <div className="bg-white rounded-3xl p-10 border border-slate-200 text-center space-y-3">
@@ -395,12 +362,9 @@ export const SkillsRepository: React.FC = () => {
         </div>
       )}
 
-      {/* Competencies Grid */}
+      {/* Competencies Grid (Without Statistics) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredSkills.map(skill => {
-          const stats = calculateSkillMasteryForClass(skill.id);
-          const hasTested = stats.testedCount > 0;
-
           return (
             <div 
               key={skill.id}
@@ -413,7 +377,7 @@ export const SkillsRepository: React.FC = () => {
                     <span className="font-mono font-bold text-xs px-2.5 py-1 rounded-xl bg-blue-50 text-blue-800 border border-blue-200 shrink-0">
                       {skill.code}
                     </span>
-                    <span className="text-xs font-bold text-slate-600 truncate">
+                    <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-xl border border-indigo-100 truncate">
                       {isRtl ? skill.domainAr : skill.domainFr}
                     </span>
                   </div>
@@ -449,61 +413,20 @@ export const SkillsRepository: React.FC = () => {
 
                 {/* Skill Pedagogical Description */}
                 {(skill.descriptionFr || skill.descriptionAr) && (
-                  <p className="text-xs text-slate-600 leading-relaxed mb-4 line-clamp-3">
+                  <p className="text-xs text-slate-600 leading-relaxed mb-3 line-clamp-3">
                     {isRtl ? (skill.descriptionAr || skill.descriptionFr) : (skill.descriptionFr || skill.descriptionAr)}
                   </p>
                 )}
               </div>
 
-              {/* Progress Bar, Stats & Actions */}
-              <div className="pt-3 border-t border-slate-100 mt-2">
-                <div className="flex items-center justify-between text-xs mb-1.5">
-                  <span className="text-[11px] text-slate-500 font-medium">
-                    {hasTested 
-                      ? `${stats.testedCount} ${isRtl ? 'سؤال منجز' : 'questions évaluées'}` 
-                      : (isRtl ? 'جاهزة للتقويم' : 'Disponible en banque')}
-                  </span>
-                  {hasTested && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-slate-700">
-                        {stats.totalObtained} / {stats.totalMax} pts
-                      </span>
-                      <span className={`px-2 py-0.2 rounded-full text-[11px] font-extrabold border ${
-                        stats.level === 4 ? 'bg-indigo-50 border-indigo-200 text-indigo-700' :
-                        stats.level === 3 ? 'bg-emerald-50 border-emerald-200 text-emerald-700' :
-                        stats.level === 2 ? 'bg-amber-50 border-amber-200 text-amber-700' :
-                        'bg-rose-50 border-rose-200 text-rose-700'
-                      }`}>
-                        {stats.percentage}%
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden mb-3">
-                  <div
-                    className={`h-full transition-all duration-500 ${
-                      !hasTested ? 'bg-slate-200' :
-                      stats.level === 4 ? 'bg-indigo-600' :
-                      stats.level === 3 ? 'bg-emerald-600' :
-                      stats.level === 2 ? 'bg-amber-500' : 'bg-rose-500'
-                    }`}
-                    style={{ width: `${hasTested ? stats.percentage : 0}%` }}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-slate-400 font-bold tracking-wider uppercase">
-                    {skill.targetLevel || '4AEP'}
-                  </span>
-                  <button
-                    onClick={() => setActiveTeacherTab('remediation')}
-                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>{isRtl ? 'أنشطة الدعم المرتبطة' : 'Activités de soutien'}</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+              {/* Footer: Level & Subject Info Only (No Statistics) */}
+              <div className="pt-3 border-t border-slate-100 mt-2 flex items-center justify-between">
+                <span className="text-[10px] text-slate-400 font-bold tracking-wider uppercase">
+                  {isRtl ? 'المستوى :' : 'Niveau :'} {skill.targetLevel || '4AEP'}
+                </span>
+                <span className="text-[11px] font-semibold text-slate-500">
+                  {isRtl ? currentSubjectObj.nameAr : currentSubjectObj.nameFr}
+                </span>
               </div>
             </div>
           );

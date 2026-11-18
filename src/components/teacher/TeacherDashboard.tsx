@@ -29,60 +29,6 @@ export const TeacherDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Banner */}
-      <div className="bg-linear-to-r from-blue-700 via-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg shadow-blue-500/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-blue-100 text-xs font-medium mb-3 backdrop-blur-xs">
-            <Layers className="w-3.5 h-3.5" />
-            {t.app.demoClass}
-          </span>
-          <h2 className="text-2xl font-bold tracking-tight">
-            {isRtl ? 'لوحة القيادة التربوية وتتبع المكتسبات' : 'Tableau de Bord Pédagogique & Suivi des Acquis'}
-          </h2>
-          <p className="text-blue-100 text-sm mt-1 max-w-2xl">
-            {isRtl 
-              ? 'تتبع مستمر لمكتسبات تلاميذ المستوى الرابع ابتدائي في مادتي الفرنسية والرياضيات وفق المنهاج المغربي المعتمد.' 
-              : 'Pilotage continu des compétences des élèves du 4AEP en français et mathématiques conformément au curriculum marocain.'}
-          </p>
-        </div>
-
-        {/* Direct Key Statistics Highlights */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 bg-white/10 backdrop-blur-md p-3.5 rounded-xl border border-white/15">
-          <div className="text-center sm:text-left px-2">
-            <span className="text-[10px] text-blue-200 block uppercase font-semibold">
-              {isRtl ? 'المعدل العام' : 'Moyenne (/10)'}
-            </span>
-            <span className="text-xl sm:text-2xl font-black text-white">
-              {(overview.averageScorePct * 0.1).toFixed(1)}<span className="text-xs font-bold text-blue-200">/10</span>
-            </span>
-          </div>
-          <div className="text-center sm:text-left px-2 border-l border-white/15">
-            <span className="text-[10px] text-blue-200 block uppercase font-semibold">
-              {isRtl ? 'نسبة المشاركة' : 'Participation'}
-            </span>
-            <span className="text-xl sm:text-2xl font-black text-emerald-300">
-              {overview.participationRate}%
-            </span>
-          </div>
-          <div className="text-center sm:text-left px-2 border-l border-white/15">
-            <span className="text-[10px] text-blue-200 block uppercase font-semibold">
-              {isRtl ? 'إجمالي المحاولات' : 'Copies notées'}
-            </span>
-            <span className="text-xl sm:text-2xl font-black text-amber-300">
-              {totalAssessed}
-            </span>
-          </div>
-          <div className="text-center sm:text-left px-2 border-l border-white/15">
-            <span className="text-[10px] text-blue-200 block uppercase font-semibold">
-              {isRtl ? 'تلاميذ القسم' : 'Élèves actifs'}
-            </span>
-            <span className="text-xl sm:text-2xl font-black text-white">
-              {overview.studentCount}
-            </span>
-          </div>
-        </div>
-      </div>
-
       {/* 4 Stat Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Students */}
@@ -124,7 +70,7 @@ export const TeacherDashboard: React.FC = () => {
             </span>
           </div>
           <div className="mt-2 text-[11px] text-indigo-600 font-medium flex items-center gap-1">
-            <span>{isRtl ? 'تشخيصي + 2 تكويني' : 'Diagnostique + Formatives'}</span>
+            <span>{isRtl ? 'تقويمات إجمالية' : 'Évaluations sommatives'}</span>
           </div>
         </div>
 
@@ -228,31 +174,6 @@ export const TeacherDashboard: React.FC = () => {
               );
             })}
           </div>
-
-          {/* Pre-Test vs Post-Test Progression Box */}
-          <div className="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <div className="text-xs font-bold text-slate-800">
-                {t.dashboard.diagnosticVsSummative}
-              </div>
-              <p className="text-[11px] text-slate-500">
-                {isRtl 
-                  ? 'مؤشر تطور المكتسبات: P = S_post - S_pre = +20 نقطة مئوية' 
-                  : 'Progression globale mesurée : P = S_post - S_pre = +20 points de maîtrise'}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="text-center">
-                <span className="text-[10px] text-slate-400 block font-semibold">PRÉ-TEST</span>
-                <span className="text-sm font-bold text-slate-700">45%</span>
-              </div>
-              <ArrowRight className="w-4 h-4 text-blue-500" />
-              <div className="text-center">
-                <span className="text-[10px] text-blue-600 block font-semibold">POST-TEST</span>
-                <span className="text-sm font-bold text-blue-700">65%</span>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Right Col: Urgent Skills Alert */}
@@ -295,27 +216,10 @@ export const TeacherDashboard: React.FC = () => {
                     <span>
                       {item.studentsNeedingHelp} {t.dashboard.studentsConcerned}
                     </span>
-                    <button
-                      onClick={() => setActiveTeacherTab('remediation')}
-                      className="text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1"
-                    >
-                      <span>{t.dashboard.actionNeeded}</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-
-          <div className="mt-6 pt-4 border-t border-slate-100">
-            <button
-              onClick={() => setActiveTeacherTab('remediation')}
-              className="w-full py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold text-xs border border-amber-200 transition flex items-center justify-center gap-2"
-            >
-              <span>{isRtl ? 'فتح فضاء المعالجة والدعم' : 'Ouvrir l\'Espace Remédiation'}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
           </div>
         </div>
       </div>
@@ -341,7 +245,6 @@ export const TeacherDashboard: React.FC = () => {
               <tr>
                 <th className="py-3 px-4">{isRtl ? 'عنوان الاختبار' : 'Titre de l\'évaluation'}</th>
                 <th className="py-3 px-4">{isRtl ? 'المادة' : 'Matière'}</th>
-                <th className="py-3 px-4">{isRtl ? 'النوع' : 'Type'}</th>
                 <th className="py-3 px-4">{isRtl ? 'المدة' : 'Durée'}</th>
                 <th className="py-3 px-4">{isRtl ? 'الحالة' : 'Statut'}</th>
                 <th className="py-3 px-4 text-right">{isRtl ? 'الإجراء' : 'Actions'}</th>
@@ -359,9 +262,6 @@ export const TeacherDashboard: React.FC = () => {
                     }`}>
                       {ev.subjectId === 'francais' ? t.evaluation.francais : t.evaluation.mathematiques}
                     </span>
-                  </td>
-                  <td className="py-3 px-4">
-                    <span className="capitalize">{t.evaluation[ev.type]}</span>
                   </td>
                   <td className="py-3 px-4">{ev.durationMinutes} {t.evaluation.minutes}</td>
                   <td className="py-3 px-4">

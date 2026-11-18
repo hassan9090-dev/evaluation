@@ -411,7 +411,6 @@ export const AnalyticsReports: React.FC = () => {
                   <thead className="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px]">
                     <tr>
                       <th className="py-2.5 px-3">Session</th>
-                      <th className="py-2.5 px-3">Type</th>
                       <th className="py-2.5 px-3">Date</th>
                       <th className="py-2.5 px-3">Note Obtenue</th>
                       <th className="py-2.5 px-3">Pourcentage</th>
@@ -429,7 +428,6 @@ export const AnalyticsReports: React.FC = () => {
                           <td className="py-2.5 px-3 font-semibold text-slate-900">
                             {ev?.titleFr}
                           </td>
-                          <td className="py-2.5 px-3 capitalize">{ev?.type}</td>
                           <td className="py-2.5 px-3 text-slate-400">{new Date(att.startedAt).toLocaleDateString()}</td>
                           <td className="py-2.5 px-3 font-bold text-blue-700">
                             {score10} / 10

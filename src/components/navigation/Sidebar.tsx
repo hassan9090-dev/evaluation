@@ -27,7 +27,6 @@ export const Sidebar: React.FC = () => {
   const [showQrModal, setShowQrModal] = useState(false);
 
   const pendingGradingCount = attempts.filter(a => a.status === 'submitted').length;
-  const pendingRemCount = remediationAssignments.filter(a => a.status === 'pending').length;
 
   const teacherNavItems: { tab: TeacherTab; label: string; icon: React.FC<{ className?: string }>; badge?: number }[] = [
     { tab: 'dashboard', label: t.nav.dashboard, icon: LayoutDashboard },
@@ -35,14 +34,12 @@ export const Sidebar: React.FC = () => {
     { tab: 'skills', label: t.nav.skills, icon: Target },
     { tab: 'evaluations', label: t.nav.evaluations, icon: FileCheck2 },
     { tab: 'correction', label: t.nav.correction, icon: CheckCircle, badge: pendingGradingCount },
-    { tab: 'remediation', label: t.nav.remediation, icon: HeartHandshake, badge: pendingRemCount },
     { tab: 'analytics', label: t.nav.analytics, icon: BarChart3 },
   ];
 
   const studentNavItems: { tab: StudentTab; label: string; icon: React.FC<{ className?: string }> }[] = [
     { tab: 'home', label: t.nav.studentHome, icon: Home },
     { tab: 'tests', label: t.nav.studentTests, icon: FileCheck2 },
-    { tab: 'remediation', label: t.nav.studentRemediation, icon: HeartHandshake },
     { tab: 'results', label: t.nav.studentResults, icon: Award },
   ];
 
@@ -316,21 +313,6 @@ export const Sidebar: React.FC = () => {
 
         {/* Bottom Section: Utilities & Actions */}
         <div className="p-2 border-t border-slate-100 space-y-1.5 bg-slate-50/50">
-          
-          {/* Bottom "Quitter" Action when in Teacher or Student mode */}
-          {role !== 'home' && (
-            <button
-              onClick={handleQuit}
-              className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-2 px-3'} py-1.5 rounded-xl text-xs font-bold text-rose-700 hover:bg-rose-100/70 transition cursor-pointer`}
-              title={t.nav.quitPrompt}
-            >
-              <LogOut className={`w-3.5 h-3.5 text-rose-600 shrink-0 ${isRtl ? 'rotate-180' : ''}`} />
-              {!isSidebarCollapsed && (
-                <span className="truncate">{t.nav.quit}</span>
-              )}
-            </button>
-          )}
-
           {/* Teacher: Change Password */}
           {role === 'teacher' && isTeacherAuthenticated && (
             <button

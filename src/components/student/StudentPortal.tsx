@@ -34,15 +34,10 @@ export const StudentPortal: React.FC = () => {
   const [autoSubmitCountdown, setAutoSubmitCountdown] = useState<number>(5);
   const [dismissTimeWarning, setDismissTimeWarning] = useState<boolean>(false);
 
-  // Active Remediation Activity State
-  const [activeRemediation, setActiveRemediation] = useState<any | null>(null);
-  const [remQuizAnswer, setRemQuizAnswer] = useState<number | null>(null);
-  const [remQuizFeedback, setRemQuizFeedback] = useState<string | null>(null);
   const [selectedWordForPlacement, setSelectedWordForPlacement] = useState<string | null>(null);
 
   // Student's completed & pending attempts
   const studentAttempts = currentStudent ? attempts.filter(a => a.studentId === currentStudent.id) : [];
-  const studentAssignments = currentStudent ? remediationAssignments.filter(a => a.studentId === currentStudent.id) : [];
 
   // Active tests available to take - always show all active evaluations!
   const availableEvaluations = evaluations.filter(ev => ev.status === 'active');
@@ -199,7 +194,7 @@ export const StudentPortal: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Friendly Student Header Banner */}
-      <div className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-3xl p-6 md:p-8 text-white shadow-lg shadow-indigo-500/10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="bg-linear-to-r from-blue-700 via-indigo-700 to-indigo-800 rounded-3xl p-6 md:p-8 text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white shadow-inner border border-white/30">
             <User className="w-8 h-8" />
@@ -250,18 +245,6 @@ export const StudentPortal: React.FC = () => {
           >
             <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
             <span>{t.student.myResults}</span>
-          </button>
-          <button
-            onClick={() => setActiveStudentTab('remediation')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition ${
-              activeStudentTab === 'remediation' ? 'bg-white text-indigo-700 shadow-sm' : 'text-white hover:bg-white/10'
-            }`}
-          >
-            <HeartHandshake className="w-4 h-4 text-rose-300" />
-            <span>{t.student.myActivities}</span>
-            {studentAssignments.filter(a => a.status === 'pending').length > 0 && (
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-            )}
           </button>
         </div>
       </div>
@@ -317,9 +300,6 @@ export const StudentPortal: React.FC = () => {
                           ev.subjectId === 'francais' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'
                         }`}>
                           {ev.subjectId === 'francais' ? 'Français' : 'Mathématiques'}
-                        </span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
-                          {ev.type === 'diagnostic' ? (isRtl ? 'تشخيصي' : 'Diagnostique') : (isRtl ? 'تكويني' : 'Formatif')}
                         </span>
                       </div>
                       <span className="text-xs text-slate-500 font-semibold flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-100">
@@ -1297,159 +1277,6 @@ export const StudentPortal: React.FC = () => {
               );
             })}
           </div>
-        </div>
-      )}
-
-      {/* ======================= TAB 3: MY REMEDIATION ACTIVITIES ======================= */}
-      {activeStudentTab === 'remediation' && (
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-bold text-slate-900">
-              {isRtl ? 'أنشطة الدعم المخصصة لتطوير مهاراتي' : 'Mes Fiches de Soutien & Exercices d\'Entraînement'}
-            </h3>
-            <p className="text-xs text-slate-500">
-              {isRtl ? 'أنشطة خاصة اختارها لك أستاذك لمساعدتك على التقدم' : 'Activités choisies spécialement par ton enseignant.'}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {studentAssignments.map(asg => {
-              const res = remediationResources.find(r => r.id === asg.resourceId);
-              if (!res) return null;
-              const skill = skills.find(s => s.id === asg.skillId);
-
-              return (
-                <div key={asg.id} className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 uppercase">
-                        {res.type} • {asg.skillId}
-                      </span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        asg.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
-                      }`}>
-                        {asg.status === 'completed' ? t.remediation.statusCompleted : t.remediation.statusPending}
-                      </span>
-                    </div>
-
-                    <h4 className="font-bold text-slate-900 text-sm mb-1">
-                      {isRtl ? res.titleAr : res.titleFr}
-                    </h4>
-                    <p className="text-xs text-slate-500 mb-4">
-                      {isRtl ? res.objectiveAr : res.objectiveFr}
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      setActiveRemediation({ assignment: asg, resource: res });
-                      setRemQuizAnswer(null);
-                      setRemQuizFeedback(null);
-                    }}
-                    className="w-full py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition flex items-center justify-center gap-1.5"
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    <span>{isRtl ? 'فتح بطاقة النشاط والتدريب' : 'Ouvrir l\'activité'}</span>
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-
-          {studentAssignments.length === 0 && (
-            <div className="p-12 text-center bg-white rounded-3xl border border-slate-200">
-              <Sparkles className="w-12 h-12 text-amber-400 mx-auto mb-3" />
-              <h4 className="text-base font-bold text-slate-800">
-                {isRtl ? 'كل شيء ممتاز! لا توجد أنشطة دعم مستعجلة لك حالياً.' : 'Tout est parfait ! Tu n\'as pas de fiche de soutien en attente.'}
-              </h4>
-            </div>
-          )}
-
-          {/* Interactive Remediation Card Modal */}
-          {activeRemediation && (
-            <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-              <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 max-h-[90vh] overflow-y-auto animate-in zoom-in-95">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                  <span className="font-bold text-xs text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full">
-                    {activeRemediation.resource.skillId}
-                  </span>
-                  <button
-                    onClick={() => setActiveRemediation(null)}
-                    className="text-slate-400 hover:text-slate-600 font-bold text-sm"
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                <h3 className="font-black text-slate-900 text-lg mb-3">
-                  {isRtl ? activeRemediation.resource.titleAr : activeRemediation.resource.titleFr}
-                </h3>
-
-                <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 text-xs text-amber-950 mb-4 leading-relaxed whitespace-pre-line font-medium">
-                  {isRtl ? activeRemediation.resource.contentAr : activeRemediation.resource.contentFr}
-                </div>
-
-                {/* Practice Question */}
-                {activeRemediation.resource.practiceQuestions && activeRemediation.resource.practiceQuestions[0] && (
-                  <div className="space-y-3 mb-6">
-                    <h5 className="font-bold text-xs text-slate-900">
-                      {isRtl ? 'تمرين تطبيقي مصغر :' : 'Mini-Quiz pour vérifier ta compréhension :'}
-                    </h5>
-                    <p className="text-xs font-semibold text-slate-800">
-                      {activeRemediation.resource.practiceQuestions[0].question}
-                    </p>
-                    <div className="space-y-1.5">
-                      {activeRemediation.resource.practiceQuestions[0].options.map((opt: string, i: number) => (
-                        <button
-                          key={i}
-                          onClick={() => {
-                            setRemQuizAnswer(i);
-                            const isOk = i === activeRemediation.resource.practiceQuestions[0].correctIndex;
-                            if (isOk) {
-                              confetti({ particleCount: 40 });
-                              setRemQuizFeedback(isRtl ? 'إجابة صحيحة وممتازة! أحسنت.' : 'Excellente réponse ! Tu as bien compris la règle.');
-                            } else {
-                              setRemQuizFeedback(isRtl ? 'حاول مرة أخرى، راجع القاعدة بأعلى البطاقة.' : 'Essaie encore ! Relis bien le conseil ci-dessus.');
-                            }
-                          }}
-                          className={`w-full p-2.5 rounded-xl border text-xs font-semibold text-left transition ${
-                            remQuizAnswer === i ? 'border-indigo-600 bg-indigo-50 text-indigo-950' : 'border-slate-200 hover:bg-slate-50'
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-
-                    {remQuizFeedback && (
-                      <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-xs font-bold text-blue-900">
-                        {remQuizFeedback}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                  <button
-                    onClick={() => setActiveRemediation(null)}
-                    className="text-xs font-bold text-slate-500 hover:text-slate-800"
-                  >
-                    Fermer
-                  </button>
-                  <button
-                    onClick={() => {
-                      completeRemediation(activeRemediation.assignment.id);
-                      confetti({ particleCount: 60 });
-                      setActiveRemediation(null);
-                    }}
-                    className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md transition"
-                  >
-                    {isRtl ? 'تأكيد إتمام النشاط' : 'J\'ai terminé cette fiche !'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>
