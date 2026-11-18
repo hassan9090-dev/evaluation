@@ -260,7 +260,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (urlMassar) {
         const clean = urlMassar.trim().toLowerCase();
         const found = initialStudents.find(s => s.studentCode.toLowerCase() === clean);
-        if (found) return found;
+        const savedEvalsRaw = localStorage.getItem(STORAGE_KEY_PREFIX + 'evaluations');
+        const evalList: Evaluation[] = savedEvalsRaw ? JSON.parse(savedEvalsRaw) : initialEvaluations;
+        const activeEv = evalList.find(e => e.status === 'active');
+        if (found && activeEv && found.classId === activeEv.classId) {
+          return found;
+        }
       }
     } catch {
       // ignore
@@ -270,10 +275,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const studentLoginByMassar = (codeMassar: string, classId?: string): { success: boolean; student?: Student; error?: string } => {
+    const activeEv = evaluations.find(e => e.status === 'active');
+    if (!activeEv) {
+      return {
+        success: false,
+        error: isRtl
+          ? 'لا يوجد أي تقويم نشط حالياً. لا يمكن ولوج فضاء المتعلم إلا عند تفعيل تقويم لقسمك.'
+          : 'Aucune évaluation n\'est active actuellement. L\'accès à l\'espace élève n\'est autorisé que lorsqu\'une évaluation est active.'
+      };
+    }
+
+    const activeClass = classes.find(c => c.id === activeEv.classId);
+    const activeClassName = activeClass ? activeClass.name : activeEv.classId;
+
     if (!classId) {
       return { 
         success: false, 
         error: isRtl ? 'يرجى تحديد القسم أولاً للمتابعة.' : 'Veuillez sélectionner votre classe d\'abord.' 
+      };
+    }
+
+    if (classId !== activeEv.classId) {
+      return {
+        success: false,
+        error: isRtl
+          ? `الولوج مسموح فقط لتلاميذ القسم المعني بالتقويم النشط (${activeClassName}).`
+          : `Accès refusé : seuls les élèves de la classe avec l'évaluation active (${activeClassName}) peuvent accéder à la page élève.`
       };
     }
 
@@ -293,19 +320,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       };
     }
 
-    if (found.classId !== classId) {
-      const targetClass = classes.find(c => c.id === found.classId);
-      const targetClassName = targetClass ? targetClass.name : found.classId;
+    if (found.classId !== activeEv.classId) {
+      const studentClass = classes.find(c => c.id === found.classId);
+      const studentClassName = studentClass ? studentClass.name : found.classId;
       return { 
         success: false, 
         error: isRtl 
-          ? `رمز مسار هذا مسجل في (${targetClassName}) وليس في القسم المحدد.` 
-          : `Ce Code Massar appartient à (${targetClassName}) et non à la classe sélectionnée.` 
+          ? `رفض الولوج: هذا التلميذ ينتمي إلى (${studentClassName}). الولوج مسموح فقط لتلاميذ (${activeClassName}) الذين لديهم تقويم نشط.` 
+          : `Accès refusé : cet élève appartient à (${studentClassName}). Seuls les élèves de la classe ayant l'évaluation active (${activeClassName}) peuvent accéder à la page élève.` 
       };
     }
 
     setCurrentStudent(found);
-    setSelectedClassId(classId);
+    setSelectedClassId(activeEv.classId);
     try {
       sessionStorage.setItem(STORAGE_KEY_PREFIX + 'current_student_code', found.studentCode);
     } catch {
@@ -500,7 +527,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (urlMassar) {
           const clean = urlMassar.trim().toLowerCase();
           const found = students.find(s => s.studentCode.toLowerCase() === clean);
-          if (found) {
+          const activeEv = evaluations.find(e => e.status === 'active');
+          if (found && activeEv && found.classId === activeEv.classId) {
             setCurrentStudent(found);
             localStorage.setItem(STORAGE_KEY_PREFIX + 'current_student_code', found.studentCode);
           }
@@ -509,7 +537,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch {
       // ignore
     }
-  }, [students]);
+  }, [students, evaluations]);
+
+  // Ensure logged-in student belongs to the class of the currently active evaluation
+  useEffect(() => {
+    if (!currentStudent) return;
+    const activeEv = evaluations.find(e => e.status === 'active');
+    if (!activeEv || currentStudent.classId !== activeEv.classId) {
+      setCurrentStudent(null);
+    }
+  }, [currentStudent, evaluations]);
 
   // LocalStorage Persistence
   useEffect(() => {

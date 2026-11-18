@@ -39,8 +39,11 @@ export const StudentPortal: React.FC = () => {
   // Student's completed & pending attempts
   const studentAttempts = currentStudent ? attempts.filter(a => a.studentId === currentStudent.id) : [];
 
-  // Active tests available to take - always show all active evaluations!
-  const availableEvaluations = evaluations.filter(ev => ev.status === 'active');
+  // Active evaluation and available tests for this student's class
+  const activeEvaluation = evaluations.find(ev => ev.status === 'active');
+  const availableEvaluations = evaluations.filter(
+    ev => ev.status === 'active' && (!currentStudent || ev.classId === currentStudent.classId)
+  );
 
   // Start an evaluation
   const handleStartTest = (ev: Evaluation) => {
@@ -187,7 +190,7 @@ export const StudentPortal: React.FC = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  if (!currentStudent) {
+  if (!currentStudent || !activeEvaluation || currentStudent.classId !== activeEvaluation.classId) {
     return <StudentMassarLogin />;
   }
 

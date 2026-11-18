@@ -11,7 +11,7 @@ import { LocalNetworkQrModal } from './network/LocalNetworkQrModal';
 export const Header: React.FC = () => {
   const { 
     role, setRole, lang, setLang, isRtl, isOffline, setIsOffline, 
-    currentStudent, setCurrentStudent, students, resetToDefaults,
+    currentStudent, setCurrentStudent, students, evaluations, resetToDefaults,
     teacherLogout, studentLogout, serverConnected, lastSyncTime, 
     isSidebarCollapsed, toggleSidebar
   } = useApp();
@@ -19,6 +19,10 @@ export const Header: React.FC = () => {
   const [showStudentPicker, setShowStudentPicker] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const t = translations[lang];
+  const activeEvaluation = evaluations.find(ev => ev.status === 'active');
+  const activeClassStudents = activeEvaluation
+    ? students.filter(st => st.classId === activeEvaluation.classId)
+    : [];
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs no-print">
@@ -122,7 +126,7 @@ export const Header: React.FC = () => {
                       <div className="text-[11px] font-semibold text-slate-400 px-2 py-1">
                         {isRtl ? 'اختر رمز مسار (Code Massar) :' : 'Choisir un Code Massar :'}
                       </div>
-                      {students.map((st) => (
+                      {activeClassStudents.map((st) => (
                         <button
                           key={st.id}
                           onClick={() => {
