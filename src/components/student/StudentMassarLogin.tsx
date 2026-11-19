@@ -180,75 +180,40 @@ export const StudentMassarLogin: React.FC = () => {
 
         {/* Login Form */}
         <form onSubmit={handleLoginSubmit} className="space-y-5 max-w-lg mx-auto">
-          {/* STEP 1: Class Selection (Only the class with the active evaluation is unlocked) */}
-          <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-800 flex items-center justify-between">
-              <span className="flex items-center gap-1.5">
-                <School className="w-4 h-4 text-indigo-600" />
-                <span>1. {isRtl ? 'القسم المعني بالتقويم النشط :' : 'Classe avec évaluation active :'}</span>
-              </span>
-              <span className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wider">
-                {isRtl ? 'مقيد بالتقويم النشط' : 'Accès restreint'}
-              </span>
-            </label>
+          {/* STEP 1: Only display the class with the active evaluation */}
+          {activeClass && (
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-slate-800 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <School className="w-4 h-4 text-indigo-600" />
+                  <span>1. {isRtl ? 'القسم المعني بالتقويم النشط :' : 'Classe avec évaluation active :'}</span>
+                </span>
+                <span className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wider">
+                  {isRtl ? 'تقويم نشط' : 'Évaluation active'}
+                </span>
+              </label>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {classes.map((cls) => {
-                const isAuthorizedClass = activeClassId === cls.id;
-                const isSelected = chosenClassId === cls.id && isAuthorizedClass;
-                return (
-                  <button
-                    key={cls.id}
-                    type="button"
-                    onClick={() => {
-                      if (!isAuthorizedClass) {
-                        setErrorMsg(
-                          isRtl
-                            ? `رفض الولوج: القسم (${cls.name}) ليس لديه تقويم نشط حالياً. الولوج مقتصر على (${activeClass?.name || ''}).`
-                            : `Accès refusé : la classe « ${cls.name} » n'a pas d'évaluation active. Seuls les élèves de « ${activeClass?.name || 'la classe active'} » peuvent accéder.`
-                        );
-                        return;
-                      }
-                      setChosenClassId(cls.id);
-                      setSelectedClassId(cls.id);
-                      setErrorMsg(null);
-                    }}
-                    className={`p-3 rounded-2xl border text-left transition-all relative flex flex-col justify-between ${
-                      isSelected
-                        ? 'border-indigo-600 bg-indigo-50/80 ring-2 ring-indigo-500/20 shadow-xs cursor-pointer'
-                        : 'border-slate-200 bg-slate-100/70 opacity-60 cursor-not-allowed'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-1 mb-1">
-                      <span className={`text-xs font-extrabold ${isSelected ? 'text-indigo-900' : 'text-slate-500'}`}>
-                        {cls.name}
-                      </span>
-                      {isAuthorizedClass ? (
-                        <span className="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0">
-                          <Check className="w-3 h-3 stroke-[3]" />
-                        </span>
-                      ) : (
-                        <span className="w-4 h-4 rounded-full bg-slate-300 text-slate-600 flex items-center justify-center shrink-0">
-                          <Lock className="w-2.5 h-2.5" />
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-between text-[10px] text-slate-500">
-                      <span className="flex items-center gap-1">
-                        <Users className="w-3 h-3 text-slate-400" />
-                        <span>{cls.teacherName || 'Prof'}</span>
-                      </span>
-                      <span className={`font-bold ${isAuthorizedClass ? 'text-emerald-700' : 'text-slate-400'}`}>
-                        {isAuthorizedClass
-                          ? (isRtl ? 'تقويم نشط' : 'Éval. active')
-                          : (isRtl ? 'مغلق' : 'Verrouillé')}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+              <div className="p-3.5 rounded-2xl border border-indigo-600 bg-indigo-50/80 ring-2 ring-indigo-500/20 shadow-xs flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-extrabold text-indigo-900">
+                    {activeClass.name}
+                  </div>
+                  <div className="text-[11px] text-slate-600 flex items-center gap-1 mt-0.5">
+                    <Users className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>{activeClass.teacherName || 'Prof'}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    {isRtl ? 'تقويم نشط' : 'Éval. active'}
+                  </span>
+                  <span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0">
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* STEP 2: Mandatory Student Code Massar */}
           <div className="space-y-1.5 pt-1">

@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { translations } from '../locales/translations';
 import { 
   GraduationCap, Languages, Wifi, WifiOff, 
-  RotateCcw, ShieldCheck, ChevronDown, LogOut,
+  ShieldCheck, ChevronDown, LogOut,
   QrCode, PanelLeft, User
 } from 'lucide-react';
 import { LocalNetworkQrModal } from './network/LocalNetworkQrModal';
@@ -11,7 +11,7 @@ import { LocalNetworkQrModal } from './network/LocalNetworkQrModal';
 export const Header: React.FC = () => {
   const { 
     role, setRole, lang, setLang, isRtl, isOffline, setIsOffline, 
-    currentStudent, setCurrentStudent, students, evaluations, resetToDefaults,
+    currentStudent, setCurrentStudent, students, evaluations,
     teacherLogout, studentLogout, serverConnected, lastSyncTime, 
     isSidebarCollapsed, toggleSidebar
   } = useApp();
@@ -195,19 +195,6 @@ export const Header: React.FC = () => {
             >
               <Languages className="w-3.5 h-3.5 text-slate-500" />
               <span className="font-semibold">{lang === 'fr' ? 'العربية' : 'Français'}</span>
-            </button>
-
-            {/* Reset Demo Data Button */}
-            <button
-              onClick={() => {
-                if (window.confirm(isRtl ? 'هل تريد استعادة البيانات التجريبية الأصلية؟' : 'Voulez-vous réinitialiser les données de démonstration ?')) {
-                  resetToDefaults();
-                }
-              }}
-              className="p-2 rounded-lg border border-slate-200 hover:bg-rose-50 hover:text-rose-600 text-slate-400 transition"
-              title={t.common.resetDemo}
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
